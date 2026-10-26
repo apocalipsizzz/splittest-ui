@@ -1,8 +1,12 @@
 {
-  "name": "@splittest/ui",
-  "version": "0.0.0",
+  "name": "@de-kit/st-ui",
+  "version": "0.1.0",
   "description": "React-компоненты splittest: SCSS-модули и токены из основного фронтенда",
   "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apocalipsizzz/splittest-ui.git"
+  },
   "files": [
     "dist",
     "README.md"
@@ -32,7 +36,7 @@
     "./package.json": "./package.json"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "scripts": {
     "dev": "storybook dev -p 6007 --no-open",

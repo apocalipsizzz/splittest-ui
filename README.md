@@ -1,4 +1,4 @@
-# @splittest/ui
+# @de-kit/st-ui
 
 React-компоненты splittest. Стили — SCSS-модули, токены скопированы из `splittest-frontend/src/app/styles`. Tailwind нет.
 
@@ -7,7 +7,7 @@ React-компоненты splittest. Стили — SCSS-модули, токе
 В CRA (sass уже стоит):
 
 ```tsx
-import '@splittest/ui/global.scss';
+import '@de-kit/st-ui/global.scss';
 import {
   Button,
   Input,
@@ -15,7 +15,7 @@ import {
   CheckboxInput,
   RadioInput,
   Spinner,
-} from '@splittest/ui';
+} from '@de-kit/st-ui';
 ```
 
 `global.scss` — база приложения (body, заголовки, таблицы, `.wrapper`). В чужой странице его не подключать. Шрифт Inter библиотека не везёт, его по-прежнему грузит фронтенд.
@@ -23,8 +23,8 @@ import {
 Свои экраны могут брать те же переменные:
 
 ```scss
-@import '@splittest/ui/vars.scss';
-@import '@splittest/ui/mixins.scss';
+@import '@de-kit/st-ui/vars.scss';
+@import '@de-kit/st-ui/mixins.scss';
 ```
 
 Компонентный css собирает sass-loader приложения: js импортирует `*.module.scss`, классы хешируются на стороне хоста.

@@ -1,4 +1,4 @@
-# @splittest/ui
+# @de-kit/st-ui
 
 Библиотека для `splittest-frontend`. Не дизайн-система marketplace-ai и не Tailwind.
 
