@@ -1,0 +1,188 @@
+@import './vars.scss';
+
+@mixin btn-focus {
+  &:focus {
+    outline: initial;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 1px solid $colorBlack;
+    background: transparent;
+  }
+}
+
+@mixin reset-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+@mixin reset-btn {
+  padding: 0;
+  border: none;
+  background-color: transparent;
+}
+
+@mixin reset-input {
+  border: none;
+  background-color: transparent;
+}
+
+@mixin btn-min {
+  display: block;
+  width: fit-content;
+  height: 30px;
+  padding: 0 9px;
+  font-size: 14px;
+  font-weight: 700;
+  color: $colorWhite;
+  background-color: $colorBlue;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: $tr;
+
+  &:disabled {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+  }
+
+  &:active,
+  &:hover {
+    background-color: $colorBlack;
+  }
+}
+
+@mixin input-min {
+  height: 38px;
+  border-radius: $borderRadius;
+  border: 4px solid $colorWhite;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  padding: 0 15px;
+  font-size: 14px;
+  transition: $tr;
+  background-color: $colorWhite;
+  appearance: none;
+  outline: none;
+
+  &:hover,
+  &:focus {
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+  }
+
+  &--recommend {
+    background-color: rgba(#ffbf00, 0.1);
+
+    &:not([value='']) {
+      background-color: $colorWhite;
+    }
+  }
+
+  &:required {
+    background-color: rgba(#ff002a, 0.1);
+
+    &:valid {
+      background-color: $colorWhite;
+    }
+  }
+
+  &:disabled {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-color: $borderColor;
+    color: rgba($colorBlack, 0.5);
+    outline-offset: 0;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+
+    &:hover,
+    &:focus {
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &::-webkit-input-placeholder {
+    color: rgba($colorBlack, 0.5);
+  }
+
+  @media (max-width: $tabletWidth) {
+    font-size: 16px;
+  }
+}
+
+@mixin linkActiveElement {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  bottom: -2px;
+  left: 0;
+  display: block;
+  width: calc(100% - 1px);
+  height: 2px;
+  background-color: $colorBlack;
+}
+
+@mixin popupShow {
+  visibility: visible;
+  opacity: 1;
+  z-index: 12;
+}
+
+@mixin popupHide {
+  visibility: hidden;
+  opacity: 0;
+}
+
+@mixin popupStyle($maxWidth: 360px, $padding: 24px 30px) {
+  position: absolute;
+  z-index: 0;
+  max-width: $maxWidth;
+  padding: $padding;
+  box-shadow: $popupBoxShadow;
+  background: $colorWhite;
+  border-radius: 5px;
+  text-align: left;
+  color: $colorBlack;
+}
+
+@mixin buttonArea($width: 20px) {
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: -#{$width * 0.5};
+    left: -#{$width * 0.5};
+    width: calc(100% + #{$width});
+    height: calc(100% + #{$width});
+  }
+}
+
+@mixin h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  line-height: 20px;
+  font-weight: 900;
+
+  @media (min-width: $tabletWidth) {
+    margin-bottom: 15px;
+  }
+}
+
+@mixin imgWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $borderColor;
+  overflow: hidden;
+
+  img {
+    z-index: -1;
+    object-fit: contain;
+    margin-inline: auto;
+  }
+}

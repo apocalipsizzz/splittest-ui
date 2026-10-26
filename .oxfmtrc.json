@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 80,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": true,
+  "quoteProps": "consistent",
+  "arrowParens": "avoid",
+  "trailingComma": "all",
+  "ignorePatterns": ["dist", "storybook-static", "pnpm-lock.yaml"]
+}

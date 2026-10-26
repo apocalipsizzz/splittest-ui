@@ -1,0 +1,66 @@
+@import '../../styles/vars.scss';
+
+.input {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 9px 14px;
+  font-size: 14px;
+  line-height: 20px;
+  background-color: transparent;
+  color: $colorBlack;
+  border-radius: $borderRadius;
+  appearance: none;
+  font-family: $mainFontName;
+  border: 1px solid $borderInputColor;
+  outline: none;
+  transition:
+    background 0.3s,
+    border-color 0.3s,
+    box-shadow 0.2s;
+
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus,
+  &:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset;
+  }
+
+  &[type='number']::-webkit-outer-spin-button,
+  &[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &[type='number'] {
+    -moz-appearance: textfield;
+  }
+
+  &[type='date'] {
+    height: 40px;
+  }
+
+  &::-webkit-date-and-time-value {
+    text-align: left;
+  }
+
+  &:focus {
+    border-color: $colorBlack;
+    box-shadow: 0 0 0 1px $colorBlack;
+  }
+
+  &:disabled {
+    background-color: $colorGray;
+    color: $colorGrayIcon;
+    fill: $colorGrayIcon;
+  }
+
+  &--recommended {
+    background-color: $inputRecomendBg;
+  }
+
+  &--error {
+    border-color: $inputErrorBorder;
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "name": "@splittest/ui",
+  "version": "0.0.0",
+  "description": "React-компоненты splittest: SCSS-модули и токены из основного фронтенда",
+  "license": "UNLICENSED",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.scss",
+    "**/*.css"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./global.scss": "./dist/styles/global.scss",
+    "./vars.scss": "./dist/styles/vars.scss",
+    "./mixins.scss": "./dist/styles/mixins.scss",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "scripts": {
+    "dev": "storybook dev -p 6007 --no-open",
+    "build": "pnpm run build:js && pnpm run build:styles",
+    "build:js": "tsdown",
+    "build:styles": "node scripts/copy-styles.mjs",
+    "build:storybook": "storybook build -o storybook-static",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt --check",
+    "format:fix": "oxfmt",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check:exports": "publint && attw --pack . --exclude-entrypoints global.scss vars.scss mixins.scss",
+    "verify": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run build && pnpm run check:exports",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "pnpm run verify && changeset publish",
+    "prepack": "pnpm run build"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@changesets/cli": "^3.0.3",
+    "@storybook/addon-a11y": "^10.6.3",
+    "@storybook/addon-docs": "^10.6.3",
+    "@storybook/react-vite": "^10.6.3",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "jsdom": "^30.1.3",
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
+    "publint": "^0.3.25",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "sass": "^1.93.2",
+    "storybook": "^10.6.3",
+    "tsdown": "^0.23.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  },
+  "peerDependencies": {
+    "react": "^18.3.0 || ^19.0.0",
+    "react-dom": "^18.3.0 || ^19.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@11.15.1"
+}

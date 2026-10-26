@@ -1,0 +1,39 @@
+// Токены splittest. Источник: splittest-frontend/src/app/styles/vars.scss
+$colorBlack: #000;
+$colorWhite: #fff;
+
+$colorBlue: #002bff;
+$colorRed: #ff0000;
+$colorGreen: #00a66f;
+$colorYellow: #ffbf00;
+$colorGray: #e5e5e5;
+$colorGrayIcon: #727272;
+$colorGrayTwo: #808080;
+$colorOrange: #ff7f00;
+$colorBackground: #f7f7f7;
+
+$borderRadius: 5px;
+$borderRadiusBig: 10px;
+$borderColor: rgba($colorBlack, 0.1);
+$borderShadowTop: 0 -1px 0 0 $borderColor;
+$borderShadowBottom: 0 1px 0 0 $borderColor;
+$borderInputColor: #d9d9d9;
+$tr: all 0.3s ease;
+$trParam: 0.3s ease;
+$trBg: background-color 0.3s ease;
+$popupBoxShadow: 0px 10px 40px 0px rgba(0, 0, 0, 0.15);
+$bgColorSidebarBlock: rgba(0, 0, 0, 0.03);
+
+$inputRecomendBg: rgba(#ffbf00, 0.1);
+$inputRequiredBg: rgba(#ff0000, 0.1);
+$inputErrorBorder: rgba(#ff0000, 0.5);
+
+$desktopWidth: 1200px;
+$laptopWidth: 1000px;
+$tabletWidth: 680px;
+$mobileWidth: 576px;
+
+$mainFontName: 'Inter', sans-serif;
+$bodyFontSize: 14px;
+$mainBgColor: #fff;
+$mainIndexBgColor: #f0f1f5;

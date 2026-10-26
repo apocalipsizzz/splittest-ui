@@ -1,0 +1,108 @@
+@import '../../styles/vars.scss';
+
+.radio {
+  display: flex;
+  align-items: flex-start;
+}
+
+.label {
+  font-size: 14px;
+  line-height: 20px;
+  display: inline-block;
+  vertical-align: top;
+  padding-left: 5px;
+  user-select: none;
+  cursor: pointer;
+}
+
+.input {
+  --active: #000;
+  --active-inner: #fff;
+  --border: #e5e5e5;
+  --border-hover: #000;
+  --background: #fff;
+  --disabled: #e5e5e5;
+  --disabled-inner: #e5e5e5;
+  --disabled-after-inner: #727272;
+  box-sizing: border-box;
+  appearance: none;
+  width: 19px;
+  height: 19px;
+  outline: none;
+  display: inline-block;
+  vertical-align: top;
+  position: relative;
+  margin: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: 1px solid var(--bc, var(--border));
+  background: var(--b, var(--background));
+  border-radius: 50%;
+  transition:
+    background 0.3s,
+    border-color 0.3s,
+    box-shadow 0.2s;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    left: 50%;
+    top: 50%;
+    border-radius: 50%;
+    background: var(--active-inner);
+    position: absolute;
+    opacity: var(--o, 0);
+    transform: translate(-50%, -50%);
+    transition:
+      transform var(--d-t, 0.3s) var(--d-t-e, ease),
+      opacity var(--d-o, 0.2s);
+  }
+
+  &:checked {
+    --b: var(--active);
+    --bc: var(--active);
+    --o: 1;
+    --d-o: 0.3s;
+    --d-t: 0.6s;
+    --d-t-e: cubic-bezier(0.2, 0.85, 0.32, 1.2);
+  }
+
+  &:hover:not(:checked):not(:disabled) {
+    border-width: 2px;
+    --bc: var(--active);
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--border-hover);
+  }
+
+  &:focus {
+    border: 1px solid var(--border-hover);
+  }
+
+  &:disabled {
+    --b: var(--disabled);
+    cursor: not-allowed;
+    opacity: 1;
+
+    &:checked {
+      --b: var(--disabled-inner);
+      --bc: var(--border);
+
+      &::after {
+        background: var(--disabled-after-inner);
+      }
+    }
+
+    & + .label {
+      color: $colorGrayTwo;
+      cursor: not-allowed;
+    }
+  }
+
+  &.error {
+    border-color: $inputErrorBorder;
+  }
+}
