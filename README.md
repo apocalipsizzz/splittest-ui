@@ -35,20 +35,22 @@ import {
 
 ```tsx
 <Button onClick={save}>Сохранить</Button>
-<Button outline>Отмена</Button>
-<Button transparent disabled>Скрыть</Button>
+<Button variant="outline">Отмена</Button>
+<Button variant="link" disabled>Скрыть</Button>
 <Button href="/prices">Тарифы</Button>
+<Button size="sm">Маленькая</Button>
+<Button size="lg">Крупная</Button>
 <Button fullWidth>Дальше</Button>
 ```
 
-| Prop                                                       | По умолчанию |                                            |
-| ---------------------------------------------------------- | ------------ | ------------------------------------------ |
-| `transparent` / `outline` / `empty` / `link` / `nopadding` | `false`      | варианты из `index.module.scss` приложения |
-| `withIcon`                                                 | `true`       | как в приложении: левый паддинг под иконку |
-| `fullWidth`                                                | `false`      | `width: 100%`                              |
-| `href`                                                     | —            | рендер `<a>`, не `<Link>`                  |
+| Prop        | По умолчанию |                                                    |
+| ----------- | ------------ | -------------------------------------------------- |
+| `variant`   | `default`    | `default` заливка, `outline` обводка, `link` текст |
+| `size`      | `md`         | `sm` компактная, `md` обычная, `lg` крупная        |
+| `fullWidth` | `false`      | ширина 100%, не зависит от `size`                  |
+| `href`      | —            | рендер `<a>`, не `<Link>`                          |
 
-`link` — это `font-weight: 400`, не тип элемента.
+`variant="link"` — это вид кнопки (`font-weight: 400`), не тип элемента. Ссылка — отдельный проп `href`.
 
 ## Остальные
 

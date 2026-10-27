@@ -10,13 +10,13 @@ import {
 import { cn, when } from '../../lib/cn';
 import './button.scss';
 
+export type ButtonVariant = 'default' | 'outline' | 'link';
+export type ButtonSize = 'sm' | 'md' | 'lg';
+
 interface ButtonStyleProps {
-  outline?: boolean;
-  /** В приложении по умолчанию true: левый паддинг под иконку. */
-  withIcon?: boolean;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   fullWidth?: boolean;
-  /** Визуальный вес ссылки (font-weight: 400), не тип элемента. */
-  link?: boolean;
   className?: string;
   children?: ReactNode;
 }
@@ -35,29 +35,21 @@ export interface ButtonLinkProps
 
 export type ButtonComponentProps = ButtonProps | ButtonLinkProps;
 
-const styleKeys = [
-  'outline',
-  'withIcon',
-  'fullWidth',
-  'link',
-  'className',
-] as const;
+const styleKeys = ['variant', 'size', 'fullWidth', 'className'] as const;
 
 const getClassName = ({
-  withIcon = true,
-  outline,
-  className,
+  variant = 'default',
+  size = 'md',
   fullWidth = false,
-  link = false,
+  className,
   disabled,
 }: ButtonStyleProps & { disabled?: boolean }) =>
   cn(
     'button',
     className,
-    when(outline, 'button--outline'),
-    when(withIcon, 'button--with-icon'),
+    `button--${variant}`,
+    `button--${size}`,
     when(fullWidth, 'button--full-width'),
-    when(link, 'button--link'),
     when(disabled, 'button--disabled'),
   );
 

@@ -14,6 +14,18 @@ const meta = {
   component: Button,
   args: {
     children: 'Кнопка',
+    variant: 'default',
+    size: 'md',
+  },
+  argTypes: {
+    variant: {
+      control: 'inline-radio',
+      options: ['default', 'outline', 'link'],
+    },
+    size: {
+      control: 'inline-radio',
+      options: ['sm', 'md', 'lg'],
+    },
   },
 } satisfies Meta<typeof Button>;
 
@@ -26,8 +38,8 @@ export const Variants: Story = {
   render: () => (
     <div style={row}>
       <Button>Основная</Button>
-      <Button outline>Обводка</Button>
-      <Button link>Ссылка-текст</Button>
+      <Button variant="outline">Обводка</Button>
+      <Button variant="link">Ссылка-текст</Button>
       <Button href="https://example.com">Как ссылка</Button>
     </div>
   ),
@@ -41,14 +53,14 @@ export const States: Story = {
         <Button disabled>disabled</Button>
       </div>
       <div style={row}>
-        <Button outline>outline</Button>
-        <Button outline disabled>
+        <Button variant="outline">outline</Button>
+        <Button variant="outline" disabled>
           disabled
         </Button>
       </div>
       <div style={row}>
-        <Button link>link</Button>
-        <Button link disabled>
+        <Button variant="link">link</Button>
+        <Button variant="link" disabled>
           disabled
         </Button>
       </div>
@@ -56,12 +68,17 @@ export const States: Story = {
   ),
 };
 
-export const FullWidth: Story = {
+export const Sizes: Story = {
   render: () => (
     <div style={{ display: 'grid', gap: 12, width: 320 }}>
+      <div style={row}>
+        <Button size="sm">sm</Button>
+        <Button size="md">md</Button>
+        <Button size="lg">lg</Button>
+      </div>
       <Button fullWidth>На всю ширину</Button>
-      <Button fullWidth outline>
-        Отмена
+      <Button fullWidth size="lg" variant="outline">
+        lg outline
       </Button>
     </div>
   ),

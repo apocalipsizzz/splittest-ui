@@ -9,7 +9,7 @@ describe('Button', () => {
     render(<Button>Сохранить</Button>);
     const button = screen.getByRole('button', { name: 'Сохранить' });
     expect(button).toHaveAttribute('type', 'button');
-    expect(button).toHaveClass('button', 'button--with-icon');
+    expect(button).toHaveClass('button', 'button--default', 'button--md');
   });
 
   it('не перебивает type', () => {
@@ -37,15 +37,27 @@ describe('Button', () => {
     expect(link).toHaveClass('button');
   });
 
-  it('outline и fullWidth попадают в className', () => {
+  it('variant и size попадают в className', () => {
     render(
-      <Button outline fullWidth>
+      <Button variant="outline" size="sm">
         Ок
       </Button>,
     );
     expect(screen.getByRole('button')).toHaveClass(
       'button',
       'button--outline',
+      'button--sm',
+    );
+  });
+
+  it('fullWidth растягивает кнопку, размер остаётся своим', () => {
+    render(
+      <Button fullWidth size="lg">
+        Дальше
+      </Button>,
+    );
+    expect(screen.getByRole('button')).toHaveClass(
+      'button--lg',
       'button--full-width',
     );
   });

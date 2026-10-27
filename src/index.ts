@@ -5,6 +5,8 @@ export {
   type ButtonComponentProps,
   type ButtonLinkProps,
   type ButtonProps,
+  type ButtonSize,
+  type ButtonVariant,
 } from './components/button';
 export { CheckboxInput, type CheckboxInputProps } from './components/checkbox';
 export { Input, type InputProps } from './components/input';
