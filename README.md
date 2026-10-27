@@ -19,11 +19,10 @@ import {
 
 `global.scss` — база приложения (body, заголовки, таблицы, `.wrapper`). В чужой странице его не подключать. Шрифт Inter библиотека не везёт, его по-прежнему грузит фронтенд.
 
-Свои экраны могут брать те же токены. Это CSS-переменные, не Sass:
+Токены подключаются один раз вместе с пакетом (`import './styles/vars.scss'` в `src/index.ts`). В своих scss это обычные `var()`, `@use` не нужен. `@use '@de-kit/st-ui/vars.scss'` — только если стили собираются без JS. Миксины отдельно:
 
 ```scss
-@use '@de-kit/st-ui/vars.scss';
-@use '@de-kit/st-ui/mixins.scss';
+@use '@de-kit/st-ui/mixins.scss' as mixins;
 ```
 
 `var(--color-black)`, `var(--font-sans)`, `var(--radius-sm)`, `var(--breakpoint-md)`. Имена как у Tailwind, значения splittest.

@@ -1,5 +1,5 @@
 // База приложения. Шрифт Inter подключает хост — файлы лежат в splittest-frontend/src/app/fonts.
-@use './vars.scss';
+// Токены (`--color-*`) подключает вход пакета, этот файл их не эмитит.
 
 :root {
   --pink: #ff00ff;

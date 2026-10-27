@@ -1,3 +1,5 @@
+import './styles/vars.scss';
+
 export {
   Button,
   type ButtonComponentProps,
