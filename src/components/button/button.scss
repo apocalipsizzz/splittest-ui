@@ -92,13 +92,9 @@
     user-select: none;
   }
 
-  &--loading {
-    cursor: progress;
+  svg {
+    flex-shrink: 0;
   }
-}
-
-.button__icon {
-  flex-shrink: 0;
 }
 
 .button__icon--spin {

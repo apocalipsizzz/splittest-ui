@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { IconArrowLeft } from '../../icons/icon-arrow-left';
+import { IconArrowRight } from '../../icons/icon-arrow-right';
+import { IconSpinner } from '../../icons/icon-spinner';
 import { Button } from './button';
 
 const row = {
@@ -26,11 +29,6 @@ const meta = {
       control: 'inline-radio',
       options: ['sm', 'md', 'lg'],
     },
-    icon: {
-      control: 'inline-radio',
-      options: ['back', 'forward'],
-    },
-    loading: { control: 'boolean' },
   },
 } satisfies Meta<typeof Button>;
 
@@ -77,29 +75,44 @@ export const Icons: Story = {
   render: () => (
     <div style={{ display: 'grid', gap: 12 }}>
       <div style={row}>
-        <Button icon="back">Назад</Button>
-        <Button icon="forward">Дальше</Button>
-        <Button loading>Сохранение</Button>
-      </div>
-      <div style={row}>
-        <Button variant="outline" icon="back">
+        <Button>
+          <IconArrowLeft width={20} height={20} />
           Назад
         </Button>
-        <Button variant="outline" icon="forward">
+        <Button>
           Дальше
+          <IconArrowRight width={20} height={20} />
         </Button>
-        <Button variant="outline" loading>
+        <Button>
+          <IconSpinner className="button__icon--spin" width={20} height={20} />
+          Сохранение
+        </Button>
+      </div>
+      <div style={row}>
+        <Button variant="outline">
+          <IconArrowLeft width={20} height={20} />
+          Назад
+        </Button>
+        <Button variant="outline">
+          Дальше
+          <IconArrowRight width={20} height={20} />
+        </Button>
+        <Button variant="outline">
+          <IconSpinner className="button__icon--spin" width={20} height={20} />
           Загрузка
         </Button>
       </div>
       <div style={row}>
-        <Button variant="link" icon="back">
+        <Button variant="link">
+          <IconArrowLeft width={20} height={20} />
           Назад
         </Button>
-        <Button variant="link" icon="forward">
+        <Button variant="link">
           Дальше
+          <IconArrowRight width={20} height={20} />
         </Button>
-        <Button variant="link" loading>
+        <Button variant="link">
+          <IconSpinner className="button__icon--spin" width={20} height={20} />
           Загрузка
         </Button>
       </div>

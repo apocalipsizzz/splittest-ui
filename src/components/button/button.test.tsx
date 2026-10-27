@@ -9,7 +9,8 @@ describe('Button', () => {
     render(<Button>Сохранить</Button>);
     const button = screen.getByRole('button', { name: 'Сохранить' });
     expect(button).toHaveAttribute('type', 'button');
-    expect(button).toHaveClass('button', 'button--default', 'button--md');
+    expect(button).toHaveClass('button');
+    expect(button).not.toHaveClass('button--default', 'button--md');
   });
 
   it('не перебивает type', () => {
@@ -50,38 +51,17 @@ describe('Button', () => {
     );
   });
 
-  it('icon back ставит стрелку 20px перед текстом', () => {
-    render(<Button icon="back">Назад</Button>);
-    const button = screen.getByRole('button', { name: 'Назад' });
-    const svg = button.querySelector('svg');
-
-    expect(button.firstElementChild).toBe(svg);
-    expect(svg).toHaveAttribute('width', '20');
-    expect(svg).toHaveAttribute('aria-hidden', 'true');
-  });
-
-  it('icon forward ставит стрелку после текста', () => {
-    render(<Button icon="forward">Дальше</Button>);
-    const button = screen.getByRole('button', { name: 'Дальше' });
-
-    expect(button.lastElementChild?.tagName).toBe('svg');
-  });
-
-  it('loading крутит спиннер и не вызывает onClick', async () => {
-    const onClick = vi.fn<() => void>();
+  it('children остаются в том порядке, как переданы', () => {
     render(
-      <Button loading onClick={onClick}>
-        Сохранение
+      <Button>
+        <span>Назад</span>
+        <span>иконка</span>
       </Button>,
     );
-    const button = screen.getByRole('button', { name: 'Сохранение' });
+    const button = screen.getByRole('button');
 
-    expect(button).toHaveAttribute('aria-busy', 'true');
-    expect(button).toHaveClass('button--loading');
-    expect(button.querySelector('.button__icon--spin')).not.toBeNull();
-
-    await userEvent.click(button);
-    expect(onClick).not.toHaveBeenCalled();
+    expect(button.textContent).toBe('Назадиконка');
+    expect(button.children).toHaveLength(2);
   });
 
   it('fullWidth растягивает кнопку, размер остаётся своим', () => {

@@ -7,22 +7,16 @@ import {
   type Ref,
 } from 'react';
 
-import { IconArrowLeft } from '../../icons/icon-arrow-left';
-import { IconArrowRight } from '../../icons/icon-arrow-right';
-import { IconSpinner } from '../../icons/icon-spinner';
 import { cn, when } from '../../lib/cn';
 import './button.scss';
 
 export type ButtonVariant = 'default' | 'outline' | 'link';
 export type ButtonSize = 'sm' | 'md' | 'lg';
-export type ButtonIcon = 'back' | 'forward';
 
 interface ButtonStyleProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   fullWidth?: boolean;
-  icon?: ButtonIcon;
-  loading?: boolean;
   className?: string;
   children?: ReactNode;
 }
@@ -41,66 +35,23 @@ export interface ButtonLinkProps
 
 export type ButtonComponentProps = ButtonProps | ButtonLinkProps;
 
-const styleKeys = [
-  'variant',
-  'size',
-  'fullWidth',
-  'icon',
-  'loading',
-  'className',
-] as const;
-
-const iconSize = {
-  sm: 16,
-  md: 20,
-  lg: 24,
-} as const;
+const styleKeys = ['variant', 'size', 'fullWidth', 'className'] as const;
 
 const getClassName = ({
   variant = 'default',
   size = 'md',
   fullWidth = false,
-  loading = false,
   className,
   disabled,
 }: ButtonStyleProps & { disabled?: boolean }) =>
   cn(
     'button',
     className,
-    `button--${variant}`,
-    `button--${size}`,
+    when(variant !== 'default', `button--${variant}`),
+    when(size !== 'md', `button--${size}`),
     when(fullWidth, 'button--full-width'),
     when(disabled, 'button--disabled'),
-    when(loading, 'button--loading'),
   );
-
-const renderGlyph = (
-  icon: ButtonIcon | undefined,
-  loading: boolean | undefined,
-  size: ButtonSize,
-) => {
-  const px = iconSize[size];
-
-  if (loading) {
-    return (
-      <IconSpinner
-        className="button__icon button__icon--spin"
-        width={px}
-        height={px}
-      />
-    );
-  }
-
-  if (icon === 'back') {
-    return <IconArrowLeft className="button__icon" width={px} height={px} />;
-  }
-
-  if (icon === 'forward') {
-    return <IconArrowRight className="button__icon" width={px} height={px} />;
-  }
-
-  return null;
-};
 
 const omitStyleProps = <T extends ButtonStyleProps>(
   props: T,
@@ -119,43 +70,18 @@ export const Button = forwardRef<
   HTMLButtonElement | HTMLAnchorElement,
   ButtonComponentProps
 >(function Button(props, ref) {
-  const size = props.size ?? 'md';
-  const { icon, loading } = props;
   const className = getClassName(props);
   const { children, href, ...domProps } = omitStyleProps(props);
-  const glyph = renderGlyph(icon, loading, size);
-  const before = icon !== 'forward';
-  const content = (
-    <>
-      {before ? glyph : null}
-      {children}
-      {before ? null : glyph}
-    </>
-  );
 
   if (typeof href === 'string') {
-    const { onClick, ...anchorProps } =
-      domProps as AnchorHTMLAttributes<HTMLAnchorElement>;
-
-    const handleClick: MouseEventHandler<HTMLAnchorElement> = event => {
-      if (loading) {
-        event.preventDefault();
-        return;
-      }
-      onClick?.(event);
-    };
-
     return (
       <a
         ref={ref as Ref<HTMLAnchorElement>}
         href={href}
         className={className}
-        {...anchorProps}
-        aria-busy={loading || undefined}
-        aria-disabled={loading || undefined}
-        onClick={handleClick}
+        {...(domProps as AnchorHTMLAttributes<HTMLAnchorElement>)}
       >
-        {content}
+        {children}
       </a>
     );
   }
@@ -168,7 +94,7 @@ export const Button = forwardRef<
   } = domProps as ButtonHTMLAttributes<HTMLButtonElement>;
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = event => {
-    if (disabled || loading) return;
+    if (disabled) return;
     onClick?.(event);
   };
 
@@ -178,11 +104,10 @@ export const Button = forwardRef<
       className={className}
       type={type}
       disabled={disabled}
-      {...buttonProps}
-      aria-busy={loading || undefined}
       onClick={handleClick}
+      {...buttonProps}
     >
-      {content}
+      {children}
     </button>
   );
 });
