@@ -6,7 +6,10 @@ import { TextArea } from './textarea';
 describe('TextArea', () => {
   it('показывает счётчик, если задан maxLength', () => {
     render(<TextArea maxLength={40} />);
-    expect(screen.getByText('Максимум 40 символов')).toBeInTheDocument();
+    expect(screen.getByRole('textbox')).toHaveClass('textarea');
+    expect(screen.getByText('Максимум 40 символов')).toHaveClass(
+      'textarea__counter',
+    );
   });
 
   it('hideCounter прячет счётчик', () => {

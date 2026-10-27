@@ -26,14 +26,14 @@ const pushClass = (classes: string[], value: ClassValue): void => {
   }
 };
 
-/** Склейка классов. Без tailwind-merge: в модулях класс один, конфликт решает последний в списке. */
+/** Склейка классов. Без tailwind-merge: одноимённые правила решает специфичность. */
 export const cn = (...inputs: ClassValue[]): string => {
   const classes: string[] = [];
   inputs.forEach(input => pushClass(classes, input));
   return classes.join(' ');
 };
 
-/** Класс из CSS-модуля. Индекс `*.scss` под `noUncheckedIndexedAccess` — `string | undefined`. */
+/** Условный класс. Пустая строка и `undefined` в `cn` не попадают. */
 export const when = (
   enabled: boolean | undefined,
   className: string | undefined,

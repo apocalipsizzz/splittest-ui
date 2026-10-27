@@ -6,7 +6,11 @@ import { CheckboxInput } from './checkbox';
 describe('CheckboxInput', () => {
   it('связывает label с input и меняет дефис на тире', () => {
     render(<CheckboxInput title="18-24" />);
-    expect(screen.getByLabelText('18–24')).toHaveAttribute('type', 'checkbox');
+    const input = screen.getByLabelText('18–24');
+    expect(input).toHaveAttribute('type', 'checkbox');
+    expect(input).toHaveClass('checkbox__input');
+    expect(input.parentElement).toHaveClass('checkbox');
+    expect(screen.getByText('18–24')).toHaveClass('checkbox__label');
   });
 
   it('disabled выключает input', () => {

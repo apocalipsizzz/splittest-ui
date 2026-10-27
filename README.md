@@ -1,13 +1,12 @@
 # @de-kit/st-ui
 
-React-компоненты splittest. Стили — SCSS-модули, токены скопированы из `splittest-frontend/src/app/styles`. Tailwind нет.
+React-компоненты splittest. Стили едут вместе с компонентом (глобальный SCSS, не CSS-модули). Токены скопированы из `splittest-frontend/src/app/styles`. Tailwind нет.
 
 ## Подключение
 
-В CRA (sass уже стоит):
+В CRA и в Vite отдельный импорт CSS не нужен — `import './button.scss'` сидит внутри компонента:
 
 ```tsx
-import '@de-kit/st-ui/global.scss';
 import {
   Button,
   Input,
@@ -20,14 +19,16 @@ import {
 
 `global.scss` — база приложения (body, заголовки, таблицы, `.wrapper`). В чужой странице его не подключать. Шрифт Inter библиотека не везёт, его по-прежнему грузит фронтенд.
 
-Свои экраны могут брать те же переменные:
+Свои экраны могут брать те же токены. Это CSS-переменные, не Sass:
 
 ```scss
-@import '@de-kit/st-ui/vars.scss';
-@import '@de-kit/st-ui/mixins.scss';
+@use '@de-kit/st-ui/vars.scss';
+@use '@de-kit/st-ui/mixins.scss';
 ```
 
-Компонентный css собирает sass-loader приложения: js импортирует `*.module.scss`, классы хешируются на стороне хоста.
+`var(--color-black)`, `var(--font-sans)`, `var(--radius-sm)`, `var(--breakpoint-md)`. Имена как у Tailwind, значения splittest.
+
+Компонентный scss собирает sass хоста. Класс в DOM буквальный: `button`, `input`, `checkbox`, `radio`, `textarea`, `spinner`. Корень и модификаторы одинарные (`.button`, `.button--outline`). Внутренние элементы — BEM: `checkbox__input`, `textarea__counter`.
 
 ## Кнопка
 
@@ -70,5 +71,5 @@ import {
 pnpm install
 pnpm dev       # Storybook, :6006
 pnpm test
-pnpm build     # dist: js + d.ts + scss рядом с модулями
+pnpm build     # dist: js + d.ts + scss рядом с компонентами
 ```

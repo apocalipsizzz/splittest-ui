@@ -8,7 +8,7 @@ import {
 } from 'react';
 
 import { cn, when } from '../../lib/cn';
-import styles from './button.module.scss';
+import './button.scss';
 
 interface ButtonStyleProps {
   outline?: boolean;
@@ -52,13 +52,13 @@ const getClassName = ({
   disabled,
 }: ButtonStyleProps & { disabled?: boolean }) =>
   cn(
-    styles.button,
+    'button',
     className,
-    when(outline, styles.outline),
-    when(withIcon, styles.withIcon),
-    when(fullWidth, styles.fullWidth),
-    when(link, styles.link),
-    when(disabled, styles.disabled),
+    when(outline, 'button--outline'),
+    when(withIcon, 'button--with-icon'),
+    when(fullWidth, 'button--full-width'),
+    when(link, 'button--link'),
+    when(disabled, 'button--disabled'),
   );
 
 const omitStyleProps = <T extends ButtonStyleProps>(

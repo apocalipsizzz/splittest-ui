@@ -1,4 +1,4 @@
-@import '../../styles/vars.scss';
+@use '../../styles/vars.scss';
 
 .input {
   box-sizing: border-box;
@@ -9,11 +9,11 @@
   font-size: 14px;
   line-height: 20px;
   background-color: transparent;
-  color: $colorBlack;
-  border-radius: $borderRadius;
+  color: var(--color-black);
+  border-radius: var(--radius-sm);
   appearance: none;
-  font-family: $mainFontName;
-  border: 1px solid $borderInputColor;
+  font-family: var(--font-sans);
+  border: 1px solid var(--color-input);
   outline: none;
   transition:
     background 0.3s,
@@ -46,21 +46,21 @@
   }
 
   &:focus {
-    border-color: $colorBlack;
-    box-shadow: 0 0 0 1px $colorBlack;
+    border-color: var(--color-black);
+    box-shadow: 0 0 0 1px var(--color-black);
   }
 
   &:disabled {
-    background-color: $colorGray;
-    color: $colorGrayIcon;
-    fill: $colorGrayIcon;
+    background-color: var(--color-neutral-200);
+    color: var(--color-neutral-500);
+    fill: var(--color-neutral-500);
   }
 
   &--recommended {
-    background-color: $inputRecomendBg;
+    background-color: color-mix(in srgb, var(--color-yellow) 10%, transparent);
   }
 
   &--error {
-    border-color: $inputErrorBorder;
+    border-color: color-mix(in srgb, var(--color-red) 50%, transparent);
   }
 }

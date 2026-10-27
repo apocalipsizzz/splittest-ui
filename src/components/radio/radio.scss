@@ -1,11 +1,6 @@
-@import '../../styles/vars.scss';
+@use '../../styles/vars.scss';
 
-.radio {
-  display: flex;
-  align-items: flex-start;
-}
-
-.label {
+.radio__label {
   font-size: 14px;
   line-height: 20px;
   display: inline-block;
@@ -15,7 +10,7 @@
   cursor: pointer;
 }
 
-.input {
+.radio__input {
   --active: #000;
   --active-inner: #fff;
   --border: #e5e5e5;
@@ -96,13 +91,21 @@
       }
     }
 
-    & + .label {
-      color: $colorGrayTwo;
+    & + .radio__label {
+      color: var(--color-gray);
       cursor: not-allowed;
     }
   }
+}
 
-  &.error {
-    border-color: $inputErrorBorder;
+// Модификатор ошибки после .radio__input: иначе shorthand border затрёт border-color.
+.radio {
+  display: flex;
+  align-items: flex-start;
+
+  &--error {
+    .radio__input {
+      border-color: color-mix(in srgb, var(--color-red) 50%, transparent);
+    }
   }
 }

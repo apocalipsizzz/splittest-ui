@@ -1,7 +1,7 @@
 import { forwardRef, useId, type InputHTMLAttributes } from 'react';
 
 import { cn, when } from '../../lib/cn';
-import styles from './radio.module.scss';
+import './radio.scss';
 
 export interface RadioInputProps extends InputHTMLAttributes<HTMLInputElement> {
   title?: string;
@@ -17,17 +17,17 @@ export const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
     const inputId = id ?? autoId;
 
     return (
-      <div className={cn(styles.radio, className)}>
+      <div className={cn('radio', className, when(error, 'radio--error'))}>
         <input
           ref={ref}
           type="radio"
           id={inputId}
           disabled={disabled}
-          className={cn(styles.input, when(error, styles.error))}
+          className="radio__input"
           {...props}
         />
         {title ? (
-          <label className={styles.label} htmlFor={inputId}>
+          <label className="radio__label" htmlFor={inputId}>
             {title}
           </label>
         ) : null}

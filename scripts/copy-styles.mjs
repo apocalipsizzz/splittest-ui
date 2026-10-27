@@ -1,8 +1,8 @@
 /**
  * tsdown собирает только js. scss копируем рядом с ним, чтобы
- * `import styles from './button.module.scss'` в dist резолвился у консьюмера
- * (CRA + sass-loader), а `@import '../../styles/vars.scss'` внутри модуля
- * находил токены.
+ * `import './button.scss'` в dist резолвился у консьюмера
+ * (CRA + sass-loader / Vite), а `@use '../../styles/vars.scss'` внутри
+ * подтягивал CSS-переменные.
  */
 import { cpSync, mkdirSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';

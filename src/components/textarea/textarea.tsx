@@ -1,7 +1,7 @@
 import { forwardRef, type TextareaHTMLAttributes } from 'react';
 
 import { cn, when } from '../../lib/cn';
-import styles from './textarea.module.scss';
+import './textarea.scss';
 
 export interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   recommended?: boolean;
@@ -24,14 +24,14 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     ref,
   ) {
     return (
-      <div className={styles.wrap}>
+      <div className="textarea__wrap">
         <textarea
           ref={ref}
           className={cn(
-            styles.textarea,
+            'textarea',
             className,
-            when(recommended, styles['textarea--recommended']),
-            when(error, styles['textarea--error']),
+            when(recommended, 'textarea--recommended'),
+            when(error, 'textarea--error'),
           )}
           value={value}
           maxLength={maxLength}
@@ -39,7 +39,9 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           {...props}
         />
         {maxLength && !hideCounter ? (
-          <span className={styles.counter}>Максимум {maxLength} символов</span>
+          <span className="textarea__counter">
+            Максимум {maxLength} символов
+          </span>
         ) : null}
       </div>
     );

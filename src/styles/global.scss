@@ -1,5 +1,5 @@
 // База приложения. Шрифт Inter подключает хост — файлы лежат в splittest-frontend/src/app/fonts.
-@import './vars.scss';
+@use './vars.scss';
 
 :root {
   --pink: #ff00ff;
@@ -7,7 +7,7 @@
   --window-max-height: 100vh;
   --wrapper-padding: 20px;
 
-  @media (min-width: $tabletWidth) {
+  @media (min-width: 680px) {
     --wrapper-padding: 30px;
   }
 }
@@ -32,19 +32,19 @@ body {
   display: flex;
   flex-direction: column;
   margin: 0;
-  font-family: $mainFontName;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: $colorBlack;
-  background-color: $mainBgColor;
-  font-size: $bodyFontSize;
+  color: var(--color-black);
+  background-color: var(--color-white);
+  font-size: var(--text-sm);
   line-height: 20px;
   font-weight: 400;
 
   &::after {
     content: '';
     display: block;
-    background-color: rgba($colorBlack, 0.3);
+    background-color: color-mix(in srgb, var(--color-black) 30%, transparent);
     position: fixed;
     left: 0;
     top: 0;
@@ -91,11 +91,11 @@ body {
   padding-left: var(--wrapper-padding);
   padding-right: var(--wrapper-padding);
 
-  @media (min-width: $tabletWidth) {
+  @media (min-width: 680px) {
     max-width: 680px;
   }
 
-  @media (min-width: $laptopWidth) {
+  @media (min-width: 1000px) {
     max-width: 1000px;
   }
 }
@@ -115,13 +115,13 @@ body {
 a {
   text-decoration: none;
   transition: color 0.3s ease;
-  color: $colorBlack;
+  color: var(--color-black);
 }
 
 button {
-  color: $colorBlack;
-  font-size: $bodyFontSize;
-  font-family: $mainFontName;
+  color: var(--color-black);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
 
   &:not(:disabled) {
     cursor: pointer;
@@ -144,16 +144,16 @@ table {
 
   td {
     word-break: break-word;
-    border-top: 1px solid $borderColor;
+    border-top: 1px solid var(--color-border);
     padding: 15px 0;
   }
 
   tr:last-of-type td {
-    border-bottom: 1px solid $borderColor;
+    border-bottom: 1px solid var(--color-border);
   }
 
   th {
-    color: rgba($colorBlack, 0.5);
+    color: color-mix(in srgb, var(--color-black) 50%, transparent);
     font-size: 11px;
     line-height: 15px;
     text-align: left;
@@ -173,7 +173,7 @@ h1 {
   font-size: 28px;
   line-height: 30px;
 
-  @media (min-width: $tabletWidth) {
+  @media (min-width: 680px) {
     font-size: 45px;
     line-height: 50px;
   }

@@ -1,7 +1,7 @@
 import type { FC, SVGProps } from 'react';
 
 import { cn, when } from '../../lib/cn';
-import styles from './spinner.module.scss';
+import './spinner.scss';
 
 const spinnerPosition = {
   top: 'top',
@@ -56,9 +56,9 @@ export const Spinner: FC<SpinnerProps> = ({
 }) => (
   <div
     className={cn(
-      styles.spinner,
+      'spinner',
       className,
-      when(position === spinnerPosition.top, styles.top),
+      when(position === spinnerPosition.top, 'spinner--top'),
     )}
   >
     <svg {...svgProps}>

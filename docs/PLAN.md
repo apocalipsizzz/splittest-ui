@@ -5,10 +5,10 @@
 ## Стек
 
 - React 18/19, peer.
-- Стили: `src/styles/vars.scss` и `mixins.scss` — копия `splittest-frontend/src/app/styles`.
-- Компонент = `tsx` + `*.module.scss`. Класс снаружи через `className`, склейка в `src/lib/cn.ts`.
-- Сборщик js — tsdown (`unbundle`, чтобы импорт `./button.module.scss` остался относительным). `scripts/copy-styles.mjs` кладёт scss в `dist` с той же структурой.
-- Sass компилирует хост (CRA уже с `sass`). Готовый css библиотека не эмитит: sass-переменные раскрываются у потребителя.
+- Стили: CSS-переменные в `src/styles/vars.scss` (`--color-black`, `--font-sans`, `--radius-sm`). Имена как у Tailwind, значения splittest. `mixins.scss` ссылается на них.
+- Компонент = `tsx` + `*.scss` (side-effect импорт, без CSS-модулей). Класс снаружи через `className`, склейка в `src/lib/cn.ts`. Корень и модификаторы одинарные (`.button`, `.button--outline`), внутренние элементы — `checkbox__label`.
+- Сборщик js — tsdown (`unbundle`, `neverBundle: /\.scss$/`, импорт `./button.scss` остаётся относительным). `scripts/copy-styles.mjs` кладёт scss в `dist` с той же структурой.
+- Sass компилирует хост (CRA уже с `sass`). Готовый css библиотека не эмитит: в браузер уезжают custom properties.
 - `global.scss` опционален. Это база из `src/app/styles/index.scss` без `@font-face`.
 
 ## Что уже есть
@@ -18,9 +18,9 @@
 Визуал снят с `src/shared/components/*`. Отличия от приложения:
 
 - `Button` не зависит от `react-router`. Ссылка — проп `href` → `<a>`.
-- Чекбокс и радио не красят все `input[type]` на странице: селекторы заперты в модуле.
+- Чекбокс и радио не красят все `input[type]` на странице: селекторы на `checkbox__input` / `radio__input`.
 - `TextArea`: `hideCounter` вместо `noMaxMoty`.
-- `Input` / `TextArea`: проп `recommended` красит фон в `$inputRecomendBg`. В модуле приложения класс вешался, правила не было.
+- `Input` / `TextArea`: проп `recommended` красит фон в `color-mix` от `--color-yellow`. В модуле приложения класс вешался, правила не было.
 
 ## Дальше, когда понадобятся
 

@@ -1,7 +1,7 @@
 import { forwardRef, useId, type InputHTMLAttributes } from 'react';
 
 import { cn, when } from '../../lib/cn';
-import styles from './checkbox.module.scss';
+import './checkbox.scss';
 
 export interface CheckboxInputProps extends InputHTMLAttributes<HTMLInputElement> {
   title?: string;
@@ -18,17 +18,20 @@ export const CheckboxInput = forwardRef<HTMLInputElement, CheckboxInputProps>(
     const inputId = id ?? autoId;
 
     return (
-      <div className={cn(styles.checkbox, className, when(hide, styles.hide))}>
+      <div className={cn('checkbox', className, when(hide, 'checkbox--hide'))}>
         <input
           ref={ref}
           type="checkbox"
           id={inputId}
           disabled={disabled}
-          className={cn(styles.input, when(!withCursor, styles.noEvents))}
+          className={cn(
+            'checkbox__input',
+            when(!withCursor, 'checkbox__input--no-events'),
+          )}
           {...props}
         />
         {title ? (
-          <label className={styles.label} htmlFor={inputId}>
+          <label className="checkbox__label" htmlFor={inputId}>
             {title.replaceAll('-', '–')}
           </label>
         ) : null}

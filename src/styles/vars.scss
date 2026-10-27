@@ -1,39 +1,36 @@
-// Токены splittest. Источник: splittest-frontend/src/app/styles/vars.scss
-$colorBlack: #000;
-$colorWhite: #fff;
+// Токены splittest. Имена как у Tailwind, значения свои — не дефолтная шкала.
+// В @media custom properties нельзя: там те же px, что у --breakpoint-*.
+:root {
+  --color-black: #000;
+  --color-white: #fff;
+  --color-blue: #002bff;
+  --color-red: #ff0000;
+  --color-green: #00a66f;
+  --color-yellow: #ffbf00;
+  --color-orange: #ff7f00;
+  --color-gray: #808080;
+  --color-neutral-100: #f7f7f7;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-500: #727272;
+  --color-input: #d9d9d9;
+  --color-border: color-mix(in srgb, var(--color-black) 10%, transparent);
+  --color-sidebar: color-mix(in srgb, var(--color-black) 3%, transparent);
 
-$colorBlue: #002bff;
-$colorRed: #ff0000;
-$colorGreen: #00a66f;
-$colorYellow: #ffbf00;
-$colorGray: #e5e5e5;
-$colorGrayIcon: #727272;
-$colorGrayTwo: #808080;
-$colorOrange: #ff7f00;
-$colorBackground: #f7f7f7;
+  --radius-sm: 5px;
+  --radius-lg: 10px;
 
-$borderRadius: 5px;
-$borderRadiusBig: 10px;
-$borderColor: rgba($colorBlack, 0.1);
-$borderShadowTop: 0 -1px 0 0 $borderColor;
-$borderShadowBottom: 0 1px 0 0 $borderColor;
-$borderInputColor: #d9d9d9;
-$tr: all 0.3s ease;
-$trParam: 0.3s ease;
-$trBg: background-color 0.3s ease;
-$popupBoxShadow: 0px 10px 40px 0px rgba(0, 0, 0, 0.15);
-$bgColorSidebarBlock: rgba(0, 0, 0, 0.03);
+  --font-sans: 'Inter', sans-serif;
+  --text-sm: 14px;
 
-$inputRecomendBg: rgba(#ffbf00, 0.1);
-$inputRequiredBg: rgba(#ff0000, 0.1);
-$inputErrorBorder: rgba(#ff0000, 0.5);
+  --shadow-xl: 0 10px 40px 0 rgb(0 0 0 / 0.15);
+  --shadow-t: 0 -1px 0 0 var(--color-border);
+  --shadow-b: 0 1px 0 0 var(--color-border);
 
-$desktopWidth: 1200px;
-$laptopWidth: 1000px;
-$tabletWidth: 680px;
-$mobileWidth: 576px;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 680px;
+  --breakpoint-lg: 1000px;
+  --breakpoint-xl: 1200px;
 
-$mainFontName: 'Inter', sans-serif;
-$bodyFontSize: 14px;
-$mainBgColor: #fff;
-$mainIndexBgColor: #f0f1f5;
+  --default-transition-duration: 0.3s;
+  --default-transition-timing-function: ease;
+}

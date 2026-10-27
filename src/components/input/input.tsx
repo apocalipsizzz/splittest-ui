@@ -1,7 +1,7 @@
 import { forwardRef, type InputHTMLAttributes } from 'react';
 
 import { cn, when } from '../../lib/cn';
-import styles from './input.module.scss';
+import './input.scss';
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   recommended?: boolean;
@@ -19,10 +19,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       disabled={disabled}
       aria-invalid={error || undefined}
       className={cn(
-        styles.input,
+        'input',
         className,
-        when(recommended, styles['input--recommended']),
-        when(error, styles['input--error']),
+        when(recommended, 'input--recommended'),
+        when(error, 'input--error'),
       )}
       {...props}
     />
