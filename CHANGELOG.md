@@ -1,5 +1,11 @@
 # @de-kit/st-ui
 
+## 0.1.4
+
+### Patch Changes
+
+- `Button` больше не вешает `button--default` и `button--md`: это базовые стили `.button`. Модификаторы остаются только у `outline`, `link`, `sm`, `lg`, `full-width` и `disabled`. Иконка передаётся в `children` с любой стороны и из любого набора. `fill` кнопок стал `currentColor`, иконка красится вместе с текстом. Класс `button__icon--spin` крутит спиннер внутри кнопки; при `prefers-reduced-motion` анимация выключена. Горизонтальный паддинг обычной кнопки — 20px.
+
 ## 0.1.3
 
 ### Patch Changes
