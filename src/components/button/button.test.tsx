@@ -50,6 +50,40 @@ describe('Button', () => {
     );
   });
 
+  it('icon back ставит стрелку 20px перед текстом', () => {
+    render(<Button icon="back">Назад</Button>);
+    const button = screen.getByRole('button', { name: 'Назад' });
+    const svg = button.querySelector('svg');
+
+    expect(button.firstElementChild).toBe(svg);
+    expect(svg).toHaveAttribute('width', '20');
+    expect(svg).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('icon forward ставит стрелку после текста', () => {
+    render(<Button icon="forward">Дальше</Button>);
+    const button = screen.getByRole('button', { name: 'Дальше' });
+
+    expect(button.lastElementChild?.tagName).toBe('svg');
+  });
+
+  it('loading крутит спиннер и не вызывает onClick', async () => {
+    const onClick = vi.fn<() => void>();
+    render(
+      <Button loading onClick={onClick}>
+        Сохранение
+      </Button>,
+    );
+    const button = screen.getByRole('button', { name: 'Сохранение' });
+
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    expect(button).toHaveClass('button--loading');
+    expect(button.querySelector('.button__icon--spin')).not.toBeNull();
+
+    await userEvent.click(button);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
   it('fullWidth растягивает кнопку, размер остаётся своим', () => {
     render(
       <Button fullWidth size="lg">

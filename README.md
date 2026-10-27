@@ -52,6 +52,9 @@ import { IconClose, LogoVisa } from '@de-kit/st-ui/icons';
 <Button size="sm">Маленькая</Button>
 <Button size="lg">Крупная</Button>
 <Button fullWidth>Дальше</Button>
+<Button icon="back">Назад</Button>
+<Button icon="forward">Дальше</Button>
+<Button loading>Сохранение</Button>
 ```
 
 | Prop        | По умолчанию |                                                    |
@@ -60,6 +63,8 @@ import { IconClose, LogoVisa } from '@de-kit/st-ui/icons';
 | `size`      | `md`         | `sm` компактная, `md` обычная, `lg` крупная        |
 | `fullWidth` | `false`      | ширина 100%, не зависит от `size`                  |
 | `href`      | —            | рендер `<a>`, не `<Link>`                          |
+| `icon`      | —            | `back` стрелка слева, `forward` справа             |
+| `loading`   | `false`      | спиннер на месте стрелки, клик не проходит         |
 
 `variant="link"` — это вид кнопки (`font-weight: 400`), не тип элемента. Ссылка — отдельный проп `href`.
 

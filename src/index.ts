@@ -3,6 +3,7 @@ import './styles/vars.scss';
 export {
   Button,
   type ButtonComponentProps,
+  type ButtonIcon,
   type ButtonLinkProps,
   type ButtonProps,
   type ButtonSize,

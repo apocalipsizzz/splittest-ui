@@ -26,6 +26,11 @@ const meta = {
       control: 'inline-radio',
       options: ['sm', 'md', 'lg'],
     },
+    icon: {
+      control: 'inline-radio',
+      options: ['back', 'forward'],
+    },
+    loading: { control: 'boolean' },
   },
 } satisfies Meta<typeof Button>;
 
@@ -62,6 +67,40 @@ export const States: Story = {
         <Button variant="link">link</Button>
         <Button variant="link" disabled>
           disabled
+        </Button>
+      </div>
+    </div>
+  ),
+};
+
+export const Icons: Story = {
+  render: () => (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <div style={row}>
+        <Button icon="back">Назад</Button>
+        <Button icon="forward">Дальше</Button>
+        <Button loading>Сохранение</Button>
+      </div>
+      <div style={row}>
+        <Button variant="outline" icon="back">
+          Назад
+        </Button>
+        <Button variant="outline" icon="forward">
+          Дальше
+        </Button>
+        <Button variant="outline" loading>
+          Загрузка
+        </Button>
+      </div>
+      <div style={row}>
+        <Button variant="link" icon="back">
+          Назад
+        </Button>
+        <Button variant="link" icon="forward">
+          Дальше
+        </Button>
+        <Button variant="link" loading>
+          Загрузка
         </Button>
       </div>
     </div>
