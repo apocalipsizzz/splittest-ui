@@ -3,7 +3,7 @@
   width: fit-content;
   display: flex;
   align-items: center;
-  padding: 10px 18px;
+  padding: 10px 20px;
   border-radius: 30px;
   font-size: 14px;
   line-height: 20px;
@@ -22,14 +22,14 @@
   &:active {
     background-color: var(--color-neutral-200);
     color: var(--color-neutral-500);
-    fill: var(--color-neutral-500);
+    fill: currentColor;
     border-color: var(--color-neutral-200);
   }
 
   &:disabled {
     background-color: var(--color-neutral-200);
     color: var(--color-neutral-500);
-    fill: var(--color-neutral-500);
+    fill: currentColor;
     border-color: var(--color-neutral-200);
     cursor: default;
     pointer-events: none;
@@ -39,13 +39,36 @@
   &--outline {
     background-color: transparent;
     color: var(--color-black);
-    fill: var(--color-black);
+    fill: currentColor;
     border: 2px solid var(--color-black);
 
     &:disabled {
       background-color: transparent;
-      border: 2px solid var(--color-black);
     }
+  }
+  
+  &--link {
+    border: none;
+    background-color: transparent;
+    color: var(--color-black);
+    fill: currentColor;
+    border-radius: 0;
+    padding: 0;
+
+    &:active,
+    &:disabled {
+      background-color: transparent;
+    }
+  }
+
+  &--disabled {
+    background-color: var(--color-neutral-200);
+    color: var(--color-neutral-500);
+    fill: var(--color-neutral-500);
+    border-color: var(--color-neutral-200);
+    cursor: default;
+    pointer-events: none;
+    user-select: none;
   }
 
   &--sm {
@@ -63,33 +86,6 @@
   &--full-width {
     width: 100%;
     justify-content: center;
-  }
-
-  &--link {
-    border: none;
-    background-color: transparent;
-    color: var(--color-black);
-    fill: var(--color-black);
-    border-radius: 0;
-    padding: 0;
-    font-weight: 400;
-
-    &:active,
-    &:disabled {
-      background-color: transparent;
-      color: rgba(0, 0, 0, 0.5);
-      fill: rgba(0, 0, 0, 0.5);
-    }
-  }
-
-  &--disabled {
-    background-color: var(--color-neutral-200);
-    color: var(--color-neutral-500);
-    fill: var(--color-neutral-500);
-    border-color: var(--color-neutral-200);
-    cursor: default;
-    pointer-events: none;
-    user-select: none;
   }
 
   svg {
