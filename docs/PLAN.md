@@ -13,7 +13,7 @@
 
 ## Что уже есть
 
-`Button`, `Input`, `TextArea`, `CheckboxInput`, `RadioInput`, `Spinner`.
+`Button`, `Input`, `TextArea`, `CheckboxInput`, `RadioInput`, `Spinner`, иконки (`@de-kit/st-ui/icons`).
 
 Визуал снят с `src/shared/components/*`. Отличия от приложения:
 
@@ -26,4 +26,4 @@
 
 Не тащить сюда виджеты с redux, роутером и API (`heatmap`, галереи, dropzone, navbar). Имеет смысл вынести самодостаточные: `Modal`, `Popup`, `Pagination`, `Select` — у модалки сейчас завязка на `react-transition-group`, `Portal` и хелперы `shared/helpers`.
 
-Публичный API — только `src/index.ts`.
+Публичный API — `src/index.ts` и `src/icons/index.ts`.
