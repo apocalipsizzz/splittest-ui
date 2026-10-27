@@ -1,5 +1,11 @@
 # @de-kit/st-ui
 
+## 0.1.5
+
+### Patch Changes
+
+- В `@de-kit/st-ui/icons` добавлен `IconPause`: 20×20 и `currentColor`, как остальные `icon_*`. Размер перекрывается `width` и `height`.
+
 ## 0.1.4
 
 ### Patch Changes
