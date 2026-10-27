@@ -68,6 +68,7 @@ export { IconMultiselect } from './icon-multiselect';
 export { IconNewwindow } from './icon-newwindow';
 export { IconOptions } from './icon-options';
 export { IconOzon } from './icon-ozon';
+export { IconPause } from './icon-pause';
 export { IconPiechart } from './icon-piechart';
 export { IconPlus } from './icon-plus';
 export { IconPreview } from './icon-preview';

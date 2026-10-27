@@ -3,7 +3,14 @@
  * `import './button.scss'` и `import './styles/vars.scss'` в dist
  * резолвились у консьюмера (CRA + sass-loader / Vite).
  */
-import { cpSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
