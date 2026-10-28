@@ -2,13 +2,7 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconCalendar = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 20 20"
-    width={20}
-    height={20}
-    fill="currentColor"
-    {...props}
-  >
+  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
     <path d="M17,3h-3c0-0.55-0.45-1-1-1c-0.55,0-1,0.45-1,1H8c0-0.55-0.45-1-1-1C6.45,2,6,2.45,6,3H3C2.45,3,2,3.45,2,4v12c0,0.55,0.45,1,1,1h14c0.55,0,1-0.45,1-1V4C18,3.45,17.55,3,17,3z M16,15H4V9h12V15z M16,7H4V5h2c0,0.55,0.45,1,1,1c0.55,0,1-0.45,1-1h4c0,0.55,0.45,1,1,1c0.55,0,1-0.45,1-1h2V7z" />
   </Svg>
 );

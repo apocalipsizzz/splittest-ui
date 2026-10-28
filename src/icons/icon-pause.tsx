@@ -2,13 +2,7 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconPause = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 20 20"
-    width={20}
-    height={20}
-    fill="currentColor"
-    {...props}
-  >
+  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
     <path d="M7,16L7,16c-0.6,0-1-0.4-1-1V5c0-0.6,0.4-1,1-1h0c0.6,0,1,0.4,1,1v10C8,15.6,7.6,16,7,16z M13,16L13,16c-0.6,0-1-0.4-1-1V5 c0-0.6,0.4-1,1-1h0c0.6,0,1,0.4,1,1v10C14,15.6,13.5,16,13,16z" />
   </Svg>
 );

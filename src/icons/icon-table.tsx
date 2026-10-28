@@ -2,13 +2,7 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconTable = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 20 20"
-    width={20}
-    height={20}
-    fill="currentColor"
-    {...props}
-  >
+  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
     <path d="M16,4H4C3.448,4,3,4.447,3,5v10c0,0.553,0.448,1,1,1h12c0.552,0,1-0.447,1-1V5C17,4.447,16.552,4,16,4z M5,6h4v3H5V6z M5,11h4v3H5V11z M15,14h-4v-3h4V14z M15,9h-4V6h4V9z" />
   </Svg>
 );

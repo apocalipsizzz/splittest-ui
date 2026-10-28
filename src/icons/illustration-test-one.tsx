@@ -2,51 +2,11 @@
 import { Svg, type IconProps } from './svg';
 
 export const IllustrationTestOne = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 240 180"
-    width={240}
-    height={180}
-    fill="currentColor"
-    {...props}
-  >
-    <path
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      d="M169.5,124.5h5c2.76,0,5,2.24,5,5v40c0,2.76-2.24,5-5,5h-5"
-    />
-    <line
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      x1="179.5"
-      y1="149.5"
-      x2="219.5"
-      y2="149.5"
-    />
-    <path
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      d="M169.5,4.5h5c2.76,0,5,2.24,5,5v100c0,2.76-2.24,5-5,5h-5"
-    />
-    <line
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      x1="179.5"
-      y1="59.5"
-      x2="219.5"
-      y2="59.5"
-    />
+  <Svg viewBox="0 0 240 180" width={240} height={180} fill="currentColor" {...props}>
+    <path fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" d="M169.5,124.5h5c2.76,0,5,2.24,5,5v40c0,2.76-2.24,5-5,5h-5" />
+    <line fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" x1="179.5" y1="149.5" x2="219.5" y2="149.5" />
+    <path fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" d="M169.5,4.5h5c2.76,0,5,2.24,5,5v100c0,2.76-2.24,5-5,5h-5" />
+    <line fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" x1="179.5" y1="59.5" x2="219.5" y2="59.5" />
     <circle cx="219.5" cy="149.5" r="9.5" />
     <circle cx="219.5" cy="59.5" r="19.5" />
     <circle cx="154.5" cy="164.5" r="4.5" />

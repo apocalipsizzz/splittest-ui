@@ -2,13 +2,7 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconBarchart = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 20 20"
-    width={20}
-    height={20}
-    fill="currentColor"
-    {...props}
-  >
+  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
     <path d="M16,6h-3V3c0-0.55-0.45-1-1-1H8C7.45,2,7,2.45,7,3v7H4c-0.55,0-1,0.45-1,1v6c0,0.55,0.45,1,1,1h12c0.55,0,1-0.45,1-1V7C17,6.45,16.55,6,16,6z M7,16H5v-4h2V16z M11,7v9H9V4h2V7z M15,16h-2V8h2V16z" />
   </Svg>
 );

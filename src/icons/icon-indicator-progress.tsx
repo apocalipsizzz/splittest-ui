@@ -2,13 +2,7 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconIndicatorProgress = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 20 20"
-    width={20}
-    height={20}
-    fill="currentColor"
-    {...props}
-  >
+  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
     <path d="M6,7c0.552,0,1,0.448,1,1v4c0,0.553-0.448,1-1,1s-1-0.447-1-1V8C5,7.448,5.448,7,6,7z" />
     <path d="M10,5c0.553,0,1,0.448,1,1v8c0,0.553-0.447,1-1,1c-0.552,0-1-0.447-1-1V6C9,5.448,9.448,5,10,5z" />
     <path d="M14,3c0.553,0,1,0.448,1,1v12c0,0.553-0.447,1-1,1s-1-0.447-1-1V4C13,3.448,13.447,3,14,3z" />

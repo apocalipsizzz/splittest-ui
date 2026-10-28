@@ -2,188 +2,25 @@
 import { Svg, type IconProps } from './svg';
 
 export const IllustrationTestMultiple = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 240 180"
-    width={240}
-    height={180}
-    fill="currentColor"
-    {...props}
-  >
-    <line
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      x1="219.5"
-      y1="109.5"
-      x2="219.5"
-      y2="149.5"
-    />
-    <path
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      d="M204.5,99.5v5c0,2.8,2.2,5,5,5h20c2.8,0,5-2.2,5-5v-5"
-    />
-    <line
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      x1="169.5"
-      y1="109.5"
-      x2="169.5"
-      y2="149.5"
-    />
-    <path
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      d="M154.5,99.5v5c0,2.8,2.2,5,5,5h20c2.8,0,5-2.2,5-5v-5"
-    />
-    <line
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      x1="119.5"
-      y1="109.5"
-      x2="119.5"
-      y2="149.5"
-    />
-    <path
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      d="M104.5,99.5v5c0,2.8,2.2,5,5,5h20c2.8,0,5-2.2,5-5v-5"
-    />
-    <line
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      x1="69.5"
-      y1="109.5"
-      x2="69.5"
-      y2="149.5"
-    />
-    <path
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      d="M54.5,99.5v5c0,2.8,2.2,5,5,5h20c2.8,0,5-2.2,5-5v-5"
-    />
-    <line
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      x1="19.5"
-      y1="109.5"
-      x2="19.5"
-      y2="149.5"
-    />
-    <path
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      d="M4.5,99.5v5c0,2.8,2.2,5,5,5h20c2.8,0,5-2.2,5-5v-5"
-    />
-    <circle
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      cx="219.5"
-      cy="89.5"
-      r="4.5"
-    />
-    <circle
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      cx="219.5"
-      cy="64.5"
-      r="4.5"
-    />
-    <circle
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      cx="219.5"
-      cy="14.5"
-      r="4.5"
-    />
-    <circle
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      cx="119.5"
-      cy="89.5"
-      r="4.5"
-    />
-    <circle
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      cx="119.5"
-      cy="14.5"
-      r="4.5"
-    />
-    <circle
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      cx="69.5"
-      cy="64.5"
-      r="4.5"
-    />
-    <circle
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      cx="19.5"
-      cy="89.5"
-      r="4.5"
-    />
-    <circle
-      fill="none"
-      opacity="1"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeMiterlimit="10"
-      cx="19.5"
-      cy="39.5"
-      r="4.5"
-    />
+  <Svg viewBox="0 0 240 180" width={240} height={180} fill="currentColor" {...props}>
+    <line fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" x1="219.5" y1="109.5" x2="219.5" y2="149.5" />
+    <path fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" d="M204.5,99.5v5c0,2.8,2.2,5,5,5h20c2.8,0,5-2.2,5-5v-5" />
+    <line fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" x1="169.5" y1="109.5" x2="169.5" y2="149.5" />
+    <path fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" d="M154.5,99.5v5c0,2.8,2.2,5,5,5h20c2.8,0,5-2.2,5-5v-5" />
+    <line fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" x1="119.5" y1="109.5" x2="119.5" y2="149.5" />
+    <path fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" d="M104.5,99.5v5c0,2.8,2.2,5,5,5h20c2.8,0,5-2.2,5-5v-5" />
+    <line fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" x1="69.5" y1="109.5" x2="69.5" y2="149.5" />
+    <path fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" d="M54.5,99.5v5c0,2.8,2.2,5,5,5h20c2.8,0,5-2.2,5-5v-5" />
+    <line fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" x1="19.5" y1="109.5" x2="19.5" y2="149.5" />
+    <path fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" d="M4.5,99.5v5c0,2.8,2.2,5,5,5h20c2.8,0,5-2.2,5-5v-5" />
+    <circle fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" cx="219.5" cy="89.5" r="4.5" />
+    <circle fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" cx="219.5" cy="64.5" r="4.5" />
+    <circle fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" cx="219.5" cy="14.5" r="4.5" />
+    <circle fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" cx="119.5" cy="89.5" r="4.5" />
+    <circle fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" cx="119.5" cy="14.5" r="4.5" />
+    <circle fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" cx="69.5" cy="64.5" r="4.5" />
+    <circle fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" cx="19.5" cy="89.5" r="4.5" />
+    <circle fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" cx="19.5" cy="39.5" r="4.5" />
     <circle cx="219.5" cy="149.5" r="4.5" />
     <circle cx="219.5" cy="39.5" r="4.5" />
     <circle cx="169.5" cy="149.5" r="19.5" />

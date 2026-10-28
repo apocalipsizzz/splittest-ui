@@ -2,13 +2,7 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconOzon = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 20 20"
-    width={20}
-    height={20}
-    fill="currentColor"
-    {...props}
-  >
+  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
     <path d="M9.33,7.53c-2.44.65-3.89,2.46-3.59,3.61.32,1.17,2.48,1.98,4.92,1.33,2.44-.65,3.91-2.44,3.59-3.61-.32-1.17-2.48-1.98-4.92-1.33ZM2,2v16h16V2H2ZM11.25,14.67c-3.53.93-6.94-.38-7.62-2.94-.71-2.56,1.59-5.4,5.12-6.35,3.53-.95,6.94.36,7.62,2.94.71,2.56-1.59,5.4-5.12,6.35Z" />
   </Svg>
 );

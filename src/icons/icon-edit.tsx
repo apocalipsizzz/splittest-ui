@@ -2,13 +2,7 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconEdit = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 20 20"
-    width={20}
-    height={20}
-    fill="currentColor"
-    {...props}
-  >
+  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
     <path d="M16.707,6.293l-3-3c-0.391-0.391-1.023-0.391-1.414,0l-7.999,7.999C4.112,11.473,4,11.724,4,12v3c0,0.553,0.448,1,1,1h3c0.276,0,0.527-0.112,0.708-0.294l8-7.999C17.098,7.316,17.098,6.684,16.707,6.293z M7.586,14H6v-1.586l4.5-4.5L12.086,9.5L7.586,14z M13.5,8.086L11.914,6.5L13,5.414L14.586,7L13.5,8.086z" />
   </Svg>
 );

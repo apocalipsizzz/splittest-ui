@@ -2,13 +2,7 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconCrop = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 20 20"
-    width={20}
-    height={20}
-    fill="currentColor"
-    {...props}
-  >
+  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
     <path d="M17,13h-2V6c0-0.553-0.448-1-1-1H7V3c0-0.552-0.448-1-1-1S5,2.448,5,3v2H3C2.448,5,2,5.447,2,6s0.448,1,1,1h2v7c0,0.553,0.448,1,1,1h7v2c0,0.553,0.447,1,1,1c0.552,0,1-0.447,1-1v-2h2c0.553,0,1-0.447,1-1S17.553,13,17,13z M7,13V7h6v6H7z" />
   </Svg>
 );

@@ -1,5 +1,11 @@
 # @de-kit/st-ui
 
+## 0.1.6
+
+### Patch Changes
+
+- `Field` оборачивает один контрол: лейбл, подсказка (`hint`, `hintPlacement`) и ошибка связаны через `aria-describedby` и `aria-errormessage`. `required` показывает «Поле «{label}» обязательно» (свой текст — `requiredMessage`), когда значение стёрли или браузер не пустил форму. У `CheckboxInput` и `RadioInput` проп `title` заменён на `label`. У чекбокса убраны `hide` и `withCursor`: клик по самому инпуту отключается через `clickable={false}`; добавлены `error` и `indeterminate`. `RadioGroup` задаёт общий `name`, рисует `fieldset` и держит `required` группы. У `Input` и `TextArea` размер `sm` | `md` | `lg`, как у кнопки; у `Input` этот проп занимает нативный `size`. `Input` получил `clearable`. У `TextArea` `hideCounter` заменён на `counter`: `counter={false}` прячет счётчик остатка при `maxLength`. `Button` получил `loading`: подпись остаётся в потоке, спиннер поверх, `aria-busy`, клик блокируется. `Spinner` принимает `size` и `label`, анимацию выключает `prefers-reduced-motion`. Пигменты `--color-black`, `--color-white`, `--color-blue`, `--color-red`, `--color-green`, `--color-yellow`, `--color-orange`, `--color-gray` и `--color-neutral-*` заменены ролями: `--color-foreground`, `--color-background`, `--color-primary`, `--color-accent`, `--color-destructive`, `--color-success`, `--color-warning`. `--breakpoint-sm` стал 480px, был 576. Из `mixins.scss` убраны `btn-min`, `input-min` и сбросы; остались `min-width` и `max-width` по `$breakpoints`.
+
 ## 0.1.5
 
 ### Patch Changes

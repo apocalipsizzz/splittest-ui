@@ -2,13 +2,7 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconFunnel = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 20 20"
-    width={20}
-    height={20}
-    fill="currentColor"
-    {...props}
-  >
+  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
     <path d="M17.53,2.153C17.364,2.049,17.182,2,17,2H3C2.818,2,2.636,2.049,2.47,2.153C2.002,2.445,1.859,3.062,2.152,3.531L7,11.288V17c0,0.553,0.448,1,1,1h4c0.553,0,1-0.447,1-1v-5.714l4.848-7.756C18.141,3.062,17.998,2.445,17.53,2.153z M9,16v-5c0-0.182-0.048-0.365-0.152-0.53L4.805,4h10.392l-4.044,6.47C11.049,10.636,11,10.819,11,11v5H9z" />
   </Svg>
 );

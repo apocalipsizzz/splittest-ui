@@ -2,13 +2,7 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconSearch = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 20 20"
-    width={20}
-    height={20}
-    fill="currentColor"
-    {...props}
-  >
+  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
     <path d="M17.707,16.293l-3.963-3.963C14.53,11.255,15,9.934,15,8.5C15,4.911,12.09,2,8.5,2S2,4.911,2,8.5S4.91,15,8.5,15c1.434,0,2.755-0.47,3.83-1.256l3.963,3.963c0.391,0.391,1.023,0.391,1.414,0S18.098,16.684,17.707,16.293z M4,8.5C4,6.015,6.015,4,8.5,4S13,6.015,13,8.5S10.985,13,8.5,13S4,10.986,4,8.5z" />
   </Svg>
 );

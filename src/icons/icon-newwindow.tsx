@@ -2,13 +2,7 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconNewwindow = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 20 20"
-    width={20}
-    height={20}
-    fill="currentColor"
-    {...props}
-  >
+  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
     <path d="M15,4h-4c-0.552,0-1,0.448-1,1s0.448,1,1,1h1.586L9.293,9.293c-0.391,0.391-0.391,1.023,0,1.414s1.023,0.391,1.414,0L14,7.415V9c0,0.552,0.447,1,1,1s1-0.448,1-1V5C16,4.448,15.553,4,15,4zM13,12c-0.553,0-1,0.447-1,1H7V8c0.552,0,1-0.448,1-1S7.552,6,7,6H6C5.448,6,5,6.448,5,7v7c0,0.553,0.448,1,1,1h7c0.553,0,1-0.447,1-1v-1C14,12.448,13.553,12,13,12z" />
   </Svg>
 );

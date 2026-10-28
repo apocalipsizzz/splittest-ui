@@ -2,13 +2,7 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconFolder = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 20 20"
-    width={20}
-    height={20}
-    fill="currentColor"
-    {...props}
-  >
+  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
     <path d="M17,5h-6.59C9.89,4.48,9.03,3.61,8.71,3.29C8.51,3.1,8.26,3,8,3H3C2.45,3,2,3.45,2,4v12c0,0.55,0.45,1,1,1h14c0.55,0,1-0.45,1-1V6C18,5.45,17.55,5,17,5z M4,10h12v5H4V10z M9.29,6.71C9.49,6.9,9.74,7,10,7c0,0,6,0,6,0v1H4V5h3.59C8.11,5.52,8.97,6.39,9.29,6.71z" />
   </Svg>
 );

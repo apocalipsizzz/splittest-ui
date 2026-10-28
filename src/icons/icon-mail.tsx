@@ -2,13 +2,7 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconMail = (props: IconProps) => (
-  <Svg
-    viewBox="0 0 20 20"
-    width={20}
-    height={20}
-    fill="currentColor"
-    {...props}
-  >
+  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
     <path d="M17,4H3C2.45,4,2,4.45,2,5v10c0,0.55,0.45,1,1,1h14c0.55,0,1-0.45,1-1V5C18,4.45,17.55,4,17,4z M16,14H4V9.02l5.43,3.8c0.35,0.24,0.8,0.23,1.13,0c0,0,0.01,0,0.02,0L16,9.02V14z M16,6.58l-6,4.2l-6-4.2V6h12V6.58z" />
   </Svg>
 );
