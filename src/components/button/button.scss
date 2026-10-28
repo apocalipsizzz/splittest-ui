@@ -58,7 +58,7 @@
     border: 2px solid var(--color-foreground);
 
     &:hover:not(:active):not(:disabled) {
-      background-color: var(--color-secondary);
+      background-color: transparent;
       border-color: var(--color-foreground);
       color: var(--color-foreground);
       fill: currentColor;
@@ -79,7 +79,6 @@
 
     &:hover:not(:active):not(:disabled) {
       background-color: transparent;
-      text-decoration: underline;
     }
 
     &:active,
