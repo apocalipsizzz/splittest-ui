@@ -2,8 +2,21 @@
 import { Svg, type IconProps } from './svg';
 
 export const IllustrationTestBest = (props: IconProps) => (
-  <Svg viewBox="0 0 240 180" width={240} height={180} fill="currentColor" {...props}>
-    <path fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" d="M4.5,94.5h70 c2.8,0,5-2.2,5-5v-15c0-2.8,2.2-5,5-5h70c2.8,0,5,2.2,5,5v40c0,2.8,2.2,5,5,5h70" />
+  <Svg
+    viewBox="0 0 240 180"
+    width={240}
+    height={180}
+    fill="currentColor"
+    {...props}
+  >
+    <path
+      fill="none"
+      opacity="1"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeMiterlimit="10"
+      d="M4.5,94.5h70 c2.8,0,5-2.2,5-5v-15c0-2.8,2.2-5,5-5h70c2.8,0,5,2.2,5,5v40c0,2.8,2.2,5,5,5h70"
+    />
     <circle cx="219.5" cy="164.5" r="4.5" />
     <circle cx="219.5" cy="139.5" r="4.5" />
     <circle cx="179.5" cy="164.5" r="4.5" />

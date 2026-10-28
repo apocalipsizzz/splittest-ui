@@ -2,7 +2,13 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconIndicatorDot = (props: IconProps) => (
-  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
+  <Svg
+    viewBox="0 0 20 20"
+    width={20}
+    height={20}
+    fill="currentColor"
+    {...props}
+  >
     <circle cx="10" cy="10" r="3" />
   </Svg>
 );

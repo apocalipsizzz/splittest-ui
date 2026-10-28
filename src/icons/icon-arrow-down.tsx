@@ -2,7 +2,13 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconArrowDown = (props: IconProps) => (
-  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
+  <Svg
+    viewBox="0 0 20 20"
+    width={20}
+    height={20}
+    fill="currentColor"
+    {...props}
+  >
     <path d="M9,4v9.586c-0.578-0.578-1.118-1.117-1.292-1.293c-0.391-0.391-1.024-0.391-1.415,0s-0.391,1.023,0,1.414l3,3c0.39,0.391,1.023,0.391,1.414,0l3-3c0.391-0.391,0.391-1.023,0-1.414s-1.023-0.391-1.414,0c-0.175,0.176-0.715,0.715-1.293,1.293V4c0-0.553-0.448-1-1-1S9,3.448,9,4z" />
   </Svg>
 );

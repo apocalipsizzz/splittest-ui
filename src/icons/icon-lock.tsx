@@ -2,7 +2,13 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconLock = (props: IconProps) => (
-  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
+  <Svg
+    viewBox="0 0 20 20"
+    width={20}
+    height={20}
+    fill="currentColor"
+    {...props}
+  >
     <circle cx="10" cy="14" r="1" />
     <path d="M15,10h-1V6c0-2.21-1.79-4-4-4C7.79,2,6,3.79,6,6v4H5c-0.55,0-1,0.45-1,1v6c0,0.55,0.45,1,1,1h10c0.55,0,1-0.45,1-1v-6C16,10.45,15.55,10,15,10z M8,6c0-1.1,0.9-2,2-2c1.1,0,2,0.9,2,2v4H8V6z M14,16H6v-4h8V16z" />
   </Svg>

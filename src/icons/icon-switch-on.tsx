@@ -2,7 +2,13 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconSwitchOn = (props: IconProps) => (
-  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
+  <Svg
+    viewBox="0 0 20 20"
+    width={20}
+    height={20}
+    fill="currentColor"
+    {...props}
+  >
     <path d="M13,4H7c-3.313,0-6,2.687-6,6s2.687,6,6,6h6c3.313,0,6-2.687,6-6S16.313,4,13,4z M13,14c-2.209,0-4-1.791-4-4s1.791-4,4-4s4,1.791,4,4S15.209,14,13,14z" />
   </Svg>
 );

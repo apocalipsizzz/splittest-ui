@@ -2,7 +2,13 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconArrowUp = (props: IconProps) => (
-  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
+  <Svg
+    viewBox="0 0 20 20"
+    width={20}
+    height={20}
+    fill="currentColor"
+    {...props}
+  >
     <path d="M9,16V6.415C8.422,6.993,7.882,7.532,7.708,7.708c-0.391,0.391-1.024,0.391-1.415,0s-0.391-1.023,0-1.414l3-3c0.39-0.391,1.023-0.391,1.414,0l3,3c0.391,0.391,0.391,1.023,0,1.414s-1.023,0.391-1.414,0C12.118,7.532,11.578,6.993,11,6.415V16c0,0.553-0.448,1-1,1S9,16.553,9,16z" />
   </Svg>
 );

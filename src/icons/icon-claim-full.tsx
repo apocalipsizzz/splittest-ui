@@ -2,7 +2,13 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconClaimFull = (props: IconProps) => (
-  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
+  <Svg
+    viewBox="0 0 20 20"
+    width={20}
+    height={20}
+    fill="currentColor"
+    {...props}
+  >
     <path d="M18.9,16.5L10.9,2.5c-.4-.6-1.4-.6-1.7,0L1.1,16.5c-.2.3-.2.7,0,1,.2.3.5.5.9.5h16c.4,0,.7-.2.9-.5.2-.3.2-.7,0-1ZM10,15c-.6,0-1-.4-1-1s.4-1,1-1,1,.4,1,1-.4,1-1,1ZM11,11c0,.6-.4,1-1,1s-1-.4-1-1v-2c0-.6.4-1,1-1s1,.4,1,1v2Z" />
   </Svg>
 );

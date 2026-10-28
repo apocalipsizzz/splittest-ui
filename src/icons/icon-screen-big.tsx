@@ -2,7 +2,13 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconScreenBig = (props: IconProps) => (
-  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
+  <Svg
+    viewBox="0 0 20 20"
+    width={20}
+    height={20}
+    fill="currentColor"
+    {...props}
+  >
     <path d="M15,4h-4c-0.552,0-1,0.447-1,1s0.448,1,1,1h1.586L6,12.586V11c0-0.553-0.448-1-1-1s-1,0.447-1,1v4c0,0.553,0.448,1,1,1h4c0.552,0,1-0.447,1-1s-0.448-1-1-1H7.414L14,7.414V9c0,0.553,0.447,1,1,1c0.552,0,1-0.447,1-1V5C16,4.447,15.552,4,15,4z" />
   </Svg>
 );

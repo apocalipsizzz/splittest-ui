@@ -2,7 +2,13 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconGalleryPrev = (props: IconProps) => (
-  <Svg viewBox="0 0 20 40" width={20} height={40} fill="currentColor" {...props}>
+  <Svg
+    viewBox="0 0 20 40"
+    width={20}
+    height={40}
+    fill="currentColor"
+    {...props}
+  >
     <path d="M4.414,20L17.707,6.707c0.391-0.391,0.391-1.023,0-1.414s-1.023-0.391-1.414,0s-14,14-14,14c-0.391,0.391-0.391,1.023,0,1.414l14,14c0.391,0.391,1.023,0.391,1.414,0s0.391-1.023,0-1.414L4.414,20z" />
   </Svg>
 );

@@ -2,7 +2,13 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconClose = (props: IconProps) => (
-  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
+  <Svg
+    viewBox="0 0 20 20"
+    width={20}
+    height={20}
+    fill="currentColor"
+    {...props}
+  >
     <path d="M11.414,10l5.293-5.293c0.391-0.391,0.391-1.023,0-1.414s-1.023-0.391-1.414,0L10,8.586L4.707,3.293c-0.391-0.391-1.023-0.391-1.414,0s-0.391,1.023,0,1.414L8.586,10l-5.293,5.293c-0.391,0.391-0.391,1.023,0,1.414s1.023,0.391,1.414,0L10,11.415l5.293,5.293c0.391,0.391,1.023,0.391,1.414,0s0.391-1.023,0-1.414L11.414,10z" />
   </Svg>
 );

@@ -2,7 +2,13 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconIndicatorStarBig = (props: IconProps) => (
-  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
+  <Svg
+    viewBox="0 0 20 20"
+    width={20}
+    height={20}
+    fill="currentColor"
+    {...props}
+  >
     <path d="M17.4,8c-0.2-0.6-0.8-1-1.4-1h-3.5l-1.1-3.3c-0.2-0.6-0.8-1-1.4-1S8.8,3,8.6,3.7L7.5,7H4C3.3,7,2.8,7.4,2.6,8s0,1.3,0.5,1.7l2.8,2.1l-1.1,3.3c-0.2,0.6,0,1.3,0.5,1.7s1.2,0.4,1.8,0l2.8-2.1l2.8,2.1c0.5,0.4,1.3,0.4,1.8,0c0.5-0.4,0.8-1,0.5-1.7l-1.1-3.3l2.8-2.1C17.4,9.3,17.6,8.6,17.4,8z" />
   </Svg>
 );

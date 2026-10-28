@@ -2,7 +2,13 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconHeartFull = (props: IconProps) => (
-  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
+  <Svg
+    viewBox="0 0 20 20"
+    width={20}
+    height={20}
+    fill="currentColor"
+    {...props}
+  >
     <path d="M16.61,4.39C14.79,2.57,11.86,2.55,10,4.3C8.14,2.55,5.21,2.57,3.39,4.39c-1.85,1.85-1.86,4.86,0,6.72l5.9,5.9c0.39,0.39,1.02,0.39,1.41,0l5.9-5.9C18.46,9.25,18.46,6.25,16.61,4.39z" />
   </Svg>
 );

@@ -2,7 +2,13 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconIndicatorDonut = (props: IconProps) => (
-  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
+  <Svg
+    viewBox="0 0 20 20"
+    width={20}
+    height={20}
+    fill="currentColor"
+    {...props}
+  >
     <path d="M10,5c-2.762,0-5,2.239-5,5c0,2.762,2.238,5,5,5s5-2.238,5-5C15,7.239,12.762,5,10,5z M10,13c-1.657,0-3-1.344-3-3s1.343-3,3-3s3,1.344,3,3S11.657,13,10,13z" />
   </Svg>
 );

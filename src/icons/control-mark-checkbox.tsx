@@ -2,7 +2,13 @@
 import { Svg, type IconProps } from './svg';
 
 export const ControlMarkCheckbox = (props: IconProps) => (
-  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
+  <Svg
+    viewBox="0 0 20 20"
+    width={20}
+    height={20}
+    fill="currentColor"
+    {...props}
+  >
     <path d="M15.71,6.29c-0.39-0.39-1.02-0.39-1.41,0c-0.31,0.31-3.76,3.76-5.29,5.29c-0.81-0.81-2.01-2.01-2.29-2.29c-0.39-0.39-1.02-0.39-1.41,0c-0.39,0.39-0.39,1.02,0,1.41c0.39,0.39,2.61,2.61,3,3c0.39,0.39,1.02,0.39,1.41,0c0.39-0.39,5.61-5.61,6-6C16.1,7.32,16.1,6.68,15.71,6.29z" />
   </Svg>
 );

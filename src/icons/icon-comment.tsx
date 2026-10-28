@@ -2,7 +2,13 @@
 import { Svg, type IconProps } from './svg';
 
 export const IconComment = (props: IconProps) => (
-  <Svg viewBox="0 0 20 20" width={20} height={20} fill="currentColor" {...props}>
+  <Svg
+    viewBox="0 0 20 20"
+    width={20}
+    height={20}
+    fill="currentColor"
+    {...props}
+  >
     <path d="M14,4H6C4.343,4,3,5.343,3,7v4c0,1.657,1.343,3,3,3h3.586l3.706,3.706C13.473,17.888,13.723,18,14,18c0.553,0,1-0.447,1-1v-3.184c1.163-0.413,2-1.512,2-2.816V7C17,5.343,15.657,4,14,4zM15,11c0,0.553-0.447,1-1,1s-1,0.447-1,1v1.586l-2.293-2.293C10.512,12.098,10.256,12,10,12H6c-0.552,0-1-0.447-1-1V7c0-0.553,0.448-1,1-1h8c0.553,0,1,0.447,1,1V11z" />
   </Svg>
 );

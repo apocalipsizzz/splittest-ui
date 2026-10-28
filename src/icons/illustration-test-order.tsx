@@ -2,11 +2,45 @@
 import { Svg, type IconProps } from './svg';
 
 export const IllustrationTestOrder = (props: IconProps) => (
-  <Svg viewBox="0 0 240 180" width={240} height={180} fill="currentColor" {...props}>
-    <path fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" d="M4.5,164.5l40-100l40,50l40-100l40,150h55" />
-    <path fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" d="M4.5,114.5l40-100l40,150l40-50l40-50l55,65" />
-    <path fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" d="M4.5,64.5l40,100l40-150l40,50l40,50l55-30" />
-    <path fill="none" opacity="1" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" d="M4.5,14.5l40,100l40-50l40,100l40-150l55,15" />
+  <Svg
+    viewBox="0 0 240 180"
+    width={240}
+    height={180}
+    fill="currentColor"
+    {...props}
+  >
+    <path
+      fill="none"
+      opacity="1"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeMiterlimit="10"
+      d="M4.5,164.5l40-100l40,50l40-100l40,150h55"
+    />
+    <path
+      fill="none"
+      opacity="1"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeMiterlimit="10"
+      d="M4.5,114.5l40-100l40,150l40-50l40-50l55,65"
+    />
+    <path
+      fill="none"
+      opacity="1"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeMiterlimit="10"
+      d="M4.5,64.5l40,100l40-150l40,50l40,50l55-30"
+    />
+    <path
+      fill="none"
+      opacity="1"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeMiterlimit="10"
+      d="M4.5,14.5l40,100l40-50l40,100l40-150l55,15"
+    />
     <circle cx="219.5" cy="164.5" r="4.5" />
     <circle cx="219.5" cy="129.5" r="9.5" />
     <circle cx="219.5" cy="84.5" r="14.5" />
