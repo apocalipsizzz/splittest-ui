@@ -1,6 +1,9 @@
 {
   "editor.tabSize": 2,
-  "editor.insertSpaces": false,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "javascript.preferences.quoteStyle": "single",
+  "typescript.preferences.quoteStyle": "single",
   "workbench.editor.wrapTabs": true,
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
@@ -35,6 +38,9 @@
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[css]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[scss]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[html]": {
