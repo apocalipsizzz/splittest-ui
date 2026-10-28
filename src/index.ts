@@ -9,11 +9,25 @@ export {
   type ButtonVariant,
 } from './components/button';
 export { CheckboxInput, type CheckboxInputProps } from './components/checkbox';
-export { Input, type InputProps } from './components/input';
-export { RadioInput, type RadioInputProps } from './components/radio';
+export {
+  Field,
+  type FieldHintPlacement,
+  type FieldProps,
+} from './components/field';
+export { Input, type InputProps, type InputSize } from './components/input';
+export {
+  RadioGroup,
+  RadioInput,
+  type RadioGroupProps,
+  type RadioInputProps,
+} from './components/radio';
 export {
   Spinner,
   type SpinnerPosition,
   type SpinnerProps,
 } from './components/spinner';
-export { TextArea, type TextAreaProps } from './components/textarea';
+export {
+  TextArea,
+  type TextAreaProps,
+  type TextAreaSize,
+} from './components/textarea';

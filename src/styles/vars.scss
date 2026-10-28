@@ -1,35 +1,86 @@
-// Токены splittest. Имена как у Tailwind, значения свои — не дефолтная шкала.
-// В @media custom properties нельзя: там те же px, что у --breakpoint-*.
+// Токены splittest. Роли как у Tailwind v4 (`--color-primary`), значения свои.
+// Компоненты не знают про пигмент. Тема — переопределение этих --color-* на
+// [data-theme='dark'], стили кнопок и полей не трогать.
+// В @media custom properties нельзя, поэтому брейкпоинты живут в mixins.scss,
+// а --breakpoint-* ниже генерируются из того же списка — значения не разъедутся.
+@use './mixins.scss' as mixins;
+
 :root {
-  --color-black: #000;
-  --color-white: #fff;
-  --color-blue: #002bff;
-  --color-red: #ff0000;
-  --color-green: #00a66f;
-  --color-yellow: #ffbf00;
-  --color-orange: #ff7f00;
-  --color-gray: #808080;
-  --color-neutral-100: #f7f7f7;
-  --color-neutral-200: #e5e5e5;
-  --color-neutral-500: #727272;
+  // Текст и страница. Сейчас оба чёрный/белый, как и кнопка ниже — роли разные.
+  --color-background: #fff;
+  --color-foreground: #000;
+
+  // Залитая кнопка: фон и текст на нём. Outline берёт --color-foreground, не primary.
+  --color-primary: #000;
+  --color-primary-foreground: #fff;
+  --color-primary-hover: #727272;
+
+  // Ховер outline. Выключенный контрол и вторичный текст/иконка.
+  --color-secondary: #f7f7f7;
+  --color-muted: #e5e5e5;
+  --color-muted-foreground: #727272;
+
+  --color-border: color-mix(in srgb, var(--color-foreground) 10%, transparent);
   --color-input: #d9d9d9;
-  --color-border: color-mix(in srgb, var(--color-black) 10%, transparent);
-  --color-sidebar: color-mix(in srgb, var(--color-black) 3%, transparent);
+  --color-ring: var(--color-foreground);
+  // Вуаль модалки и тень не от foreground: в тёмной теме свет не падает снизу,
+  // они остаются тёмными. Нужен другой оттенок — переопределять эти две роли.
+  --color-overlay: rgb(0 0 0 / 0.3);
+  --color-shadow: rgb(0 0 0 / 0.15);
+  --color-sidebar: color-mix(in srgb, var(--color-foreground) 3%, transparent);
+
+  // Акцент, ошибка, успех. Текст на акценте отдельный: в тёмной теме primary-foreground инвертируется, этот нет.
+  --color-accent: #002bff;
+  --color-accent-foreground: #fff;
+  --color-destructive: #ff0000;
+  --color-success: #00a66f;
+  --color-warning: #ffbf00;
+
+  // Фон recommended — разбавленный warning, компоненты этот процент не знают.
+  // В тёмной теме достаточно переопределить --color-warning.
+  --color-recommended: color-mix(
+    in srgb,
+    var(--color-warning) 10%,
+    transparent
+  );
 
   --radius-sm: 5px;
   --radius-lg: 10px;
 
   --font-sans: 'Inter', sans-serif;
+
+  // Шкала текста: размер и парная к нему высота строки. Других размеров в splittest нет,
+  // по умолчанию почти везде --text-sm. Заголовки: h1 и h2 — 2xl (h1 с 680px — 3xl), h3 — lg, h4 — sm.
+  --text-xs: 11px;
+  --text-xs--line-height: 15px;
   --text-sm: 14px;
+  --text-sm--line-height: 20px;
+  --text-base: 16px;
+  --text-base--line-height: 20px;
+  --text-lg: 18px;
+  --text-lg--line-height: 20px;
+  --text-2xl: 28px;
+  --text-2xl--line-height: 30px;
+  --text-3xl: 45px;
+  --text-3xl--line-height: 50px;
 
-  --shadow-xl: 0 10px 40px 0 rgb(0 0 0 / 0.15);
-  --shadow-t: 0 -1px 0 0 var(--color-border);
-  --shadow-b: 0 1px 0 0 var(--color-border);
+  // Сетка 5px. Паддинги кнопки и инпута сняты с макета вне сетки и остаются литералами.
+  --space-1: 5px;
+  --space-2: 10px;
+  --space-3: 15px;
+  --space-4: 20px;
+  --space-6: 30px;
 
-  --breakpoint-sm: 576px;
-  --breakpoint-md: 680px;
-  --breakpoint-lg: 1000px;
-  --breakpoint-xl: 1200px;
+  // Фокус. Одна обводка на всю библиотеку: и box-shadow у инпута, и outline у кнопки.
+  --focus-ring-width: 1px;
+  --focus-ring-color: var(--color-ring);
+  --focus-ring-offset: 2px;
+
+  --shadow-xl: 0 10px 40px 0 var(--color-shadow);
+
+  @each $name, $value in mixins.$breakpoints {
+    --breakpoint-#{$name}: #{$value};
+  }
 
   --default-transition-duration: 0.3s;
   --default-transition-timing-function: ease;

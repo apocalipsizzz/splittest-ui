@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { IconArrowLeft } from '../../icons/icon-arrow-left';
-import { IconArrowRight } from '../../icons/icon-arrow-right';
-import { IconSpinner } from '../../icons/icon-spinner';
+import { IconArrowLeft } from '@/icons/icon-arrow-left';
+import { IconArrowRight } from '@/icons/icon-arrow-right';
 import { Button } from './button';
 
 const row = {
@@ -29,6 +28,9 @@ const meta = {
       control: 'inline-radio',
       options: ['sm', 'md', 'lg'],
     },
+    loading: {
+      control: 'boolean',
+    },
   },
 } satisfies Meta<typeof Button>;
 
@@ -44,6 +46,12 @@ export const Variants: Story = {
       <Button variant="outline">Обводка</Button>
       <Button variant="link">Ссылка-текст</Button>
       <Button href="https://example.com">Как ссылка</Button>
+      <Button href="https://example.com" variant="outline">
+        Ссылка с обводкой
+      </Button>
+      <Button href="https://example.com" variant="link">
+        Ссылка-текст
+      </Button>
     </div>
   ),
 };
@@ -83,10 +91,7 @@ export const Icons: Story = {
           Дальше
           <IconArrowRight width={20} height={20} />
         </Button>
-        <Button>
-          <IconSpinner className="button__icon--spin" width={20} height={20} />
-          Сохранение
-        </Button>
+        <Button loading>Сохранение</Button>
       </div>
       <div style={row}>
         <Button variant="outline">
@@ -97,8 +102,7 @@ export const Icons: Story = {
           Дальше
           <IconArrowRight width={20} height={20} />
         </Button>
-        <Button variant="outline">
-          <IconSpinner className="button__icon--spin" width={20} height={20} />
+        <Button variant="outline" loading>
           Загрузка
         </Button>
       </div>
@@ -111,8 +115,7 @@ export const Icons: Story = {
           Дальше
           <IconArrowRight width={20} height={20} />
         </Button>
-        <Button variant="link">
-          <IconSpinner className="button__icon--spin" width={20} height={20} />
+        <Button variant="link" loading>
           Загрузка
         </Button>
       </div>
@@ -131,6 +134,9 @@ export const Sizes: Story = {
       <Button fullWidth>На всю ширину</Button>
       <Button fullWidth size="lg" variant="outline">
         lg outline
+      </Button>
+      <Button fullWidth loading>
+        Загрузка на всю ширину
       </Button>
     </div>
   ),

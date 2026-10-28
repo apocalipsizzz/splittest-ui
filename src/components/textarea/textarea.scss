@@ -1,58 +1,85 @@
+@use '../../styles/mixins.scss' as mixins;
+
 .textarea__wrap {
   position: relative;
 }
 
 .textarea {
+  // Паддинги как у Input соответствующего размера, высота — 0.75 / 1 / 1.25 от md.
+  --textarea-padding-y: var(--space-2);
+  --textarea-padding-x: var(--space-3);
+  --textarea-min-height: 160px;
   box-sizing: border-box;
   width: 100%;
-  min-height: 160px;
-  display: flex;
-  align-items: center;
-  padding: 10px 15px;
-  font-size: 14px;
-  line-height: 20px;
+  min-height: var(--textarea-min-height);
+  padding: var(--textarea-padding-y) var(--textarea-padding-x);
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
   background-color: transparent;
-  color: var(--color-black);
+  color: var(--color-foreground);
   border-radius: var(--radius-sm);
-  resize: none;
+  resize: vertical;
   font-family: var(--font-sans);
   border: 1px solid var(--color-input);
-  outline: 1px solid transparent;
+  outline: var(--focus-ring-width) solid transparent;
   transition:
     background 0.3s,
     border-color 0.3s,
     box-shadow 0.2s;
 
   &:focus {
-    border-color: var(--color-black);
-    outline: 1px solid var(--color-black);
+    border-color: var(--color-ring);
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
   }
 
   &:disabled {
-    background-color: var(--color-neutral-200);
-    border-color: var(--color-neutral-200);
-    color: color-mix(in srgb, var(--color-black) 50%, transparent);
-    fill: var(--color-neutral-500);
+    background-color: var(--color-muted);
+    border-color: var(--color-muted);
+    color: var(--color-muted-foreground);
+    fill: var(--color-muted-foreground);
+    resize: none;
   }
 
-  @media (min-width: 680px) {
-    min-height: 80px;
+  @include mixins.min-width(md) {
+    --textarea-min-height: 80px;
+  }
+
+  // Медиазапрос базы стоит выше и при равной специфичности проиграет, поэтому у
+  // каждого размера своя пара значений.
+  &--sm {
+    --textarea-padding-y: 4px;
+    --textarea-padding-x: 12px;
+    --textarea-min-height: 120px;
+
+    @include mixins.min-width(md) {
+      --textarea-min-height: 60px;
+    }
+  }
+
+  &--lg {
+    --textarea-padding-y: var(--space-3);
+    --textarea-padding-x: 24px;
+    --textarea-min-height: 200px;
+
+    @include mixins.min-width(md) {
+      --textarea-min-height: 100px;
+    }
   }
 
   &--recommended {
-    background-color: color-mix(in srgb, var(--color-yellow) 10%, transparent);
+    background-color: var(--color-recommended);
   }
 
   &--error {
-    border-color: color-mix(in srgb, var(--color-red) 50%, transparent);
+    border-color: color-mix(in srgb, var(--color-destructive) 50%, transparent);
   }
 }
 
 .textarea__counter {
   display: block;
-  margin-top: 5px;
-  font-size: 11px;
-  line-height: 20px;
-  color: color-mix(in srgb, var(--color-black) 50%, transparent);
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  line-height: var(--text-sm--line-height);
+  color: var(--color-muted-foreground);
   text-align: left;
 }

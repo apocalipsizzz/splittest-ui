@@ -1,1 +1,6 @@
-export { RadioInput, type RadioInputProps } from './radio';
+export {
+  RadioGroup,
+  RadioInput,
+  type RadioGroupProps,
+  type RadioInputProps,
+} from './radio';

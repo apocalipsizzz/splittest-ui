@@ -41,9 +41,9 @@ const grid = {
 export const All = () => (
   <div style={{ display: 'grid', gap: 28 }}>
     <div style={{ display: 'flex', gap: 16 }}>
-      <icons.IconClose style={{ color: 'var(--color-black)' }} />
-      <icons.IconClose style={{ color: 'var(--color-blue)' }} />
-      <icons.IconClose style={{ color: 'var(--color-red)' }} />
+      <icons.IconClose style={{ color: 'var(--color-foreground)' }} />
+      <icons.IconClose style={{ color: 'var(--color-accent)' }} />
+      <icons.IconClose style={{ color: 'var(--color-destructive)' }} />
     </div>
     {groups.map(group => (
       <section key={group.title} style={{ display: 'grid', gap: 12 }}>
@@ -57,7 +57,7 @@ export const All = () => (
                 justifyItems: 'center',
                 alignContent: 'start',
                 gap: 8,
-                color: 'var(--color-black)',
+                color: 'var(--color-foreground)',
               }}
             >
               <Icon
@@ -72,7 +72,7 @@ export const All = () => (
                   fontSize: 11,
                   lineHeight: 1.3,
                   textAlign: 'center',
-                  color: 'var(--color-neutral-500)',
+                  color: 'var(--color-muted-foreground)',
                 }}
               >
                 {name}

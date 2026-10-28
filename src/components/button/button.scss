@@ -5,42 +5,64 @@
   align-items: center;
   padding: 8px 18px;
   border-radius: 30px;
-  font-size: 14px;
-  line-height: 20px;
-  background-color: var(--color-black);
-  color: var(--color-white);
-  fill: var(--color-white);
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  background-color: var(--color-primary);
+  color: var(--color-primary-foreground);
+  fill: var(--color-primary-foreground);
   font-weight: bold;
   font-family: var(--font-sans);
-  border: 2px solid var(--color-black);
+  border: 2px solid var(--color-primary);
   flex-shrink: 0;
   cursor: pointer;
   transition: none;
   gap: 8px;
   text-decoration: none;
 
-  &:active {
-    background-color: var(--color-neutral-200);
-    color: var(--color-neutral-500);
-    fill: currentColor;
-    border-color: var(--color-neutral-200);
+  &:hover:not(:active):not(:disabled) {
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
   }
 
-  &:disabled {
-    background-color: var(--color-neutral-200);
-    color: var(--color-neutral-500);
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  &:active {
+    background-color: var(--color-muted);
+    color: var(--color-muted-foreground);
     fill: currentColor;
-    border-color: var(--color-neutral-200);
+    border-color: var(--color-muted);
+  }
+
+  // pointer-events не гасим: нативный disabled и так не пускает клик, а так
+  // на кнопку можно навести тултип «почему недоступна».
+  &:disabled {
+    background-color: var(--color-muted);
+    color: var(--color-muted-foreground);
+    fill: currentColor;
+    border-color: var(--color-muted);
     cursor: default;
-    pointer-events: none;
     user-select: none;
   }
 
   &--outline {
     background-color: transparent;
-    color: var(--color-black);
+    color: var(--color-foreground);
     fill: currentColor;
-    border: 2px solid var(--color-black);
+    border: 2px solid var(--color-foreground);
+
+    &:hover:not(:active):not(:disabled) {
+      background-color: var(--color-secondary);
+      border-color: var(--color-foreground);
+      color: var(--color-foreground);
+      fill: currentColor;
+    }
 
     &:disabled {
       background-color: transparent;
@@ -50,10 +72,15 @@
   &--link {
     border: none;
     background-color: transparent;
-    color: var(--color-black);
+    color: var(--color-foreground);
     fill: currentColor;
     border-radius: 0;
     padding: 0;
+
+    &:hover:not(:active):not(:disabled) {
+      background-color: transparent;
+      text-decoration: underline;
+    }
 
     &:active,
     &:disabled {
@@ -61,16 +88,27 @@
     }
   }
 
-  &--disabled {
-    background-color: var(--color-neutral-200);
-    color: var(--color-neutral-500);
-    fill: var(--color-neutral-500);
-    border-color: var(--color-neutral-200);
-    cursor: default;
-    pointer-events: none;
-    user-select: none;
+  &--loading {
+    position: relative;
   }
 
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: inherit;
+    opacity: 0;
+  }
+
+  &__spinner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  // 12/16 и 16/24 у sm и lg сняты со старого макета и в шкалу --text-* не попадают.
   &--sm {
     padding: 5px 12px;
     font-size: 12px;

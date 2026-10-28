@@ -1,26 +1,26 @@
 .radio__label {
-  font-size: 14px;
-  line-height: 20px;
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
   display: inline-block;
   vertical-align: top;
-  padding-left: 5px;
+  padding-left: var(--space-1);
   user-select: none;
   cursor: pointer;
 }
 
 .radio__input {
-  --active: #000;
-  --active-inner: #fff;
-  --border: #e5e5e5;
-  --border-hover: #000;
-  --background: #fff;
-  --disabled: #e5e5e5;
-  --disabled-inner: #e5e5e5;
-  --disabled-after-inner: #727272;
+  --active: var(--color-primary);
+  --active-inner: var(--color-primary-foreground);
+  --border: var(--color-muted);
+  --border-hover: var(--color-foreground);
+  --background: var(--color-background);
+  --disabled: var(--color-muted);
+  --disabled-inner: var(--color-muted);
+  --disabled-after-inner: var(--color-muted-foreground);
   box-sizing: border-box;
   appearance: none;
-  width: 19px;
-  height: 19px;
+  width: 20px;
+  height: 20px;
   outline: none;
   display: inline-block;
   vertical-align: top;
@@ -75,6 +75,15 @@
     border: 1px solid var(--border-hover);
   }
 
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+
   &:disabled {
     --b: var(--disabled);
     cursor: not-allowed;
@@ -90,7 +99,7 @@
     }
 
     & + .radio__label {
-      color: var(--color-gray);
+      color: var(--color-muted-foreground);
       cursor: not-allowed;
     }
   }
@@ -103,7 +112,33 @@
 
   &--error {
     .radio__input {
-      border-color: color-mix(in srgb, var(--color-red) 50%, transparent);
+      border-color: color-mix(
+        in srgb,
+        var(--color-destructive) 50%,
+        transparent
+      );
     }
+  }
+}
+
+.radio-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+.radio-group__legend {
+  margin: 0 0 var(--space-3);
+  color: var(--color-foreground);
+  font-size: var(--text-lg);
+  font-weight: 900;
+  line-height: var(--text-lg--line-height);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .radio__input,
+  .radio__input::after {
+    transition: none;
   }
 }

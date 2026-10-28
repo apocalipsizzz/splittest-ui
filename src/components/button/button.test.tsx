@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { createRef } from 'react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -26,7 +27,44 @@ describe('Button', () => {
       </Button>,
     );
 
-    await userEvent.click(screen.getByRole('button'));
+    const button = screen.getByRole('button');
+    expect(button).not.toHaveClass('button--disabled');
+    await userEvent.click(button);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('loading ставит aria-busy и не вызывает onClick', async () => {
+    const onClick = vi.fn<() => void>();
+    render(
+      <Button loading onClick={onClick}>
+        Сохранить
+      </Button>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Сохранить' });
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    expect(button).toBeDisabled();
+    expect(button.querySelector('.button__label')).toHaveTextContent(
+      'Сохранить',
+    );
+    expect(button.querySelector('.button__icon--spin')).toBeInTheDocument();
+
+    await userEvent.click(button);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('loading на ссылке ставит aria-busy и не вызывает onClick', () => {
+    const onClick = vi.fn<() => void>();
+    render(
+      <Button href="/prices" loading onClick={onClick}>
+        Тарифы
+      </Button>,
+    );
+
+    const link = screen.getByRole('link', { name: 'Тарифы' });
+    expect(link).toHaveAttribute('aria-busy', 'true');
+    expect(link).not.toHaveAttribute('disabled');
+    expect(fireEvent.click(link)).toBe(false);
     expect(onClick).not.toHaveBeenCalled();
   });
 
@@ -74,5 +112,45 @@ describe('Button', () => {
       'button--lg',
       'button--full-width',
     );
+  });
+
+  it('ref без href — button, с href — anchor', () => {
+    const buttonRef = createRef<HTMLButtonElement>();
+    const anchorRef = createRef<HTMLAnchorElement>();
+
+    render(
+      <>
+        <Button ref={buttonRef}>Кнопка</Button>
+        <Button href="/prices" ref={anchorRef}>
+          Тарифы
+        </Button>
+      </>,
+    );
+
+    expect(buttonRef.current).toBeInstanceOf(HTMLButtonElement);
+    expect(anchorRef.current).toBeInstanceOf(HTMLAnchorElement);
+
+    void (
+      <>
+        {/* @ts-expect-error href сужает ref до HTMLAnchorElement */}
+        <Button href="/prices" ref={buttonRef}>
+          Тарифы
+        </Button>
+        {/* @ts-expect-error без href ref — HTMLButtonElement */}
+        <Button ref={anchorRef}>Кнопка</Button>
+      </>
+    );
+  });
+
+  it('loading у ссылки объявляет aria-disabled и aria-busy', () => {
+    render(
+      <Button href="/prices" loading>
+        Тарифы
+      </Button>,
+    );
+
+    const link = screen.getByRole('link', { name: 'Тарифы' });
+    expect(link).toHaveAttribute('aria-disabled', 'true');
+    expect(link).toHaveAttribute('aria-busy', 'true');
   });
 });

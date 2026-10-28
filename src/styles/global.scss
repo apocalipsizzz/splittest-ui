@@ -1,13 +1,12 @@
 // База приложения. Шрифт Inter подключает хост — файлы лежат в splittest-frontend/src/app/fonts.
 // Токены (`--color-*`) подключает вход пакета, этот файл их не эмитит.
+@use './mixins.scss' as mixins;
 
 :root {
-  --pink: #ff00ff;
-  --blue: #00aaff;
   --window-max-height: 100vh;
   --wrapper-padding: 20px;
 
-  @media (min-width: 680px) {
+  @include mixins.min-width(md) {
     --wrapper-padding: 30px;
   }
 }
@@ -35,16 +34,16 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: var(--color-black);
-  background-color: var(--color-white);
+  color: var(--color-foreground);
+  background-color: var(--color-background);
   font-size: var(--text-sm);
-  line-height: 20px;
+  line-height: var(--text-sm--line-height);
   font-weight: 400;
 
   &::after {
     content: '';
     display: block;
-    background-color: color-mix(in srgb, var(--color-black) 30%, transparent);
+    background-color: var(--color-overlay);
     position: fixed;
     left: 0;
     top: 0;
@@ -91,11 +90,11 @@ body {
   padding-left: var(--wrapper-padding);
   padding-right: var(--wrapper-padding);
 
-  @media (min-width: 680px) {
+  @include mixins.min-width(md) {
     max-width: 680px;
   }
 
-  @media (min-width: 1000px) {
+  @include mixins.min-width(lg) {
     max-width: 1000px;
   }
 }
@@ -106,20 +105,27 @@ body {
   height: 8px;
 }
 
+// Ползунок — производная от текста, обводка — от фона: в тёмной теме
+// ползунок светлеет вместе с ней, как и остальные серые в этом файле.
 .scroll-block::-webkit-scrollbar-thumb {
   border-radius: 4px;
-  background-color: #c3c3c3;
-  box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+  background-color: color-mix(
+    in srgb,
+    var(--color-foreground) 24%,
+    var(--color-background)
+  );
+  box-shadow: 0 0 1px
+    color-mix(in srgb, var(--color-background) 50%, transparent);
 }
 
 a {
   text-decoration: none;
   transition: color 0.3s ease;
-  color: var(--color-black);
+  color: var(--color-foreground);
 }
 
 button {
-  color: var(--color-black);
+  color: var(--color-foreground);
   font-size: var(--text-sm);
   font-family: var(--font-sans);
 
@@ -153,9 +159,9 @@ table {
   }
 
   th {
-    color: color-mix(in srgb, var(--color-black) 50%, transparent);
-    font-size: 11px;
-    line-height: 15px;
+    color: var(--color-muted-foreground);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
     text-align: left;
     font-weight: normal;
     padding: 15px 0;
@@ -170,26 +176,26 @@ h3 {
 }
 
 h1 {
-  font-size: 28px;
-  line-height: 30px;
+  font-size: var(--text-2xl);
+  line-height: var(--text-2xl--line-height);
 
-  @media (min-width: 680px) {
-    font-size: 45px;
-    line-height: 50px;
+  @include mixins.min-width(md) {
+    font-size: var(--text-3xl);
+    line-height: var(--text-3xl--line-height);
   }
 }
 
 h2 {
-  font-size: 28px;
-  line-height: 30px;
+  font-size: var(--text-2xl);
+  line-height: var(--text-2xl--line-height);
 }
 
 h3 {
-  font-size: 18px;
-  line-height: 20px;
+  font-size: var(--text-lg);
+  line-height: var(--text-lg--line-height);
 }
 
 h4 {
-  font-size: 14px;
-  line-height: 20px;
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
 }

@@ -2,12 +2,16 @@ import {
   forwardRef,
   type AnchorHTMLAttributes,
   type ButtonHTMLAttributes,
+  type ForwardedRef,
   type MouseEventHandler,
+  type ReactElement,
   type ReactNode,
   type Ref,
+  type RefAttributes,
 } from 'react';
 
-import { cn, when } from '../../lib/cn';
+import { IconSpinner } from '@/icons/icon-spinner';
+import { cn, when } from '@/lib/cn';
 import './button.scss';
 
 export type ButtonVariant = 'default' | 'outline' | 'link';
@@ -17,6 +21,7 @@ interface ButtonStyleProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   fullWidth?: boolean;
+  loading?: boolean;
   className?: string;
   children?: ReactNode;
 }
@@ -35,22 +40,35 @@ export interface ButtonLinkProps
 
 export type ButtonComponentProps = ButtonProps | ButtonLinkProps;
 
-const styleKeys = ['variant', 'size', 'fullWidth', 'className'] as const;
+interface ButtonComponent {
+  (
+    props: ButtonLinkProps & RefAttributes<HTMLAnchorElement>,
+  ): ReactElement | null;
+  (props: ButtonProps & RefAttributes<HTMLButtonElement>): ReactElement | null;
+}
+
+const styleKeys = [
+  'variant',
+  'size',
+  'fullWidth',
+  'loading',
+  'className',
+] as const;
 
 const getClassName = ({
   variant = 'default',
   size = 'md',
   fullWidth = false,
+  loading = false,
   className,
-  disabled,
-}: ButtonStyleProps & { disabled?: boolean }) =>
+}: ButtonStyleProps) =>
   cn(
     'button',
     className,
     when(variant !== 'default', `button--${variant}`),
     when(size !== 'md', `button--${size}`),
     when(fullWidth, 'button--full-width'),
-    when(disabled, 'button--disabled'),
+    when(loading, 'button--loading'),
   );
 
 const omitStyleProps = <T extends ButtonStyleProps>(
@@ -66,22 +84,47 @@ const omitStyleProps = <T extends ButtonStyleProps>(
   return next as Omit<T, (typeof styleKeys)[number]>;
 };
 
-export const Button = forwardRef<
-  HTMLButtonElement | HTMLAnchorElement,
-  ButtonComponentProps
->(function Button(props, ref) {
+const renderContent = (children: ReactNode, loading?: boolean) => {
+  if (!loading) return children;
+
+  return (
+    <>
+      <span className="button__label">{children}</span>
+      <span className="button__spinner">
+        <IconSpinner className="button__icon--spin" />
+      </span>
+    </>
+  );
+};
+
+// forwardRef остаётся: в React 18 ref ещё не обычный проп, peer — ^18.3 || ^19.
+export const Button = forwardRef(function Button(
+  props: ButtonComponentProps,
+  ref: ForwardedRef<HTMLButtonElement | HTMLAnchorElement>,
+) {
+  const { loading } = props;
   const className = getClassName(props);
   const { children, href, ...domProps } = omitStyleProps(props);
+  const content = renderContent(children, loading);
 
   if (typeof href === 'string') {
+    const anchorProps = domProps as AnchorHTMLAttributes<HTMLAnchorElement>;
+    const handleClick: MouseEventHandler<HTMLAnchorElement> = event => {
+      event.preventDefault();
+    };
+
     return (
       <a
+        {...anchorProps}
         ref={ref as Ref<HTMLAnchorElement>}
-        href={href}
         className={className}
-        {...(domProps as AnchorHTMLAttributes<HTMLAnchorElement>)}
+        aria-busy={loading || undefined}
+        // Ссылку нельзя выключить нативно: клик гасим, состояние объявляем.
+        aria-disabled={loading || undefined}
+        onClick={loading ? handleClick : anchorProps.onClick}
+        href={href}
       >
-        {children}
+        {content}
       </a>
     );
   }
@@ -93,21 +136,17 @@ export const Button = forwardRef<
     ...buttonProps
   } = domProps as ButtonHTMLAttributes<HTMLButtonElement>;
 
-  const handleClick: MouseEventHandler<HTMLButtonElement> = event => {
-    if (disabled) return;
-    onClick?.(event);
-  };
-
   return (
     <button
+      {...buttonProps}
       ref={ref as Ref<HTMLButtonElement>}
       className={className}
       type={type}
-      disabled={disabled}
-      onClick={handleClick}
-      {...buttonProps}
+      disabled={disabled || loading}
+      onClick={onClick}
+      aria-busy={loading || undefined}
     >
-      {children}
+      {content}
     </button>
   );
-});
+}) as ButtonComponent;
