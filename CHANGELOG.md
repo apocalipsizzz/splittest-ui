@@ -1,5 +1,11 @@
 # @de-kit/st-ui
 
+## 0.1.7
+
+### Patch Changes
+
+- Иконки в `@de-kit/st-ui/icons` переформатированы: JSX разбит по атрибутам. Пути, размеры, `currentColor` и пропы те же, картинка не меняется.
+
 ## 0.1.6
 
 ### Patch Changes
