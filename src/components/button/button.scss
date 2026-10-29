@@ -1,3 +1,5 @@
+@use '../../styles/mixins.scss' as mixins;
+
 .button {
   box-sizing: border-box;
   width: fit-content;
@@ -19,7 +21,7 @@
   gap: 8px;
   text-decoration: none;
 
-  &:hover:not(:active):not(:disabled) {
+  &:hover:not(:active, :disabled) {
     background-color: var(--color-primary-hover);
     border-color: var(--color-primary-hover);
   }
@@ -57,7 +59,7 @@
     fill: currentColor;
     border: 2px solid var(--color-foreground);
 
-    &:hover:not(:active):not(:disabled) {
+    &:hover:not(:active, :disabled) {
       background-color: transparent;
       border-color: var(--color-foreground);
       color: var(--color-foreground);
@@ -77,7 +79,7 @@
     border-radius: 0;
     padding: 0;
 
-    &:hover:not(:active):not(:disabled) {
+    &:hover:not(:active, :disabled) {
       background-color: transparent;
     }
 
@@ -85,6 +87,76 @@
     &:disabled {
       background-color: transparent;
     }
+  }
+
+  &--image {
+    --size: 60px;
+    background-color: var(--color-secondary);
+    border: none;
+    padding: 0;
+    border-radius: var(--radius-sm);
+    width: var(--size);
+    height: var(--size);
+    position: relative;
+
+    @include mixins.min-width(md) {
+      --size: 100px;
+    }
+
+    &:hover:not(:active, :disabled) {
+      background-color: var(--color-secondary);
+    }
+
+    &__icon {
+      --size-icon: 32px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: 1;
+      display: flex;
+      width: var(--size-icon);
+      height: var(--size-icon);
+      border-radius: 50%;
+      background-color: var(--color-primary);
+      color: var(--color-primary-foreground);
+      justify-content: center;
+      align-items: center;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+
+      @include mixins.min-width(md) {
+        --size-icon: 40px;
+      }
+    }
+  }
+
+  &--icon {
+    --size: 40px;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    justify-content: center;
+    padding: 0;
+  }
+
+  // 12/16 и 16/24 у sm и lg сняты со старого макета и в шкалу --text-* не попадают.
+  &--sm {
+    padding: 5px 12px;
+    font-size: 12px;
+    line-height: 16px;
+    --size: 30px;
+  }
+
+  &--lg {
+    --size: 52px;
+    padding: 12px 24px;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  &--full-width {
+    width: 100%;
+    justify-content: center;
   }
 
   &--loading {
@@ -105,24 +177,6 @@
     align-items: center;
     justify-content: center;
     pointer-events: none;
-  }
-
-  // 12/16 и 16/24 у sm и lg сняты со старого макета и в шкалу --text-* не попадают.
-  &--sm {
-    padding: 5px 12px;
-    font-size: 12px;
-    line-height: 16px;
-  }
-
-  &--lg {
-    padding: 12px 24px;
-    font-size: 16px;
-    line-height: 24px;
-  }
-
-  &--full-width {
-    width: 100%;
-    justify-content: center;
   }
 
   svg {

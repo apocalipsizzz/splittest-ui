@@ -117,16 +117,16 @@ describe('Button', () => {
   it('ButtonProps принимает ref на HTMLElement', () => {
     let node: HTMLElement | null = null;
     const props: ButtonProps = {
-      children: 'Кнопка',
-      disabled: false,
-      className: 'x',
-      role: 'button',
-      tabIndex: 0,
+      'children': 'Кнопка',
+      'disabled': false,
+      'className': 'x',
+      'role': 'button',
+      'tabIndex': 0,
       'aria-disabled': false,
       'aria-pressed': undefined,
       'aria-roledescription': 'draggable',
       'aria-describedby': 'hint',
-      ref: (element: HTMLElement | null) => {
+      'ref': (element: HTMLElement | null) => {
         node = element;
       },
     };

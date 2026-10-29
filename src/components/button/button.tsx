@@ -13,7 +13,7 @@ import { IconSpinner } from '@/icons/icon-spinner';
 import { cn, when } from '@/lib/cn';
 import './button.scss';
 
-export type ButtonVariant = 'default' | 'outline' | 'link';
+export type ButtonVariant = 'default' | 'outline' | 'link' | 'image' | 'icon';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonStyleProps {

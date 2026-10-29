@@ -13,6 +13,9 @@
   },
   "oxc.enable.oxlint": true,
   "oxc.enable.oxfmt": true,
+  "oxc.path.node": "C:\\nvm4w\\nodejs\\node.exe",
+  "oxc.path.oxfmt": "node_modules/oxfmt/bin/oxfmt",
+  "oxc.path.oxlint": "node_modules/oxlint/bin/oxlint",
   "eslint.enable": false,
   "prettier.enable": false,
   "[typescript]": {

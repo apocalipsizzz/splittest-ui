@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { IconArrowLeft } from '@/icons/icon-arrow-left';
 import { IconArrowRight } from '@/icons/icon-arrow-right';
 import { Button } from './button';
+import { IconPreview } from '@/icons';
 
 const row = {
   display: 'flex',
@@ -51,6 +52,18 @@ export const Variants: Story = {
       </Button>
       <Button href="https://example.com" variant="link">
         Ссылка-текст
+      </Button>
+      <Button variant="image">
+        <img
+          src="https://api.splittest.ru/storage/min_images/34702/0bdca0b1-9060-4b1f-b15e-f88ac0945e88.png"
+          alt=""
+        />
+        <span className="button--image__icon">
+          <IconPreview />
+        </span>
+      </Button>
+      <Button variant="icon">
+        <IconPreview />
       </Button>
     </div>
   ),
@@ -138,6 +151,17 @@ export const Sizes: Story = {
       <Button fullWidth loading>
         Загрузка на всю ширину
       </Button>
+      <div style={row}>
+        <Button size="sm" variant="icon">
+          sm
+        </Button>
+        <Button size="md" variant="icon">
+          md
+        </Button>
+        <Button size="lg" variant="icon">
+          lg
+        </Button>
+      </div>
     </div>
   ),
 };
