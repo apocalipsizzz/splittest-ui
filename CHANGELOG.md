@@ -1,5 +1,11 @@
 # @de-kit/st-ui
 
+## 0.1.11
+
+### Patch Changes
+
+- `Button`: `:active` красится в `--color-primary`, раньше был `--color-muted`. Те же состояния можно включить атрибутами `data-active`, `data-focus` и `data-focus-visible` — они повторяют `:active`, `:focus` и `:focus-visible`. Hover не срабатывает поверх `data-active`. У `link` скругление `--radius-sm`. У `image` контент по центру, hover и active оставляют фон `--color-secondary`.
+
 ## 0.1.10
 
 ### Patch Changes
