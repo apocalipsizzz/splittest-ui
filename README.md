@@ -67,7 +67,9 @@ import { IconClose, LogoVisa } from '@de-kit/st-ui/icons';
 <Button onClick={save}>Сохранить</Button>
 <Button variant="outline">Отмена</Button>
 <Button variant="link" disabled>Скрыть</Button>
-<Button href="/prices">Тарифы</Button>
+<Button asChild>
+  <a href="/prices">Тарифы</a>
+</Button>
 <Button size="sm">Маленькая</Button>
 <Button size="lg">Крупная</Button>
 <Button fullWidth>Дальше</Button>
@@ -82,17 +84,17 @@ import { IconClose, LogoVisa } from '@de-kit/st-ui/icons';
 <Button loading>Сохранение</Button>
 ```
 
-Иконка — обычный `children`, слева или справа, какой набор нужен. `loading` оставляет подпись в потоке (`opacity: 0`) и кладёт спиннер поверх, поэтому ширина не прыгает. Ставит `aria-busy`. Пока `loading`, `<button>` получает `disabled`, у ссылки клик отменяется.
+Иконка — обычный `children`, слева или справа, какой набор нужен. `loading` оставляет подпись в потоке (`opacity: 0`) и кладёт спиннер поверх, поэтому ширина не прыгает. Ставит `aria-busy`. Пока `loading`, `<button>` получает `disabled`. У `asChild` на не-кнопке клик отменяется и ставится `aria-disabled`.
 
-| Prop        | По умолчанию |                                                     |
-| ----------- | ------------ | --------------------------------------------------- |
-| `variant`   | `default`    | `default` заливка, `outline` обводка, `link` текст  |
-| `size`      | `md`         | `sm` компактная, `md` обычная, `lg` крупная         |
-| `fullWidth` | `false`      | ширина 100%, не зависит от `size`                   |
-| `href`      | —            | рендер `<a>`, не `<Link>`                           |
-| `loading`   | `false`      | `aria-busy`, клик блокируется, ширина как у подписи |
+| Prop        | По умолчанию |                                                         |
+| ----------- | ------------ | ------------------------------------------------------- |
+| `variant`   | `default`    | `default` заливка, `outline` обводка, `link` текст      |
+| `size`      | `md`         | `sm` компактная, `md` обычная, `lg` крупная             |
+| `fullWidth` | `false`      | ширина 100%, не зависит от `size`                       |
+| `asChild`   | `false`      | классы и пропы на единственном ребёнке, без своего тега |
+| `loading`   | `false`      | `aria-busy`, клик блокируется, ширина как у подписи     |
 
-`variant="link"` — это вид кнопки (`font-weight: 400`), не тип элемента. Ссылка — отдельный проп `href`.
+`variant="link"` — это вид кнопки (`font-weight: 400`), не тип элемента. Ссылка — `asChild` вокруг своего `<a>` или `Link`: классы, `ref` и обработчики сливаются в единственного ребёнка, свой `<button>` не рисуется. Ребёнок должен принять `className` и `ref`.
 
 ## Остальные
 

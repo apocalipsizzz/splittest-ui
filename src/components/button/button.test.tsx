@@ -1,9 +1,9 @@
-import { createRef } from 'react';
+import { createRef, type ReactNode } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Button, type ButtonLinkProps, type ButtonProps } from './button';
+import { Button, type ButtonProps } from './button';
 
 describe('Button', () => {
   it('рендерит button type="button" по умолчанию', () => {
@@ -51,29 +51,6 @@ describe('Button', () => {
 
     await userEvent.click(button);
     expect(onClick).not.toHaveBeenCalled();
-  });
-
-  it('loading на ссылке ставит aria-busy и не вызывает onClick', () => {
-    const onClick = vi.fn<() => void>();
-    render(
-      <Button href="/prices" loading onClick={onClick}>
-        Тарифы
-      </Button>,
-    );
-
-    const link = screen.getByRole('link', { name: 'Тарифы' });
-    expect(link).toHaveAttribute('aria-busy', 'true');
-    expect(link).not.toHaveAttribute('disabled');
-    expect(fireEvent.click(link)).toBe(false);
-    expect(onClick).not.toHaveBeenCalled();
-  });
-
-  it('href рендерит ссылку без type', () => {
-    render(<Button href="/prices">Тарифы</Button>);
-    const link = screen.getByRole('link', { name: 'Тарифы' });
-    expect(link).toHaveAttribute('href', '/prices');
-    expect(link).not.toHaveAttribute('type');
-    expect(link).toHaveClass('button');
   });
 
   it('variant и size попадают в className', () => {
@@ -133,55 +110,194 @@ describe('Button', () => {
 
     render(<Button {...props} />);
     expect(node).toBeInstanceOf(HTMLButtonElement);
-
-    const linkProps: ButtonLinkProps = {
-      href: '/prices',
-      children: 'Тарифы',
-      ref: (element: HTMLElement | null) => {
-        node = element;
-      },
-    };
-    render(<Button {...linkProps} />);
-    expect(node).toBeInstanceOf(HTMLAnchorElement);
   });
 
-  it('ref без href — button, с href — anchor', () => {
+  it('ref без asChild — button', () => {
     const buttonRef = createRef<HTMLButtonElement>();
     const anchorRef = createRef<HTMLAnchorElement>();
 
-    render(
-      <>
-        <Button ref={buttonRef}>Кнопка</Button>
-        <Button href="/prices" ref={anchorRef}>
-          Тарифы
-        </Button>
-      </>,
-    );
-
+    render(<Button ref={buttonRef}>Кнопка</Button>);
     expect(buttonRef.current).toBeInstanceOf(HTMLButtonElement);
-    expect(anchorRef.current).toBeInstanceOf(HTMLAnchorElement);
 
     void (
       <>
-        {/* @ts-expect-error href сужает ref до HTMLAnchorElement */}
-        <Button href="/prices" ref={buttonRef}>
-          Тарифы
-        </Button>
-        {/* @ts-expect-error без href ref — HTMLButtonElement */}
+        {/* @ts-expect-error ref кнопки — HTMLButtonElement */}
         <Button ref={anchorRef}>Кнопка</Button>
       </>
     );
   });
 
-  it('loading у ссылки объявляет aria-disabled и aria-busy', () => {
+  it('asChild вешает классы на ребёнка и не рисует button', () => {
     render(
-      <Button href="/prices" loading>
-        Тарифы
+      <Button asChild variant="outline" size="sm" fullWidth className="extra">
+        <a href="/prices" className="child">
+          Тарифы
+        </a>
+      </Button>,
+    );
+
+    const link = screen.getByRole('link', { name: 'Тарифы' });
+    expect(link.tagName).toBe('A');
+    expect(link).toHaveClass(
+      'button',
+      'button--outline',
+      'button--sm',
+      'button--full-width',
+      'extra',
+      'child',
+    );
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('asChild вызывает onClick ребёнка и кнопки', async () => {
+    const onChildClick =
+      vi.fn<(event: { defaultPrevented: boolean }) => void>();
+    const onClick = vi.fn<() => void>();
+
+    render(
+      <Button asChild onClick={onClick}>
+        <button type="button" onClick={onChildClick}>
+          Тарифы
+        </button>
+      </Button>,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Тарифы' }));
+    expect(onChildClick).toHaveBeenCalledOnce();
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it('asChild не зовёт onClick кнопки, если ребёнок отменил событие', () => {
+    const onClick = vi.fn<() => void>();
+
+    render(
+      <Button asChild onClick={onClick}>
+        <a
+          href="/prices"
+          onClick={event => {
+            event.preventDefault();
+          }}
+        >
+          Тарифы
+        </a>
+      </Button>,
+    );
+
+    fireEvent.click(screen.getByRole('link', { name: 'Тарифы' }));
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('asChild loading блокирует клик и оставляет спиннер внутри ребёнка', () => {
+    const onClick = vi.fn<() => void>();
+    const onChildClick = vi.fn<() => void>();
+
+    render(
+      <Button asChild loading onClick={onClick}>
+        <a href="/prices" onClick={onChildClick}>
+          Тарифы
+        </a>
+      </Button>,
+    );
+
+    const link = screen.getByRole('link', { name: 'Тарифы' });
+    expect(link).toHaveAttribute('aria-busy', 'true');
+    expect(link).toHaveAttribute('aria-disabled', 'true');
+    expect(link).not.toHaveAttribute('disabled');
+    expect(link.querySelector('.button__icon--spin')).toBeInTheDocument();
+    expect(fireEvent.click(link)).toBe(false);
+    expect(onClick).not.toHaveBeenCalled();
+    expect(onChildClick).not.toHaveBeenCalled();
+  });
+
+  it('asChild disabled на button-ребёнке выключает его и не подменяет type', () => {
+    const onClick = vi.fn<() => void>();
+
+    render(
+      <Button asChild disabled onClick={onClick}>
+        <button type="submit">Отправить</button>
+      </Button>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Отправить' });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('type', 'submit');
+    expect(button).toHaveClass('button');
+  });
+
+  it('asChild по умолчанию ставит type="button" на button-ребёнка', () => {
+    render(
+      <Button asChild>
+        <button>Сохранить</button>
+      </Button>,
+    );
+
+    expect(screen.getByRole('button')).toHaveAttribute('type', 'button');
+  });
+
+  it('asChild disabled на ссылке не навигирует', () => {
+    const onClick = vi.fn<() => void>();
+
+    render(
+      <Button asChild disabled onClick={onClick}>
+        <a href="/prices">Тарифы</a>
       </Button>,
     );
 
     const link = screen.getByRole('link', { name: 'Тарифы' });
     expect(link).toHaveAttribute('aria-disabled', 'true');
-    expect(link).toHaveAttribute('aria-busy', 'true');
+    expect(link).not.toHaveAttribute('disabled');
+    expect(fireEvent.click(link)).toBe(false);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('asChild собирает ref кнопки и ребёнка на одном узле', () => {
+    const buttonRef = createRef<HTMLElement>();
+    const childRef = createRef<HTMLAnchorElement>();
+
+    render(
+      <Button asChild ref={buttonRef}>
+        <a href="/prices" ref={childRef}>
+          Тарифы
+        </a>
+      </Button>,
+    );
+
+    expect(buttonRef.current).toBeInstanceOf(HTMLAnchorElement);
+    expect(buttonRef.current).toBe(childRef.current);
+  });
+
+  it('asChild прокидывает className в свой компонент', () => {
+    function Link(props: {
+      href: string;
+      className?: string;
+      children?: ReactNode;
+    }) {
+      const { href, className, children } = props;
+      return (
+        <a href={href} className={className}>
+          {children}
+        </a>
+      );
+    }
+
+    render(
+      <Button asChild variant="outline">
+        <Link href="/prices">Тарифы</Link>
+      </Button>,
+    );
+
+    expect(screen.getByRole('link', { name: 'Тарифы' })).toHaveClass(
+      'button',
+      'button--outline',
+    );
+  });
+
+  it('asChild без элемента кидает ошибку', () => {
+    expect(() =>
+      render(
+        // @ts-expect-error asChild ждёт элемент, не текст
+        <Button asChild>Текст</Button>,
+      ),
+    ).toThrow('Button с asChild ждёт ровно один React-элемент.');
   });
 });

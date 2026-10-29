@@ -2,8 +2,8 @@ import './styles/vars.scss';
 
 export {
   Button,
+  type ButtonAsChildProps,
   type ButtonComponentProps,
-  type ButtonLinkProps,
   type ButtonProps,
   type ButtonSize,
   type ButtonVariant,

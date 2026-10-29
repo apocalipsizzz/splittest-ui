@@ -43,8 +43,8 @@ function ImageButton(props: {
 
   if (href) {
     return (
-      <Button variant="image" aria-label={label} loading={loading} href={href}>
-        {content}
+      <Button asChild variant="image" aria-label={label} loading={loading}>
+        <a href={href}>{content}</a>
       </Button>
     );
   }
@@ -103,6 +103,9 @@ const meta = {
     loading: {
       control: 'boolean',
     },
+    asChild: {
+      control: 'boolean',
+    },
   },
 } satisfies Meta<typeof Button>;
 
@@ -117,15 +120,35 @@ export const Variants: Story = {
       <Button>Основная</Button>
       <Button variant="outline">Обводка</Button>
       <Button variant="link">Ссылка-текст</Button>
-      <Button href="https://example.com">Как ссылка</Button>
-      <Button href="https://example.com" variant="outline">
-        Ссылка с обводкой
-      </Button>
-      <Button href="https://example.com" variant="link">
-        Ссылка-текст
-      </Button>
       <ImageButton label="Превью" />
       <IconButton label="Превью" />
+    </div>
+  ),
+};
+
+export const AsChild: Story = {
+  render: () => (
+    <div style={row}>
+      <Button asChild>
+        <a href="https://example.com">Ссылка</a>
+      </Button>
+      <Button asChild variant="outline">
+        <a href="https://example.com">Обводка</a>
+      </Button>
+      <Button asChild variant="link">
+        <a href="https://example.com">Текст</a>
+      </Button>
+      <Button asChild variant="icon" aria-label="Превью">
+        <a href="https://example.com">
+          <IconPreview />
+        </a>
+      </Button>
+      <Button asChild disabled>
+        <a href="https://example.com">Недоступна</a>
+      </Button>
+      <Button asChild loading>
+        <a href="https://example.com">Загрузка</a>
+      </Button>
     </div>
   ),
 };

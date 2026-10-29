@@ -17,7 +17,7 @@
 
 Визуал снят с `src/shared/components/*`. Отличия от приложения:
 
-- `Button` не зависит от `react-router`. Ссылка — проп `href` → `<a>`.
+- `Button` не зависит от `react-router`. Ссылка — `asChild` вокруг своего `<a>` или `Link`.
 - Чекбокс и радио не красят все `input[type]` на странице: селекторы на `checkbox__input` / `radio__input`.
 - `TextArea`: `counter={false}` вместо `noMaxMoty`.
 - `Input` / `TextArea`: проп `recommended` красит фон в `--color-recommended`. В модуле приложения класс вешался, правила не было.

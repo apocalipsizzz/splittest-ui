@@ -1,6 +1,8 @@
 import {
+  cloneElement,
+  Fragment,
   forwardRef,
-  type AnchorHTMLAttributes,
+  isValidElement,
   type ButtonHTMLAttributes,
   type ForwardedRef,
   type MouseEventHandler,
@@ -11,6 +13,7 @@ import {
 
 import { IconSpinner } from '@/icons/icon-spinner';
 import { cn, when } from '@/lib/cn';
+import { Slot } from '@/lib/slot';
 import './button.scss';
 
 export type ButtonVariant = 'default' | 'outline' | 'link' | 'image' | 'icon';
@@ -27,23 +30,30 @@ interface ButtonStyleProps {
 
 export interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>, ButtonStyleProps {
-  href?: undefined;
+  asChild?: false;
   ref?: Ref<HTMLButtonElement> | ((element: HTMLElement | null) => void);
 }
 
-export interface ButtonLinkProps
+export interface ButtonAsChildProps
   extends
-    Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>,
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'>,
     ButtonStyleProps {
-  href: string;
-  ref?: Ref<HTMLAnchorElement> | ((element: HTMLElement | null) => void);
+  asChild: true;
+  children: ReactElement;
+  ref?: Ref<HTMLElement> | ((element: HTMLElement | null) => void);
 }
 
-export type ButtonComponentProps = ButtonProps | ButtonLinkProps;
+export type ButtonComponentProps = ButtonProps | ButtonAsChildProps;
 
 interface ButtonComponent {
-  (props: ButtonLinkProps): ReactElement | null;
+  (props: ButtonAsChildProps): ReactElement | null;
   (props: ButtonProps): ReactElement | null;
+}
+
+interface ChildElementProps {
+  children?: ReactNode;
+  className?: string;
+  onClick?: MouseEventHandler<HTMLElement>;
 }
 
 const styleKeys = [
@@ -51,6 +61,7 @@ const styleKeys = [
   'size',
   'fullWidth',
   'loading',
+  'asChild',
   'className',
 ] as const;
 
@@ -99,35 +110,60 @@ const renderContent = (children: ReactNode, loading?: boolean) => {
 // forwardRef остаётся: в React 18 ref ещё не обычный проп, peer — ^18.3 || ^19.
 export const Button = forwardRef(function Button(
   props: ButtonComponentProps,
-  ref: ForwardedRef<HTMLButtonElement | HTMLAnchorElement>,
+  ref: ForwardedRef<HTMLElement>,
 ) {
   const { loading } = props;
   const className = getClassName(props);
-  const { children, href, ref: propsRef, ...domProps } = omitStyleProps(props);
+  const { children, ref: propsRef, ...domProps } = omitStyleProps(props);
   const nodeRef = ref ?? propsRef;
-  const content = renderContent(children, loading);
 
-  if (typeof href === 'string') {
-    const anchorProps = domProps as AnchorHTMLAttributes<HTMLAnchorElement>;
-    const handleClick: MouseEventHandler<HTMLAnchorElement> = event => {
-      event.preventDefault();
+  if (props.asChild) {
+    if (!isValidElement(children) || children.type === Fragment) {
+      throw new Error('Button с asChild ждёт ровно один React-элемент.');
+    }
+
+    const childProps = children.props as ChildElementProps;
+    const { disabled, onClick, type, ...childDomProps } =
+      domProps as ButtonHTMLAttributes<HTMLButtonElement>;
+    const hostButton = children.type === 'button';
+    const isBlocked = Boolean(disabled || loading);
+    const handleClick: MouseEventHandler<HTMLElement> = event => {
+      if (isBlocked) {
+        event.preventDefault();
+        return;
+      }
+
+      childProps.onClick?.(event);
+      if (!event.defaultPrevented) {
+        (onClick as MouseEventHandler<HTMLElement> | undefined)?.(event);
+      }
     };
 
+    const element = cloneElement(
+      children,
+      {},
+      renderContent(childProps.children, loading),
+    );
+
     return (
-      <a
-        {...anchorProps}
-        ref={nodeRef as Ref<HTMLAnchorElement>}
+      <Slot
+        {...childDomProps}
         className={className}
-        aria-busy={loading || undefined}
-        // Ссылку нельзя выключить нативно: клик гасим, состояние объявляем.
-        aria-disabled={loading || undefined}
-        onClick={loading ? handleClick : anchorProps.onClick}
-        href={href}
+        ref={nodeRef}
+        onClick={handleClick}
+        {...(type !== undefined || hostButton
+          ? { type: type ?? 'button' }
+          : {})}
+        {...(hostButton && isBlocked ? { disabled: true } : {})}
+        {...(loading ? { 'aria-busy': true } : {})}
+        {...(!hostButton && isBlocked ? { 'aria-disabled': true } : {})}
       >
-        {content}
-      </a>
+        {element}
+      </Slot>
     );
   }
+
+  const content = renderContent(children, loading);
 
   const {
     type = 'button',

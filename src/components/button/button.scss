@@ -21,7 +21,7 @@
   gap: 8px;
   text-decoration: none;
 
-  &:hover:not(:active, :disabled) {
+  &:hover:not(:active, :disabled, [aria-disabled='true']) {
     background-color: var(--color-primary-hover);
     border-color: var(--color-primary-hover);
   }
@@ -35,7 +35,7 @@
     outline-offset: var(--focus-ring-offset);
   }
 
-  &:active {
+  &:active:not(:disabled, [aria-disabled='true']) {
     background-color: var(--color-muted);
     color: var(--color-muted-foreground);
     fill: currentColor;
@@ -43,8 +43,11 @@
   }
 
   // pointer-events не гасим: нативный disabled и так не пускает клик, а так
-  // на кнопку можно навести тултип «почему недоступна».
-  &:disabled {
+  // на кнопку можно навести тултип «почему недоступна». aria-disabled — для
+  // asChild на ссылке: :disabled у <a> не срабатывает. loading уже aria-busy,
+  // его вид не приглушаем.
+  &:disabled,
+  &[aria-disabled='true']:not([aria-busy='true']) {
     background-color: var(--color-muted);
     color: var(--color-muted-foreground);
     fill: currentColor;
@@ -59,14 +62,15 @@
     fill: currentColor;
     border: 2px solid var(--color-foreground);
 
-    &:hover:not(:active, :disabled) {
+    &:hover:not(:active, :disabled, [aria-disabled='true']) {
       background-color: transparent;
       border-color: var(--color-foreground);
       color: var(--color-foreground);
       fill: currentColor;
     }
 
-    &:disabled {
+    &:disabled,
+    &[aria-disabled='true']:not([aria-busy='true']) {
       background-color: transparent;
     }
   }
@@ -79,12 +83,13 @@
     border-radius: 0;
     padding: 0;
 
-    &:hover:not(:active, :disabled) {
+    &:hover:not(:active, :disabled, [aria-disabled='true']) {
       background-color: transparent;
     }
 
-    &:active,
-    &:disabled {
+    &:active:not([aria-disabled='true']),
+    &:disabled,
+    &[aria-disabled='true']:not([aria-busy='true']) {
       background-color: transparent;
     }
   }
@@ -103,12 +108,13 @@
       --size: 100px;
     }
 
-    &:hover:not(:active, :disabled) {
+    &:hover:not(:active, :disabled, [aria-disabled='true']) {
       background-color: var(--color-secondary);
     }
 
     &__icon {
       --size-icon: 32px;
+      --size-svg: 16px;
       position: absolute;
       top: 50%;
       left: 50%;
@@ -124,8 +130,14 @@
       transform: translate(-50%, -50%);
       pointer-events: none;
 
+      svg {
+        width: var(--size-svg);
+        height: var(--size-svg);
+      }
+
       @include mixins.min-width(md) {
         --size-icon: 40px;
+        --size-svg: 20px;
       }
     }
   }
