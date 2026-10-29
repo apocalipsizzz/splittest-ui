@@ -1,5 +1,11 @@
 # @de-kit/st-ui
 
+## 0.1.9
+
+### Patch Changes
+
+- `Button`: варианты `image` и `icon`. `icon` — круг без паддинга, 40px (`sm` 30px, `lg` 52px). `image` — квадрат 60px, с `md` 100px, фон `--color-secondary`, без рамки и с `--radius-sm`. Бейдж по центру картинки — класс `button--image__icon`: круг `--color-primary`, 32px, с `md` 40px.
+
 ## 0.1.8
 
 ### Patch Changes
