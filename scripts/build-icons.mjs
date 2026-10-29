@@ -7,8 +7,11 @@
  */
 import { spawnSync } from 'node:child_process';
 import { readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+const require = createRequire(import.meta.url);
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const svgDir = join(root, 'src/icons/svg');
@@ -407,10 +410,20 @@ const generated = [
   join(outDir, 'index.ts'),
   ...exports.map(item => join(outDir, item.file)),
 ];
-const formatted = spawnSync('pnpm', ['exec', 'oxfmt', ...generated], {
+// Same node on macOS and Windows. spawn('pnpm') is ENOENT on Windows
+// (pnpm.cmd) and depends on PATH when nvm is used on macOS.
+const oxfmtBin = join(
+  dirname(require.resolve('oxfmt/package.json')),
+  'bin/oxfmt',
+);
+const formatted = spawnSync(process.execPath, [oxfmtBin, ...generated], {
   cwd: root,
   stdio: 'inherit',
 });
+if (formatted.error) {
+  console.error(formatted.error);
+  process.exit(1);
+}
 if (formatted.status !== 0) process.exit(formatted.status ?? 1);
 
 console.log(`icons: ${exports.length} components, skipped ${skipped.length}`);

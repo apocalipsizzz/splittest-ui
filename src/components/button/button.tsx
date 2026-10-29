@@ -7,7 +7,6 @@ import {
   type ReactElement,
   type ReactNode,
   type Ref,
-  type RefAttributes,
 } from 'react';
 
 import { IconSpinner } from '@/icons/icon-spinner';
@@ -29,6 +28,7 @@ interface ButtonStyleProps {
 export interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>, ButtonStyleProps {
   href?: undefined;
+  ref?: Ref<HTMLButtonElement> | ((element: HTMLElement | null) => void);
 }
 
 export interface ButtonLinkProps
@@ -36,15 +36,14 @@ export interface ButtonLinkProps
     Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>,
     ButtonStyleProps {
   href: string;
+  ref?: Ref<HTMLAnchorElement> | ((element: HTMLElement | null) => void);
 }
 
 export type ButtonComponentProps = ButtonProps | ButtonLinkProps;
 
 interface ButtonComponent {
-  (
-    props: ButtonLinkProps & RefAttributes<HTMLAnchorElement>,
-  ): ReactElement | null;
-  (props: ButtonProps & RefAttributes<HTMLButtonElement>): ReactElement | null;
+  (props: ButtonLinkProps): ReactElement | null;
+  (props: ButtonProps): ReactElement | null;
 }
 
 const styleKeys = [
@@ -104,7 +103,8 @@ export const Button = forwardRef(function Button(
 ) {
   const { loading } = props;
   const className = getClassName(props);
-  const { children, href, ...domProps } = omitStyleProps(props);
+  const { children, href, ref: propsRef, ...domProps } = omitStyleProps(props);
+  const nodeRef = ref ?? propsRef;
   const content = renderContent(children, loading);
 
   if (typeof href === 'string') {
@@ -116,7 +116,7 @@ export const Button = forwardRef(function Button(
     return (
       <a
         {...anchorProps}
-        ref={ref as Ref<HTMLAnchorElement>}
+        ref={nodeRef as Ref<HTMLAnchorElement>}
         className={className}
         aria-busy={loading || undefined}
         // Ссылку нельзя выключить нативно: клик гасим, состояние объявляем.
@@ -139,7 +139,7 @@ export const Button = forwardRef(function Button(
   return (
     <button
       {...buttonProps}
-      ref={ref as Ref<HTMLButtonElement>}
+      ref={nodeRef as Ref<HTMLButtonElement>}
       className={className}
       type={type}
       disabled={disabled || loading}

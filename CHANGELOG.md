@@ -1,5 +1,11 @@
 # @de-kit/st-ui
 
+## 0.1.8
+
+### Patch Changes
+
+- `Button` принимает `ref` в пропсах. Без `href` это `HTMLButtonElement`, с `href` — `HTMLAnchorElement`. Колбэк `(element: HTMLElement | null) => void` тоже подходит: так `ref` отдают dnd-kit и похожие библиотеки.
+
 ## 0.1.7
 
 ### Patch Changes

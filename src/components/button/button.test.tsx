@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Button } from './button';
+import { Button, type ButtonLinkProps, type ButtonProps } from './button';
 
 describe('Button', () => {
   it('рендерит button type="button" по умолчанию', () => {
@@ -112,6 +112,37 @@ describe('Button', () => {
       'button--lg',
       'button--full-width',
     );
+  });
+
+  it('ButtonProps принимает ref на HTMLElement', () => {
+    let node: HTMLElement | null = null;
+    const props: ButtonProps = {
+      children: 'Кнопка',
+      disabled: false,
+      className: 'x',
+      role: 'button',
+      tabIndex: 0,
+      'aria-disabled': false,
+      'aria-pressed': undefined,
+      'aria-roledescription': 'draggable',
+      'aria-describedby': 'hint',
+      ref: (element: HTMLElement | null) => {
+        node = element;
+      },
+    };
+
+    render(<Button {...props} />);
+    expect(node).toBeInstanceOf(HTMLButtonElement);
+
+    const linkProps: ButtonLinkProps = {
+      href: '/prices',
+      children: 'Тарифы',
+      ref: (element: HTMLElement | null) => {
+        node = element;
+      },
+    };
+    render(<Button {...linkProps} />);
+    expect(node).toBeInstanceOf(HTMLAnchorElement);
   });
 
   it('ref без href — button, с href — anchor', () => {
