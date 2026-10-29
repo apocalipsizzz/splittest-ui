@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { Labeled, LabeledBlock } from '@/stories/labeled';
+import { storyStack } from '@/stories/story-stack';
 import { TextArea } from './textarea';
 
 const meta = {
@@ -18,28 +20,55 @@ export const Playground: Story = {};
 
 export const Sizes: Story = {
   render: () => (
-    <div style={{ display: 'grid', gap: 16, width: 360 }}>
-      <TextArea size="sm" placeholder="sm" />
-      <TextArea placeholder="md" />
-      <TextArea size="lg" placeholder="lg" />
-    </div>
+    <LabeledBlock title="size">
+      <Labeled label="sm" wide maxWidth={360}>
+        <TextArea size="sm" placeholder="sm" />
+      </Labeled>
+      <Labeled label="md" wide maxWidth={360}>
+        <TextArea placeholder="md" />
+      </Labeled>
+      <Labeled label="lg" wide maxWidth={360}>
+        <TextArea size="lg" placeholder="lg" />
+      </Labeled>
+    </LabeledBlock>
   ),
 };
 
 export const States: Story = {
   render: () => (
-    <div style={{ display: 'grid', gap: 16, width: 360 }}>
-      <TextArea
-        placeholder="Счётчик"
-        maxLength={80}
-        defaultValue="Уже набрано"
-      />
-      <TextArea placeholder="Без счётчика" maxLength={80} counter={false} />
-      <TextArea placeholder="Рекомендуем" recommended />
-      <TextArea placeholder="Ошибка" error defaultValue="текст" />
-      <TextArea recommended error defaultValue="спорно" />
-      <TextArea readOnly defaultValue="только чтение" />
-      <TextArea disabled defaultValue="нельзя" />
+    <div style={storyStack}>
+      <LabeledBlock title="state">
+        <Labeled label="default" wide maxWidth={360}>
+          <TextArea placeholder="Комментарий" />
+        </Labeled>
+        <Labeled label="recommended" wide maxWidth={360}>
+          <TextArea placeholder="Комментарий" recommended />
+        </Labeled>
+        <Labeled label="error" wide maxWidth={360}>
+          <TextArea placeholder="Комментарий" error defaultValue="текст" />
+        </Labeled>
+        <Labeled label="recommended + error" wide maxWidth={360}>
+          <TextArea recommended error defaultValue="спорно" />
+        </Labeled>
+        <Labeled label="readOnly" wide maxWidth={360}>
+          <TextArea readOnly defaultValue="только чтение" />
+        </Labeled>
+        <Labeled label="disabled" wide maxWidth={360}>
+          <TextArea disabled defaultValue="нельзя" />
+        </Labeled>
+      </LabeledBlock>
+      <LabeledBlock title="counter">
+        <Labeled label="maxLength" wide maxWidth={360}>
+          <TextArea
+            placeholder="Комментарий"
+            maxLength={80}
+            defaultValue="Уже набрано"
+          />
+        </Labeled>
+        <Labeled label="counter=false" wide maxWidth={360}>
+          <TextArea placeholder="Комментарий" maxLength={80} counter={false} />
+        </Labeled>
+      </LabeledBlock>
     </div>
   ),
 };

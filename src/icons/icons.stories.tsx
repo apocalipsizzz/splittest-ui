@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import { Labeled, LabeledBlock } from '@/stories/labeled';
+import { storyStack } from '@/stories/story-stack';
 import * as icons from './index';
 import type { IconProps } from './svg';
 
@@ -32,55 +34,33 @@ const groups = [
   },
 ];
 
-const grid = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(108px, 1fr))',
-  gap: 12,
-} as const;
-
 export const All = () => (
-  <div style={{ display: 'grid', gap: 28 }}>
-    <div style={{ display: 'flex', gap: 16 }}>
-      <icons.IconClose style={{ color: 'var(--color-foreground)' }} />
-      <icons.IconClose style={{ color: 'var(--color-accent)' }} />
-      <icons.IconClose style={{ color: 'var(--color-destructive)' }} />
-    </div>
+  <div style={storyStack}>
+    <LabeledBlock title="цвет">
+      <Labeled label="foreground">
+        <icons.IconClose style={{ color: 'var(--color-foreground)' }} />
+      </Labeled>
+      <Labeled label="accent">
+        <icons.IconClose style={{ color: 'var(--color-accent)' }} />
+      </Labeled>
+      <Labeled label="destructive">
+        <icons.IconClose style={{ color: 'var(--color-destructive)' }} />
+      </Labeled>
+    </LabeledBlock>
     {groups.map(group => (
-      <section key={group.title} style={{ display: 'grid', gap: 12 }}>
-        <div style={{ fontSize: 16, fontWeight: 600 }}>{group.title}</div>
-        <div style={grid}>
-          {group.items.map(([name, Icon]) => (
-            <div
-              key={name}
-              style={{
-                display: 'grid',
-                justifyItems: 'center',
-                alignContent: 'start',
-                gap: 8,
-                color: 'var(--color-foreground)',
-              }}
-            >
-              <Icon
-                style={
-                  name.startsWith('Logo') || name.startsWith('Illustration')
-                    ? { maxWidth: '100%', height: 'auto' }
-                    : undefined
-                }
-              />
-              <span
-                style={{
-                  fontSize: 11,
-                  lineHeight: 1.3,
-                  textAlign: 'center',
-                  color: 'var(--color-muted-foreground)',
-                }}
-              >
-                {name}
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
+      <LabeledBlock key={group.title} title={group.title}>
+        {group.items.map(([name, Icon]) => (
+          <Labeled key={name} label={name}>
+            <Icon
+              style={
+                name.startsWith('Logo') || name.startsWith('Illustration')
+                  ? { maxWidth: 96, height: 'auto' }
+                  : undefined
+              }
+            />
+          </Labeled>
+        ))}
+      </LabeledBlock>
     ))}
   </div>
 );

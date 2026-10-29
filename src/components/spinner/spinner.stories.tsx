@@ -1,5 +1,6 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 
+import { Labeled, LabeledBlock } from '@/stories/labeled';
 import { Spinner } from './spinner';
 
 const meta = {
@@ -31,24 +32,30 @@ export const Small: Story = {
   decorators: [inBox],
 };
 
+const sizeBox = {
+  width: 160,
+  height: 120,
+  border: '1px dashed var(--color-input)',
+} as const;
+
 export const Sizes: Story = {
   render: () => (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: 12,
-      }}
-    >
-      <div style={{ height: 120, border: '1px dashed var(--color-input)' }}>
-        <Spinner size={16} label="16" />
-      </div>
-      <div style={{ height: 120, border: '1px dashed var(--color-input)' }}>
-        <Spinner size={24} label="24" />
-      </div>
-      <div style={{ height: 120, border: '1px dashed var(--color-input)' }}>
-        <Spinner size={64} label="64" />
-      </div>
-    </div>
+    <LabeledBlock title="size">
+      <Labeled label="16">
+        <div style={sizeBox}>
+          <Spinner size={16} label="16" />
+        </div>
+      </Labeled>
+      <Labeled label="24">
+        <div style={sizeBox}>
+          <Spinner size={24} label="24" />
+        </div>
+      </Labeled>
+      <Labeled label="64">
+        <div style={sizeBox}>
+          <Spinner size={64} label="64" />
+        </div>
+      </Labeled>
+    </LabeledBlock>
   ),
 };

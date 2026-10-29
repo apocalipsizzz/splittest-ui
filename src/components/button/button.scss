@@ -21,25 +21,30 @@
   gap: 8px;
   text-decoration: none;
 
-  &:hover:not(:active, :disabled, [aria-disabled='true']) {
+  &:hover:not(:active, [data-active], :disabled, [aria-disabled='true']) {
     background-color: var(--color-primary-hover);
     border-color: var(--color-primary-hover);
   }
 
-  &:focus:not(:focus-visible) {
+  // data-* повторяют псевдоклассы: в Storybook :active и :focus-visible
+  // на нескольких кнопках сразу не удержать.
+  &:focus:not(:focus-visible),
+  &[data-focus]:not([data-focus-visible]) {
     outline: none;
   }
 
-  &:focus-visible {
+  &:focus-visible,
+  &[data-focus-visible] {
     outline: var(--focus-ring-width) solid var(--focus-ring-color);
     outline-offset: var(--focus-ring-offset);
   }
 
-  &:active:not(:disabled, [aria-disabled='true']) {
-    background-color: var(--color-muted);
-    color: var(--color-muted-foreground);
+  &:active:not(:disabled, [aria-disabled='true']),
+  &[data-active]:not(:disabled, [aria-disabled='true']) {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
     fill: currentColor;
-    border-color: var(--color-muted);
+    border-color: var(--color-primary);
   }
 
   // pointer-events не гасим: нативный disabled и так не пускает клик, а так
@@ -62,7 +67,7 @@
     fill: currentColor;
     border: 2px solid var(--color-foreground);
 
-    &:hover:not(:active, :disabled, [aria-disabled='true']) {
+    &:hover:not(:active, [data-active], :disabled, [aria-disabled='true']) {
       background-color: transparent;
       border-color: var(--color-foreground);
       color: var(--color-foreground);
@@ -80,14 +85,15 @@
     background-color: transparent;
     color: var(--color-foreground);
     fill: currentColor;
-    border-radius: 0;
+    border-radius: var(--radius-sm);
     padding: 0;
 
-    &:hover:not(:active, :disabled, [aria-disabled='true']) {
+    &:hover:not(:active, [data-active], :disabled, [aria-disabled='true']) {
       background-color: transparent;
     }
 
     &:active:not([aria-disabled='true']),
+    &[data-active]:not([aria-disabled='true']),
     &:disabled,
     &[aria-disabled='true']:not([aria-busy='true']) {
       background-color: transparent;
@@ -103,12 +109,18 @@
     width: var(--size);
     height: var(--size);
     position: relative;
+    justify-content: center;
 
     @include mixins.min-width(md) {
       --size: 100px;
     }
 
-    &:hover:not(:active, :disabled, [aria-disabled='true']) {
+    &:hover:not(:active, [data-active], :disabled, [aria-disabled='true']) {
+      background-color: var(--color-secondary);
+    }
+
+    &:active:not(:disabled, [aria-disabled='true']),
+    &[data-active]:not(:disabled, [aria-disabled='true']) {
       background-color: var(--color-secondary);
     }
 
