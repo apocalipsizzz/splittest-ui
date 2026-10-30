@@ -46,6 +46,11 @@ export const Inputs: Story = {
             <Input placeholder="Иванов" />
           </Field>
         </Labeled>
+        <Labeled label="без label" wide maxWidth={360}>
+          <Field>
+            <Input aria-label="Поиск" placeholder="Поиск" />
+          </Field>
+        </Labeled>
         <Labeled label="required" wide maxWidth={360}>
           <Field label="Имя" required>
             <Input placeholder="Пока пусто, ошибки нет" />

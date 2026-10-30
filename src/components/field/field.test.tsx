@@ -183,6 +183,21 @@ describe('Field', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
+  it('без лейбла не рисует label', async () => {
+    const { container } = render(
+      <Field required>
+        <Input aria-label="Поиск" defaultValue="текст" />
+      </Field>,
+    );
+
+    const input = screen.getByLabelText('Поиск');
+    expect(container.querySelector('.field__label')).toBeNull();
+    expect(input).not.toHaveAttribute('aria-labelledby');
+
+    await userEvent.clear(input);
+    expect(screen.getByRole('alert')).toHaveTextContent('Обязательное поле');
+  });
+
   it('пустое обязательное поле ругается после неудачной отправки', () => {
     render(
       <form>

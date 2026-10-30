@@ -1,5 +1,11 @@
 # @de-kit/st-ui
 
+## 0.1.12
+
+### Patch Changes
+
+- `Field`: проп `label` необязателен. Без него `<label>` не рисуется, `aria-labelledby` на контрол не вешается. Текст `required` без строкового лейбла — «Обязательное поле».
+
 ## 0.1.11
 
 ### Patch Changes

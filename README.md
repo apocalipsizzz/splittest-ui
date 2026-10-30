@@ -117,7 +117,7 @@ import { IconClose, LogoVisa } from '@de-kit/st-ui/icons';
 
 ## Поле
 
-`Field` оборачивает один контрол: ставит лейбл, подсказку и ошибку и связывает их через `aria-describedby`, `aria-errormessage` и `role="alert"`.
+`Field` оборачивает один контрол: ставит подсказку и ошибку и связывает их через `aria-describedby`, `aria-errormessage` и `role="alert"`. `label` необязателен: без него `<label>` не рисуется, а текст `required` — «Обязательное поле».
 
 ```tsx
 <Field label="Имя" hint="Нельзя изменить после проверки">

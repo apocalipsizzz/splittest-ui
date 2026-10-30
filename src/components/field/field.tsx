@@ -18,7 +18,7 @@ import './field.scss';
 export type FieldHintPlacement = 'bottom' | 'label';
 
 export interface FieldProps {
-  label: ReactNode;
+  label?: ReactNode;
   hint?: ReactNode;
   /** `bottom` — под полем, `label` — сразу под лейблом. */
   hintPlacement?: FieldHintPlacement;
@@ -57,7 +57,8 @@ export const Field = ({
   children,
 }: FieldProps) => {
   const inputId = useId();
-  const labelId = `${inputId}-label`;
+  const hasLabel = Boolean(label);
+  const labelId = hasLabel ? `${inputId}-label` : undefined;
   const rootRef = useRef<HTMLDivElement>(null);
   // ponytail: value/defaultValue больше не читаем с ребёнка. Контрол зовёт
   // reportValue из эффекта — до первого эффекта hadValue ещё false.
@@ -154,9 +155,11 @@ export const Field = ({
         when(Boolean(hint) && hintPlacement === 'label', 'field--hint-label'),
       )}
     >
-      <label id={labelId} className="field__label" htmlFor={inputId}>
-        {label}
-      </label>
+      {hasLabel ? (
+        <label id={labelId} className="field__label" htmlFor={inputId}>
+          {label}
+        </label>
+      ) : null}
       {hintByPlacement.label}
       <FieldControlProvider value={contextValue}>
         {children}
