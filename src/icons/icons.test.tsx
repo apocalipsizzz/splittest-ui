@@ -34,12 +34,13 @@ describe('icons', () => {
     expect(svgOf(container)).not.toHaveAttribute('aria-hidden');
   });
 
-  it('высокая иконка не сплющивается в квадрат', () => {
+  it('стрелка галереи 20×20, viewBox 20×40', () => {
     const { container } = render(<IconGalleryNext />);
     const svg = svgOf(container);
 
+    expect(svg).toHaveAttribute('viewBox', '0 0 20 40');
     expect(svg).toHaveAttribute('width', '20');
-    expect(svg).toHaveAttribute('height', '40');
+    expect(svg).toHaveAttribute('height', '20');
   });
 
   it('бренд сохраняет заливку, градиент уникален на экземпляр', () => {

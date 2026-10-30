@@ -1,5 +1,11 @@
 # @de-kit/st-ui
 
+## 0.1.13
+
+### Patch Changes
+
+- 10cce6b: `IconGalleryNext` и `IconGalleryPrev` рисуются 20×20. `viewBox` остаётся `0 0 20 40`.
+
 ## 0.1.12
 
 ### Patch Changes
