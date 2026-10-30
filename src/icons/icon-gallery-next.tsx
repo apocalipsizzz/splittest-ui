@@ -5,7 +5,7 @@ export const IconGalleryNext = (props: IconProps) => (
   <Svg
     viewBox="0 0 20 40"
     width={20}
-    height={40}
+    height={20}
     fill="currentColor"
     {...props}
   >

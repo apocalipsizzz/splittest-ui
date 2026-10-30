@@ -1,4 +1,4 @@
 export const storyStack = {
   display: 'grid',
-  gap: 16,
+  gap: 20,
 } as const;

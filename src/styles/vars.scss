@@ -30,7 +30,7 @@
   --color-sidebar: color-mix(in srgb, var(--color-foreground) 3%, transparent);
 
   // Акцент, ошибка, успех. Текст на акценте отдельный: в тёмной теме primary-foreground инвертируется, этот нет.
-  --color-accent: #002bff;
+  --color-accent: #0000ff;
   --color-accent-foreground: #fff;
   --color-destructive: #ff0000;
   --color-success: #00a66f;

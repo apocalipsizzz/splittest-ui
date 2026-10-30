@@ -57,8 +57,8 @@ export function Labeled(props: {
 
   return (
     <div style={{ ...storyCell, ...wideStyle }}>
-      <span style={storyCaption}>{label}</span>
       {children}
+      <span style={storyCaption}>{label}</span>
     </div>
   );
 }
