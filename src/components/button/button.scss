@@ -5,7 +5,7 @@
   width: fit-content;
   display: flex;
   align-items: center;
-  padding: 8px 18px;
+  padding: 8px 16px;
   border-radius: 30px;
   font-size: var(--text-sm);
   line-height: var(--text-sm--line-height);
@@ -18,7 +18,7 @@
   flex-shrink: 0;
   cursor: pointer;
   transition: none;
-  gap: 8px;
+  gap: 5px;
   text-decoration: none;
 
   &:hover:not(:active, [data-active], :disabled, [aria-disabled='true']) {
