@@ -1,6 +1,7 @@
 /**
  * SVG из src/icons/svg → React-компоненты в src/icons.
- * Размер берётся из SVG (иконки 20×20, галерея 20×40). width/height в пропсах
+ * Размер берётся из SVG (иконки 20×20). У стрелок галереи viewBox 20×40,
+ * width и height — 20. width/height в пропсах
  * перекрывают его. icon/control — currentColor, label и logo — свои заливки.
  * У illustration чёрный stroke становится currentColor.
  * Файл с пустым сегментом имени (illustration_test_.svg) пропускается.
@@ -382,9 +383,15 @@ const checkbox = readOut('control-mark-checkbox.tsx');
 if (!checkbox.includes('width={20}') || !checkbox.includes('height={20}')) {
   throw new Error('checkbox mark is not 20px');
 }
-const gallery = readOut('icon-gallery-next.tsx');
-if (!gallery.includes('width={20}') || !gallery.includes('height={40}')) {
-  throw new Error('gallery icon lost 20×40');
+for (const name of ['icon-gallery-next.tsx', 'icon-gallery-prev.tsx']) {
+  const gallery = readOut(name);
+  if (
+    !gallery.includes('viewBox="0 0 20 40"') ||
+    !gallery.includes('width={20}') ||
+    !gallery.includes('height={20}')
+  ) {
+    throw new Error(`${name}: expected 20×20 with viewBox 20×40`);
+  }
 }
 const illustration = readOut('illustration-test-best.tsx');
 if (

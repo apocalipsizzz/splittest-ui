@@ -27,7 +27,7 @@ import { IconClose, LogoVisa } from '@de-kit/st-ui/icons';
 <IconClose width={16} height={16} aria-label="Закрыть" />
 ```
 
-`icon_*` и `control_*` — 20×20 и `currentColor` (галерея 20×40). Размер меняется пропом `width`/`height` или CSS, он перекрывает дефолт. `icon_label-*` сохраняют заливку. `logo_*` и `illustration_*` — размер из SVG, у иллюстраций чёрный stroke заменён на `currentColor`. Новый svg кладётся в `src/icons/svg`, дальше `pnpm build:icons` (его же зовут `dev` и `build`).
+`icon_*` и `control_*` — 20×20 и `currentColor`. У стрелок галереи `viewBox` 20×40, рисуются тоже 20×20. Размер меняется пропом `width`/`height` или CSS, он перекрывает дефолт. `icon_label-*` сохраняют заливку. `logo_*` и `illustration_*` — размер из SVG, у иллюстраций чёрный stroke заменён на `currentColor`. Новый svg кладётся в `src/icons/svg`, дальше `pnpm build:icons` (его же зовут `dev` и `build`).
 
 `global.scss` — база приложения (body, заголовки, таблицы, `.wrapper`). В чужой странице его не подключать. Шрифт Inter библиотека не везёт, его по-прежнему грузит фронтенд.
 
