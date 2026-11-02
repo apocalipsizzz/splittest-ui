@@ -1,6 +1,6 @@
 {
   "name": "@de-kit/st-ui",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "React-компоненты splittest: глобальный SCSS и токены из основного фронтенда",
   "license": "UNLICENSED",
   "repository": {
@@ -33,6 +33,7 @@
     "./global.scss": "./dist/styles/global.scss",
     "./vars.scss": "./dist/styles/vars.scss",
     "./mixins.scss": "./dist/styles/mixins.scss",
+    "./typography.scss": "./dist/styles/typography.scss",
     "./icons": {
       "import": {
         "types": "./dist/icons/index.d.ts",
@@ -62,7 +63,7 @@
     "format:fix": "oxfmt",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check:exports": "publint && attw --pack . --profile node16 --exclude-entrypoints global.scss vars.scss mixins.scss",
+    "check:exports": "publint && attw --pack . --profile node16 --exclude-entrypoints global.scss vars.scss mixins.scss typography.scss",
     "verify": "pnpm run build:icons && pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run build && pnpm run check:exports",
     "changeset": "changeset",
     "version": "changeset version",

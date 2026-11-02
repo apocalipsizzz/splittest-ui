@@ -66,5 +66,5 @@ export const All = () => (
 );
 
 export default {
-  title: 'Icons',
+  title: 'Foundations/Icons',
 };

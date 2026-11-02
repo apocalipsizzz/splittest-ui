@@ -1,5 +1,11 @@
 # @de-kit/st-ui
 
+## 0.1.19
+
+### Patch Changes
+
+- Экспорт `@de-kit/st-ui/typography.scss`: шкала текста и заголовков (классы `.text-*`, `.heading-*` и стили h1–h4) для приложений, которые не подключают `global.scss`.
+
 ## 0.1.18
 
 ### Patch Changes
