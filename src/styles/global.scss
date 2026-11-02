@@ -4,10 +4,10 @@
 
 :root {
   --window-max-height: 100vh;
-  --wrapper-padding: 20px;
+  --wrapper-padding: var(--space-4);
 
   @include mixins.min-width(md) {
-    --wrapper-padding: 30px;
+    --wrapper-padding: var(--space-6);
   }
 }
 

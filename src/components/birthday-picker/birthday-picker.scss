@@ -4,14 +4,14 @@
 
   .birthday-picker__trigger {
     cursor: pointer;
-    padding-right: 44px;
+    padding-right: 45px;
   }
 }
 
 .birthday-picker__icon {
   position: absolute;
   top: 50%;
-  right: 14px;
+  right: var(--space-3);
   transform: translateY(-50%);
   pointer-events: none;
 }

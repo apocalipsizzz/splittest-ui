@@ -27,6 +27,7 @@ export {
   BirthdayPicker,
   type BirthdayPickerProps,
 } from './components/birthday-picker';
+export { HR, type HRProps } from './components/hr';
 export { Input, type InputProps, type InputSize } from './components/input';
 export {
   RadioGroup,
