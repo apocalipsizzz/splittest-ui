@@ -5,15 +5,16 @@ import { Field } from '@/components/field';
 import { Form, FormSubmit } from '@/components/form';
 import { Labeled, LabeledBlock } from '@/stories/labeled';
 import { storyStack } from '@/stories/story-stack';
-import { BirthdayPicker } from './birthday-picker';
+import { DatePicker } from './date-picker';
 
 const meta = {
-  title: 'Components/BirthdayPicker',
-  component: BirthdayPicker,
+  title: 'Components/DatePicker',
+  component: DatePicker,
   args: {
     minAge: 18,
+    title: 'Дата рождения',
   },
-} satisfies Meta<typeof BirthdayPicker>;
+} satisfies Meta<typeof DatePicker>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -26,7 +27,7 @@ const ControlledDemo = () => {
   return (
     <div style={storyStack}>
       <Labeled label="controlled" wide maxWidth={360}>
-        <BirthdayPicker value={birth} onChange={setBirth} />
+        <DatePicker value={birth} onChange={setBirth} />
       </Labeled>
       <p>Значение: {birth ? birth.toLocaleDateString('ru') : '—'}</p>
     </div>
@@ -42,16 +43,16 @@ export const States: Story = {
     <div style={storyStack}>
       <LabeledBlock title="state">
         <Labeled label="default" wide maxWidth={360}>
-          <BirthdayPicker />
+          <DatePicker />
         </Labeled>
         <Labeled label="filled" wide maxWidth={360}>
-          <BirthdayPicker value={new Date(1990, 2, 15)} onChange={() => {}} />
+          <DatePicker value={new Date(1990, 2, 15)} onChange={() => {}} />
         </Labeled>
         <Labeled label="error" wide maxWidth={360}>
-          <BirthdayPicker error value={null} onChange={() => {}} />
+          <DatePicker error value={null} onChange={() => {}} />
         </Labeled>
         <Labeled label="disabled" wide maxWidth={360}>
-          <BirthdayPicker disabled value={new Date(1990, 2, 15)} />
+          <DatePicker disabled value={new Date(1990, 2, 15)} />
         </Labeled>
       </LabeledBlock>
     </div>
@@ -67,7 +68,7 @@ export const InForm: Story = {
         }}
       >
         <Field label="Дата рождения" required>
-          <BirthdayPicker name="birth" />
+          <DatePicker name="birth" />
         </Field>
         <FormSubmit>Отправить</FormSubmit>
       </Form>

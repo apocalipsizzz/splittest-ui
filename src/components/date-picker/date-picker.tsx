@@ -8,7 +8,7 @@ import { IconCalendar } from '@/icons/icon-calendar';
 import { IconCorrect } from '@/icons/icon-correct';
 import { cn } from '@/lib/cn';
 import { WheelColumn } from './wheel-column';
-import './birthday-picker.scss';
+import './date-picker.scss';
 
 const MONTH_NAMES = [
   'январь',
@@ -42,7 +42,7 @@ const MONTH_NAMES_GENITIVE = [
 ];
 
 /** Месяц здесь 1–12, как в календаре, а не индекс массива. */
-interface BirthdayParts {
+interface DateParts {
   day: number;
   month: number;
   year: number;
@@ -51,13 +51,13 @@ interface BirthdayParts {
 const daysInMonth = (year: number, month: number) =>
   new Date(year, month, 0).getDate();
 
-const partsOf = (date: Date): BirthdayParts => ({
+const partsOf = (date: Date): DateParts => ({
   day: date.getDate(),
   month: date.getMonth() + 1,
   year: date.getFullYear(),
 });
 
-const toDate = ({ day, month, year }: BirthdayParts) =>
+const toDate = ({ day, month, year }: DateParts) =>
   new Date(year, month - 1, day);
 
 const pad = (value: number) => String(value).padStart(2, '0');
@@ -65,11 +65,11 @@ const pad = (value: number) => String(value).padStart(2, '0');
 const toIsoDate = (date: Date) =>
   `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 
-const formatBirthday = (date: Date) =>
+const formatDate = (date: Date) =>
   `${date.getDate()} ${MONTH_NAMES_GENITIVE[date.getMonth()]} ${date.getFullYear()}`;
 
 /** Сегодня минус `minAge` лет. 29 февраля в невисокосном году уходит на 28-е. */
-const maxBirthDate = (minAge: number, today: Date) => {
+const maxAllowedDate = (minAge: number, today: Date) => {
   const year = today.getFullYear() - minAge;
   const month = today.getMonth();
   const day = Math.min(today.getDate(), daysInMonth(year, month + 1));
@@ -77,7 +77,7 @@ const maxBirthDate = (minAge: number, today: Date) => {
 };
 
 /** Подрезает день под длину месяца и не даёт выбрать дату позже максимальной. */
-const clampParts = (parts: BirthdayParts, max: Date): BirthdayParts => {
+const clampParts = (parts: DateParts, max: Date): DateParts => {
   const next = {
     ...parts,
     day: Math.min(parts.day, daysInMonth(parts.year, parts.month)),
@@ -89,48 +89,52 @@ const clampParts = (parts: BirthdayParts, max: Date): BirthdayParts => {
 const range = (from: number, to: number) =>
   from > to ? [] : Array.from({ length: to - from + 1 }, (_, i) => from + i);
 
-export interface BirthdayPickerProps {
+export interface DatePickerProps {
   value?: Date | null;
   onChange?: (date: Date) => void;
   /** Самый ранний год в списке. */
   minYear?: number;
   /** Самый поздний год в списке. По умолчанию — текущий. */
   maxYear?: number;
-  /** Минимальный возраст: позже этой даты выбрать нельзя. */
+  /** Минимальный возраст: позже сегодня минус столько лет выбрать нельзя. 0 — без ограничения. */
   minAge?: number;
   disabled?: boolean;
   /** Имя для FormData: уходит дата в формате `YYYY-MM-DD`. */
   name?: string;
+  /** Текст в поле, пока дата не выбрана. */
   placeholder?: string;
+  /** Заголовок окна выбора. */
+  title?: string;
   error?: boolean;
   className?: string;
 }
 
 /**
- * Дата рождения: поле открывает нижний лист с выбором дня, месяца и года.
+ * Выбор даты: поле открывает нижний лист с выбором дня, месяца и года.
  * Поле только для чтения с клавиатуры, поэтому `required` из `Field` и
  * нативная проверка формы работают, а телефонная клавиатура не открывается.
  */
-export const BirthdayPicker = ({
+export const DatePicker = ({
   value,
   onChange,
   minYear = 1930,
   maxYear,
-  minAge = 18,
+  minAge = 0,
   disabled = false,
   name,
-  placeholder,
+  placeholder = 'Выберите дату',
+  title = 'Выберите дату',
   error,
   className,
-}: BirthdayPickerProps) => {
+}: DatePickerProps) => {
   const [today] = useState(() => new Date());
   const [open, setOpen] = useState(false);
-  const maxBirth = maxBirthDate(minAge, today);
+  const maxBirth = maxAllowedDate(minAge, today);
   const lastYear = Math.min(
     maxYear ?? today.getFullYear(),
     maxBirth.getFullYear(),
   );
-  const [draft, setDraft] = useState<BirthdayParts>(() =>
+  const [draft, setDraft] = useState<DateParts>(() =>
     clampParts(partsOf(value ?? maxBirth), maxBirth),
   );
   const triggerRef = useRef<HTMLInputElement>(null);
@@ -182,7 +186,7 @@ export const BirthdayPicker = ({
     triggerRef.current?.focus();
   };
 
-  const updateDraft = (patch: Partial<BirthdayParts>) => {
+  const updateDraft = (patch: Partial<DateParts>) => {
     setDraft(prev => clampParts({ ...prev, ...patch }, maxBirth));
   };
 
@@ -206,11 +210,11 @@ export const BirthdayPicker = ({
   };
 
   return (
-    <div className={cn('birthday-picker', className)}>
+    <div className={cn('date-picker', className)}>
       <Input
         ref={triggerRef}
-        className="birthday-picker__trigger"
-        value={value ? formatBirthday(value) : ''}
+        className="date-picker__trigger"
+        value={value ? formatDate(value) : ''}
         onChange={() => {}}
         onClick={openSheet}
         onKeyDown={handleTriggerKeyDown}
@@ -219,11 +223,11 @@ export const BirthdayPicker = ({
         autoComplete="off"
         aria-haspopup="dialog"
         aria-expanded={open}
-        placeholder={placeholder ?? `Возраст от ${minAge} лет`}
+        placeholder={placeholder}
         disabled={disabled}
         error={error}
       />
-      <IconCalendar className="birthday-picker__icon" aria-hidden />
+      <IconCalendar className="date-picker__icon" aria-hidden />
       {name ? (
         <input
           type="hidden"
@@ -234,10 +238,10 @@ export const BirthdayPicker = ({
 
       {open
         ? createPortal(
-            <div className="birthday-picker__layer">
+            <div className="date-picker__layer">
               <button
                 type="button"
-                className="birthday-picker__mask"
+                className="date-picker__mask"
                 aria-label="Закрыть"
                 onClick={close}
               />
@@ -246,14 +250,14 @@ export const BirthdayPicker = ({
                 open
                 aria-modal="true"
                 aria-labelledby={titleId}
-                className="birthday-picker__sheet"
+                className="date-picker__sheet"
               >
-                <h2 id={titleId} className="birthday-picker__title">
-                  Дата рождения
+                <h2 id={titleId} className="date-picker__title">
+                  {title}
                 </h2>
-                <div className="birthday-picker__columns">
-                  <div className="birthday-picker__column">
-                    <span className="birthday-picker__caption">День</span>
+                <div className="date-picker__columns">
+                  <div className="date-picker__column">
+                    <span className="date-picker__caption">День</span>
                     <WheelColumn
                       label="День"
                       items={days.map(day => ({
@@ -264,8 +268,8 @@ export const BirthdayPicker = ({
                       onChange={day => updateDraft({ day })}
                     />
                   </div>
-                  <div className="birthday-picker__column">
-                    <span className="birthday-picker__caption">Месяц</span>
+                  <div className="date-picker__column">
+                    <span className="date-picker__caption">Месяц</span>
                     <WheelColumn
                       label="Месяц"
                       items={MONTH_NAMES.map((month, index) => ({
@@ -276,8 +280,8 @@ export const BirthdayPicker = ({
                       onChange={month => updateDraft({ month })}
                     />
                   </div>
-                  <div className="birthday-picker__column">
-                    <span className="birthday-picker__caption">Год</span>
+                  <div className="date-picker__column">
+                    <span className="date-picker__caption">Год</span>
                     <WheelColumn
                       label="Год"
                       items={years.map(year => ({
@@ -289,7 +293,7 @@ export const BirthdayPicker = ({
                     />
                   </div>
                 </div>
-                <div className="birthday-picker__actions">
+                <div className="date-picker__actions">
                   <Button onClick={apply}>
                     <IconCorrect />
                     Применить

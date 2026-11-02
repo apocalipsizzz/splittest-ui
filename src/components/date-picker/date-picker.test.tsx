@@ -10,7 +10,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Field } from '@/components/field';
 import { Form, FormSubmit } from '@/components/form';
-import { BirthdayPicker } from './birthday-picker';
+import { DatePicker } from './date-picker';
 import { WHEEL_ITEM_HEIGHT } from './wheel-column';
 
 const trigger = () => screen.getByRole('textbox');
@@ -22,10 +22,10 @@ const pick = async (label: string, text: string) => {
   await userEvent.click(within(wheel(label)).getByText(text));
 };
 
-describe('BirthdayPicker', () => {
+describe('DatePicker', () => {
   it('показывает дату текстом и отдаёт ISO в hidden-поле', () => {
     const { container } = render(
-      <BirthdayPicker
+      <DatePicker
         name="birth"
         value={new Date(1990, 2, 15)}
         onChange={() => {}}
@@ -40,7 +40,7 @@ describe('BirthdayPicker', () => {
 
   it('клик по пунктам колёс и «Применить» отдаёт выбранную дату', async () => {
     const onChange = vi.fn<(date: Date) => void>();
-    render(<BirthdayPicker onChange={onChange} />);
+    render(<DatePicker onChange={onChange} />);
 
     await userEvent.click(trigger());
     // Год и месяц first: день не может быть позже максимальной даты по возрасту.
@@ -56,9 +56,7 @@ describe('BirthdayPicker', () => {
 
   it('стрелки меняют выбранный пункт колеса', async () => {
     const onChange = vi.fn<(date: Date) => void>();
-    render(
-      <BirthdayPicker value={new Date(1990, 2, 15)} onChange={onChange} />,
-    );
+    render(<DatePicker value={new Date(1990, 2, 15)} onChange={onChange} />);
 
     await userEvent.click(trigger());
     wheel('Месяц').focus();
@@ -69,7 +67,7 @@ describe('BirthdayPicker', () => {
   });
 
   it('прокрутка колеса выбирает пункт посередине после остановки', async () => {
-    render(<BirthdayPicker value={new Date(1990, 2, 15)} />);
+    render(<DatePicker value={new Date(1990, 2, 15)} />);
     await userEvent.click(trigger());
 
     const node = wheel('День');
@@ -81,8 +79,29 @@ describe('BirthdayPicker', () => {
     });
   });
 
+  it('title попадает в заголовок окна, по умолчанию — общий', async () => {
+    const { unmount } = render(<DatePicker title="Дата заезда" />);
+    await userEvent.click(trigger());
+
+    expect(
+      screen.getByRole('heading', { name: 'Дата заезда' }),
+    ).toBeInTheDocument();
+    unmount();
+  });
+
+  it('без title и minAge окно общее, годы до текущего', async () => {
+    render(<DatePicker />);
+    await userEvent.click(trigger());
+
+    expect(
+      screen.getByRole('heading', { name: 'Выберите дату' }),
+    ).toBeInTheDocument();
+    const years = items('Год');
+    expect(years.at(-1)).toHaveTextContent(String(new Date().getFullYear()));
+  });
+
   it('минимальный возраст ограничивает список годов', async () => {
-    render(<BirthdayPicker minAge={18} />);
+    render(<DatePicker minAge={18} />);
     await userEvent.click(trigger());
 
     const years = items('Год');
@@ -92,7 +111,7 @@ describe('BirthdayPicker', () => {
   });
 
   it('в феврале дней не больше длины месяца', async () => {
-    render(<BirthdayPicker />);
+    render(<DatePicker />);
     await userEvent.click(trigger());
 
     await pick('Год', '2001');
@@ -105,7 +124,7 @@ describe('BirthdayPicker', () => {
   });
 
   it('текст не вводится с клавиатуры', async () => {
-    render(<BirthdayPicker />);
+    render(<DatePicker />);
 
     trigger().focus();
     await userEvent.keyboard('1990');
@@ -115,7 +134,7 @@ describe('BirthdayPicker', () => {
   });
 
   it('Escape закрывает лист', async () => {
-    render(<BirthdayPicker />);
+    render(<DatePicker />);
     await userEvent.click(trigger());
 
     await userEvent.keyboard('{Escape}');
@@ -128,7 +147,7 @@ describe('BirthdayPicker', () => {
     render(
       <Form onSubmit={onSubmit}>
         <Field label="Дата рождения" required>
-          <BirthdayPicker name="birth" />
+          <DatePicker name="birth" />
         </Field>
         <FormSubmit>Отправить</FormSubmit>
       </Form>,
