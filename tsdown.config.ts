@@ -15,7 +15,13 @@ export default defineConfig({
     '@/': fileURLToPath(new URL('./src/', import.meta.url)),
   },
   deps: {
-    neverBundle: ['react', 'react-dom', 'react/jsx-runtime', /\.scss$/],
+    neverBundle: [
+      'react',
+      'react-dom',
+      'react/jsx-runtime',
+      'react-imask',
+      /\.scss$/,
+    ],
   },
   publint: false,
 });

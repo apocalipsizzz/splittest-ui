@@ -5,4 +5,5 @@
 # для распаковки нативных бинарников.
 allowBuilds:
   '@parcel/watcher': true
+  core-js-pure: false
   'esbuild': true

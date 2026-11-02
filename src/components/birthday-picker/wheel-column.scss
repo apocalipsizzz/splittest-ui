@@ -1,0 +1,61 @@
+.wheel-frame {
+  position: relative;
+}
+
+// Полоса выбранного пункта посередине окна. Поверх колеса, не перехватывает клики.
+.wheel-frame::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: var(--wheel-item-height);
+  transform: translateY(-50%);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  pointer-events: none;
+}
+
+.wheel {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  font-size: var(--text-sm);
+  outline: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+    border-radius: var(--radius-sm);
+  }
+}
+
+.wheel__spacer {
+  flex: none;
+  pointer-events: none;
+}
+
+.wheel__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-muted-foreground);
+  font: inherit;
+  scroll-snap-align: center;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.wheel__item--active {
+  color: var(--color-foreground);
+  font-weight: 700;
+}
