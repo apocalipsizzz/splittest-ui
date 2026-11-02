@@ -18,7 +18,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const src = join(root, 'src');
 const dist = join(root, 'dist');
 
-const scssImport = /^import ['"]\.\/[^'"]+\.scss['"];\r?\n/gm;
+const scssImport = /^import ['"]\.\.?\/[^'"]+\.scss['"];\r?\n/gm;
 
 const walk = dir => {
   for (const entry of readdirSync(dir)) {
