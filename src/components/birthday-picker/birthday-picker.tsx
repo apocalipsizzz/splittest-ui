@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 
 import { Button } from '@/components/button';
 import { Input } from '@/components/input';
-import '@/components/input/input.scss';
+import '../input/input.scss';
 import { IconCalendar } from '@/icons/icon-calendar';
 import { IconCorrect } from '@/icons/icon-correct';
 import { cn } from '@/lib/cn';

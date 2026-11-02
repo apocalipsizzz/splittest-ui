@@ -59,3 +59,25 @@ const stripScssImports = dir => {
 };
 
 stripScssImports(dist);
+
+// Алиас `@/` резолвит только tsdown. scss в neverBundle, поэтому его импорт
+// уходит в js как есть, а у консьюмера такого алиаса нет.
+const assertNoAliasImports = dir => {
+  for (const entry of readdirSync(dir)) {
+    const file = join(dir, entry);
+    if (statSync(file).isDirectory()) {
+      assertNoAliasImports(file);
+      continue;
+    }
+    if (!/\.(c|m)?js$/.test(entry)) continue;
+
+    const match = readFileSync(file, 'utf8').match(/['"]@\/[^'"]+['"]/);
+    if (match) {
+      throw new Error(
+        `${relative(root, file)}: остался импорт с алиасом ${match[0]}`,
+      );
+    }
+  }
+};
+
+assertNoAliasImports(dist);

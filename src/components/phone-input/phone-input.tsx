@@ -14,7 +14,7 @@ import { useFieldControl } from '@/components/field/field-context';
 import type { InputSize } from '@/components/input';
 import { IconCross } from '@/icons/icon-cross';
 import { cn, when } from '@/lib/cn';
-import '@/components/input/input.scss';
+import '../input/input.scss';
 
 export const PHONE_MASK = '+7 (000) 000-00-00';
 

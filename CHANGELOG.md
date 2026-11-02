@@ -1,5 +1,12 @@
 # @de-kit/st-ui
 
+## 0.1.15
+
+### Patch Changes
+
+- - Исправлены импорты SCSS в `BirthdayPicker` и `PhoneInput`: `@/components/input/input.scss` заменён на относительный путь, чтобы консьюмеры без алиаса `@/` могли собирать пакет.
+  - В `scripts/copy-styles.mjs` добавлена проверка `assertNoAliasImports`, которая ломает сборку, если в `dist` остались импорты с алиасом `@/`.
+
 ## 0.1.14
 
 ### Patch Changes
