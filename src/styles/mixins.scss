@@ -49,3 +49,49 @@ $-length-units: 'px', 'em', 'rem';
     @content;
   }
 }
+
+/* Текст. Значения лежат в токенах vars.scss, миксины только подставляют их. */
+@mixin text-small {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+}
+
+@mixin text-regular {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+}
+
+@mixin text-medium {
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+}
+
+@mixin text-large {
+  font-size: var(--text-lg);
+  line-height: var(--text-lg--line-height);
+}
+
+/* Заголовки */
+@mixin heading-h1 {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-weight-black);
+  line-height: var(--text-4xl--line-height);
+}
+
+@mixin heading-h2 {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-black);
+  line-height: var(--text-3xl--line-height);
+}
+
+@mixin heading-h3 {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-black);
+  line-height: var(--text-2xl--line-height);
+}
+
+@mixin heading-h4 {
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-black);
+  line-height: var(--text-xl--line-height);
+}

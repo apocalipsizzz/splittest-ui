@@ -1,6 +1,7 @@
 // База приложения. Шрифт Inter подключает хост — файлы лежат в splittest-frontend/src/app/fonts.
 // Токены (`--color-*`) подключает вход пакета, этот файл их не эмитит.
 @use './mixins.scss' as mixins;
+@use './typography.scss';
 
 :root {
   --window-max-height: 100vh;
@@ -166,36 +167,4 @@ table {
     font-weight: normal;
     padding: 15px 0;
   }
-}
-
-h1,
-h2,
-h3 {
-  text-align: left;
-  font-weight: 900;
-}
-
-h1 {
-  font-size: var(--text-2xl);
-  line-height: var(--text-2xl--line-height);
-
-  @include mixins.min-width(md) {
-    font-size: var(--text-3xl);
-    line-height: var(--text-3xl--line-height);
-  }
-}
-
-h2 {
-  font-size: var(--text-2xl);
-  line-height: var(--text-2xl--line-height);
-}
-
-h3 {
-  font-size: var(--text-lg);
-  line-height: var(--text-lg--line-height);
-}
-
-h4 {
-  font-size: var(--text-sm);
-  line-height: var(--text-sm--line-height);
 }

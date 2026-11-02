@@ -1,0 +1,70 @@
+@use './mixins.scss' as mixins;
+
+// Роли текста: класс задаёт вид, тег — семантику. Классы работают на любом элементе.
+.text-xs {
+  @include mixins.text-small;
+}
+
+.text-sm {
+  @include mixins.text-regular;
+}
+
+.text-base {
+  @include mixins.text-medium;
+}
+
+.text-lg {
+  @include mixins.text-large;
+}
+
+.heading-1 {
+  @include mixins.heading-h1;
+}
+
+.heading-2 {
+  @include mixins.heading-h2;
+}
+
+.heading-3 {
+  @include mixins.heading-h3;
+}
+
+.heading-4 {
+  @include mixins.heading-h4;
+}
+
+// Теги по умолчанию. h1–h3 меняются с 680px, как в вёрстке splittest.
+h1,
+h2,
+h3,
+h4 {
+  text-align: left;
+}
+
+h1 {
+  @include mixins.heading-h3;
+
+  @include mixins.min-width(md) {
+    @include mixins.heading-h1;
+  }
+}
+
+h2 {
+  @include mixins.heading-h3;
+
+  @include mixins.min-width(md) {
+    @include mixins.heading-h2;
+  }
+}
+
+h3 {
+  @include mixins.heading-h4;
+
+  @include mixins.min-width(md) {
+    @include mixins.heading-h3;
+  }
+}
+
+h4 {
+  @include mixins.heading-h4;
+}

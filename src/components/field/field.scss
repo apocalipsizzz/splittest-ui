@@ -6,9 +6,9 @@
 
 .field__label {
   color: var(--color-foreground);
-  font-size: var(--text-lg);
-  font-weight: 900;
-  line-height: var(--text-lg--line-height);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-black);
+  line-height: var(--text-xl--line-height);
   display: block;
   margin-bottom: var(--space-3);
   overflow-wrap: anywhere;
