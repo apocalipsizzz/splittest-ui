@@ -47,3 +47,4 @@ export {
   type TextAreaProps,
   type TextAreaSize,
 } from './components/textarea';
+export { useMediaQuery } from './lib/hooks/use-media-query';

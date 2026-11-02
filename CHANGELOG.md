@@ -1,5 +1,11 @@
 # @de-kit/st-ui
 
+## 0.1.20
+
+### Patch Changes
+
+- Хук `useMediaQuery(query)` для адаптивного поведения в JS (например, число строк у TextArea): подписан на matchMedia, первое значение доступно сразу.
+
 ## 0.1.19
 
 ### Patch Changes
