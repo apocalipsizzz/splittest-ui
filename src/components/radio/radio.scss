@@ -64,7 +64,7 @@
   }
 
   &:hover:not(:checked):not(:disabled) {
-    border-width: 1px;
+    border-width: 2px;
     --bc: var(--active);
   }
 
