@@ -100,6 +100,27 @@
     }
   }
 
+  &--destructive {
+    border: none;
+    background-color: transparent;
+    color: var(--color-destructive);
+    fill: currentColor;
+    border-radius: var(--radius-sm);
+    padding: 0;
+
+    &:hover:not(:active, [data-active], :disabled, [aria-disabled='true']) {
+      background-color: transparent;
+      color: var(--color-destructive);
+    }
+
+    &:active:not([aria-disabled='true']),
+    &[data-active]:not([aria-disabled='true']),
+    &:disabled,
+    &[aria-disabled='true']:not([aria-busy='true']) {
+      background-color: transparent;
+    }
+  }
+
   &--image {
     --size: 60px;
     background-color: var(--color-secondary);

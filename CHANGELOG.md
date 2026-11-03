@@ -1,5 +1,14 @@
 # @de-kit/st-ui
 
+## 0.1.22
+
+### Patch Changes
+
+- - Добавлен вариант `Button` `destructive` в стиле красной ссылочной кнопки.
+  - В `vars.scss` добавлены токены `--radius-md` и `--radius-rounded`, а `--radius-lg` приведён к значению `30px`.
+  - В `DatePicker` радиус верхних углов листа переведён на `--radius-md`.
+  - В примеры кода `RadioGroup` добавлен `FieldList` для групп из нескольких радио-кнопок.
+
 ## 0.1.21
 
 ### Patch Changes

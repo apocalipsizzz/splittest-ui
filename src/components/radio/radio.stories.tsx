@@ -96,42 +96,46 @@ export const Feedback: Story = {
   ),
 };
 
-const usageExample = `import { RadioGroup, RadioInput } from '@de-kit/st-ui';
+const usageExample = `import { FieldList, RadioGroup, RadioInput } from '@de-kit/st-ui';
 
 function DeliveryChoice() {
   return (
     <RadioGroup label="Доставка" name="delivery">
-      <RadioInput label="Курьер" value="courier" defaultChecked />
-      <RadioInput label="Самовывоз" value="pickup" />
+      <FieldList>
+        <RadioInput label="Курьер" value="courier" defaultChecked />
+        <RadioInput label="Самовывоз" value="pickup" />
+      </FieldList>
     </RadioGroup>
   );
 }`;
 
 const controlledExample = `import { useState } from 'react';
-import { RadioGroup, RadioInput } from '@de-kit/st-ui';
+import { FieldList, RadioGroup, RadioInput } from '@de-kit/st-ui';
 
 function PlanPicker() {
   const [plan, setPlan] = useState('monthly');
 
   return (
     <RadioGroup label="Тариф" name="plan">
-      <RadioInput
-        label="Ежемесячно"
-        value="monthly"
-        checked={plan === 'monthly'}
-        onChange={() => setPlan('monthly')}
-      />
-      <RadioInput
-        label="Ежегодно"
-        value="yearly"
-        checked={plan === 'yearly'}
-        onChange={() => setPlan('yearly')}
-      />
+      <FieldList>
+        <RadioInput
+          label="Ежемесячно"
+          value="monthly"
+          checked={plan === 'monthly'}
+          onChange={() => setPlan('monthly')}
+        />
+        <RadioInput
+          label="Ежегодно"
+          value="yearly"
+          checked={plan === 'yearly'}
+          onChange={() => setPlan('yearly')}
+        />
+      </FieldList>
     </RadioGroup>
   );
 }`;
 
-const feedbackExample = `import { RadioGroup, RadioInput } from '@de-kit/st-ui';
+const feedbackExample = `import { FieldList, RadioGroup, RadioInput } from '@de-kit/st-ui';
 
 function DeliveryChoice({ error }: { error?: string }) {
   return (
@@ -141,8 +145,10 @@ function DeliveryChoice({ error }: { error?: string }) {
       hint="Курьер привозит до двери"
       error={error}
     >
-      <RadioInput label="Курьер" value="courier" />
-      <RadioInput label="Самовывоз" value="pickup" />
+      <FieldList>
+        <RadioInput label="Курьер" value="courier" />
+        <RadioInput label="Самовывоз" value="pickup" />
+      </FieldList>
     </RadioGroup>
   );
 }`;

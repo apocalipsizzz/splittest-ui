@@ -153,7 +153,14 @@ const meta = {
   argTypes: {
     variant: {
       control: 'inline-radio',
-      options: ['default', 'outline', 'link', 'image', 'icon'],
+      options: [
+        'default',
+        'outline',
+        'link',
+        'destructive',
+        'image',
+        'icon',
+      ],
     },
     size: {
       control: 'inline-radio',
@@ -184,6 +191,9 @@ export const Variants: Story = {
       </Labeled>
       <Labeled label="link">
         <Button variant="link">Кнопка</Button>
+      </Labeled>
+      <Labeled label="destructive">
+        <Button variant="destructive">Удалить</Button>
       </Labeled>
       <Labeled label="image">
         <ImageButton label="Картинка" />

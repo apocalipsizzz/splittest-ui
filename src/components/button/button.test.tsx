@@ -66,6 +66,14 @@ describe('Button', () => {
     );
   });
 
+  it('поддерживает destructive-вариант', () => {
+    render(<Button variant="destructive">Удалить</Button>);
+    expect(screen.getByRole('button', { name: 'Удалить' })).toHaveClass(
+      'button',
+      'button--destructive',
+    );
+  });
+
   it('children остаются в том порядке, как переданы', () => {
     render(
       <Button>

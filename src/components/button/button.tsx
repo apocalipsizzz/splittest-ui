@@ -16,7 +16,13 @@ import { cn, when } from '@/lib/cn';
 import { Slot } from '@/lib/slot';
 import './button.scss';
 
-export type ButtonVariant = 'default' | 'outline' | 'link' | 'image' | 'icon';
+export type ButtonVariant =
+  | 'default'
+  | 'outline'
+  | 'link'
+  | 'destructive'
+  | 'image'
+  | 'icon';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonStyleProps {
