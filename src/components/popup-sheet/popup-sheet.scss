@@ -1,0 +1,51 @@
+@use '../../styles/mixins' as Mixins;
+
+.popup-sheet {
+  position: fixed;
+  z-index: 12;
+  opacity: 0;
+  width: 100%;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+  transform: translateY(100%);
+  pointer-events: none;
+  inset: auto 0 0;
+
+  &--open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  &__inner {
+    position: relative;
+    padding: var(--space-5) var(--space-6);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-background);
+    box-shadow: var(--shadow-xl);
+  }
+
+  &__content {
+    @include Mixins.text-regular;
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__title {
+    margin-block: 0 var(--space-5);
+  }
+
+  &__close {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    color: var(--color-muted-foreground);
+
+    &:is(:hover, :active, :focus) {
+      color: var(--color-foreground);
+    }
+  }
+}

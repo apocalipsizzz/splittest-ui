@@ -1,5 +1,11 @@
 # @de-kit/st-ui
 
+## 0.1.23
+
+### Patch Changes
+
+- Добавлен компонент `PopupSheet` — нижний sheet (slide-up) с заголовком, кнопкой закрытия, блокировкой скролла `body`, закрытием по клику вне области, Escape и `onClose`. Для выпадающих порталов внутри sheet экспортирован селектор `POPUP_SHEET_PORTAL_SELECTOR` (`data-popup-sheet-portal`).
+
 ## 0.1.22
 
 ### Patch Changes

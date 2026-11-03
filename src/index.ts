@@ -40,6 +40,11 @@ export {
   type PhoneInputProps,
 } from './components/phone-input';
 export {
+  POPUP_SHEET_PORTAL_SELECTOR,
+  PopupSheet,
+  type PopupSheetProps,
+} from './components/popup-sheet';
+export {
   Spinner,
   type SpinnerPosition,
   type SpinnerProps,
