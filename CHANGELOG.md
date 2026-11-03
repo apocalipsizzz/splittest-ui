@@ -1,5 +1,13 @@
 # @de-kit/st-ui
 
+## 0.1.25
+
+### Patch Changes
+
+- Добавлен **`PopupSheet`** — нижний sheet с заголовком, закрытием, блокировкой скролла и `POPUP_SHEET_PORTAL_SELECTOR`.
+
+  Добавлен **`Popover`** на `@floating-ui/react`: якорь через `trigger`, позиция по умолчанию над кнопкой (`top-start`) с `flip`/`shift`, portal, закрытие снаружи/Escape. Ширина панели **не** привязана к якорю: `minWidth` 280px, `maxWidth` 360px (`POPOVER_MIN_WIDTH`, `POPOVER_MAX_WIDTH`). Экспорт `POPOVER_PORTAL_SELECTOR`.
+
 ## 0.1.23
 
 ### Patch Changes

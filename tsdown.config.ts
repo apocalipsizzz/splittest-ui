@@ -20,6 +20,8 @@ export default defineConfig({
       'react-dom',
       'react/jsx-runtime',
       'react-imask',
+      '@floating-ui/react',
+      '@floating-ui/dom',
       /\.scss$/,
     ],
   },
