@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { Field } from '@/components/field';
 import { Form, FormSubmit } from '@/components/form';
+import { CodeBlock } from '@/stories/code-block';
 import { Labeled, LabeledBlock } from '@/stories/labeled';
 import { storyStack } from '@/stories/story-stack';
 import { PhoneInput } from './phone-input';
@@ -68,6 +69,55 @@ export const InForm: Story = {
         </Field>
         <FormSubmit>Отправить</FormSubmit>
       </Form>
+    </div>
+  ),
+};
+
+const usageExample = `import { Field, PhoneInput } from '@de-kit/st-ui';
+
+function PhoneField() {
+  return (
+    <Field label="Номер телефона" required>
+      <PhoneInput name="phone" clearable />
+    </Field>
+  );
+}`;
+
+const digitsExample = `import { useState } from 'react';
+import { Field, PhoneInput } from '@de-kit/st-ui';
+
+// value — с маской, unmaskedValue — только цифры для запроса
+function PhoneStep() {
+  const [digits, setDigits] = useState('');
+
+  return (
+    <Field label="Телефон" required>
+      <PhoneInput onAccept={(_, unmaskedValue) => setDigits(unmaskedValue)} />
+    </Field>
+  );
+}`;
+
+const maskExample = `import { PhoneInput } from '@de-kit/st-ui';
+
+// Маска из react-imask: 0 — цифра
+function BelarusPhone() {
+  return <PhoneInput mask="+375 (00) 000-00-00" />;
+}`;
+
+export const Usage: Story = {
+  render: () => (
+    <div style={storyStack}>
+      <LabeledBlock title="Примеры кода">
+        <Labeled label="Базовый случай" wide maxWidth={720}>
+          <CodeBlock code={usageExample} />
+        </Labeled>
+        <Labeled label="Цифры без маски" wide maxWidth={720}>
+          <CodeBlock code={digitsExample} />
+        </Labeled>
+        <Labeled label="Своя маска" wide maxWidth={720}>
+          <CodeBlock code={maskExample} />
+        </Labeled>
+      </LabeledBlock>
     </div>
   ),
 };

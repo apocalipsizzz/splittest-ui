@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { Field } from '@/components/field';
 import { Form, FormSubmit } from '@/components/form';
+import { CodeBlock } from '@/stories/code-block';
 import { Labeled, LabeledBlock } from '@/stories/labeled';
 import { storyStack } from '@/stories/story-stack';
 import { DatePicker } from './date-picker';
@@ -72,6 +73,55 @@ export const InForm: Story = {
         </Field>
         <FormSubmit>Отправить</FormSubmit>
       </Form>
+    </div>
+  ),
+};
+
+const usageExample = `import { useState } from 'react';
+import { DatePicker } from '@de-kit/st-ui';
+
+function BirthdayPicker() {
+  const [birthday, setBirthday] = useState<Date | null>(null);
+
+  return (
+    <DatePicker
+      title="Дата рождения"
+      value={birthday}
+      onChange={setBirthday}
+      minAge={18}
+    />
+  );
+}`;
+
+const formExample = `import { DatePicker, Field, Form, FormSubmit } from '@de-kit/st-ui';
+
+function ProfileForm() {
+  const handleSubmit = (data: FormData) => {
+    // data.get('birthday') вернёт дату в формате YYYY-MM-DD
+    return saveProfile(data);
+  };
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Field label="Дата рождения" required>
+        <DatePicker name="birthday" minYear={1950} />
+      </Field>
+      <FormSubmit>Сохранить</FormSubmit>
+    </Form>
+  );
+}`;
+
+export const Usage: Story = {
+  render: () => (
+    <div style={storyStack}>
+      <LabeledBlock title="Примеры кода">
+        <Labeled label="Контролируемое значение и возраст" wide maxWidth={720}>
+          <CodeBlock code={usageExample} />
+        </Labeled>
+        <Labeled label="В форме с Field" wide maxWidth={720}>
+          <CodeBlock code={formExample} />
+        </Labeled>
+      </LabeledBlock>
     </div>
   ),
 };

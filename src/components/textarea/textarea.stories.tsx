@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { CodeBlock } from '@/stories/code-block';
 import { Labeled, LabeledBlock } from '@/stories/labeled';
 import { storyStack } from '@/stories/story-stack';
 import { TextArea } from './textarea';
@@ -67,6 +68,50 @@ export const States: Story = {
         </Labeled>
         <Labeled label="counter=false" wide maxWidth={360}>
           <TextArea placeholder="Комментарий" maxLength={80} counter={false} />
+        </Labeled>
+      </LabeledBlock>
+    </div>
+  ),
+};
+
+const usageExample = `import { Field, TextArea } from '@de-kit/st-ui';
+
+function CommentField() {
+  return (
+    <Field label="Комментарий" hint="Необязательно" hintPlacement="label">
+      <TextArea name="comment" rows={4} placeholder="Например, пожелания" />
+    </Field>
+  );
+}`;
+
+const counterExample = `import { useState } from 'react';
+import { Field, TextArea } from '@de-kit/st-ui';
+
+function ReviewField() {
+  const [text, setText] = useState('');
+
+  return (
+    <Field label="Отзыв" required>
+      <TextArea
+        rows={5}
+        maxLength={500}
+        value={text}
+        onChange={e => setText(e.target.value)}
+      />
+      <p>{text.length} / 500</p>
+    </Field>
+  );
+}`;
+
+export const Usage: Story = {
+  render: () => (
+    <div style={storyStack}>
+      <LabeledBlock title="Примеры кода">
+        <Labeled label="В Field с подсказкой" wide maxWidth={720}>
+          <CodeBlock code={usageExample} />
+        </Labeled>
+        <Labeled label="Контролируемый счётчик" wide maxWidth={720}>
+          <CodeBlock code={counterExample} />
         </Labeled>
       </LabeledBlock>
     </div>

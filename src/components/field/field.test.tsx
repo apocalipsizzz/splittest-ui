@@ -5,6 +5,28 @@ import { describe, expect, it } from 'vitest';
 import { Input } from '@/components/input';
 import { TextArea } from '@/components/textarea';
 import { Field } from './field';
+import { FieldList } from './field-list';
+
+describe('FieldList', () => {
+  it('оборачивает поля в колонку с gap', () => {
+    render(
+      <FieldList data-testid="list">
+        <Field label="Имя">
+          <Input />
+        </Field>
+        <Field label="Фамилия">
+          <Input />
+        </Field>
+      </FieldList>,
+    );
+
+    const list = screen.getByTestId('list');
+    expect(list).toHaveClass('field__list');
+    expect(list.children).toHaveLength(2);
+    expect(screen.getByLabelText('Имя')).toBeInTheDocument();
+    expect(screen.getByLabelText('Фамилия')).toBeInTheDocument();
+  });
+});
 
 describe('Field', () => {
   it('связывает лейбл, подсказку и ошибку', () => {

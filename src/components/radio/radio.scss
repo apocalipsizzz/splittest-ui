@@ -26,6 +26,7 @@
   vertical-align: top;
   position: relative;
   margin: 0;
+  padding: 0;
   flex-shrink: 0;
   cursor: pointer;
   border: 1px solid var(--bc, var(--border));
@@ -63,7 +64,7 @@
   }
 
   &:hover:not(:checked):not(:disabled) {
-    border-width: 2px;
+    border-width: 1px;
     --bc: var(--active);
   }
 

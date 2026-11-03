@@ -4,14 +4,11 @@ import { CheckboxInput } from '@/components/checkbox';
 import { Input } from '@/components/input';
 import { RadioGroup, RadioInput } from '@/components/radio';
 import { TextArea } from '@/components/textarea';
+import { CodeBlock } from '@/stories/code-block';
 import { Labeled, LabeledBlock } from '@/stories/labeled';
 import { storyStack } from '@/stories/story-stack';
 import { Field } from './field';
-
-const options = {
-  display: 'grid',
-  gap: 8,
-} as const;
+import { FieldList } from './field-list';
 
 const meta = {
   title: 'Components/Field',
@@ -339,11 +336,11 @@ export const Radios: Story = {
             hint="Один вариант. Пустую группу стереть нельзя"
           >
             <RadioGroup name="age">
-              <div style={options}>
+              <FieldList>
                 <RadioInput label="18-24" value="18" defaultChecked />
                 <RadioInput label="25-34" value="25" />
                 <RadioInput label="35+" value="35" />
-              </div>
+              </FieldList>
             </RadioGroup>
           </Field>
         </Labeled>
@@ -354,20 +351,20 @@ export const Radios: Story = {
             hintPlacement="label"
           >
             <RadioGroup name="plan">
-              <div style={options}>
+              <FieldList>
                 <RadioInput label="Старт" value="start" />
                 <RadioInput label="Про" value="pro" />
-              </div>
+              </FieldList>
             </RadioGroup>
           </Field>
         </Labeled>
         <Labeled label="error" wide maxWidth={360}>
           <Field label="Оплата" error="Выбери способ">
             <RadioGroup name="pay">
-              <div style={options}>
+              <FieldList>
                 <RadioInput label="Карта" value="card" />
                 <RadioInput label="Счёт" value="invoice" />
-              </div>
+              </FieldList>
             </RadioGroup>
           </Field>
         </Labeled>
@@ -378,17 +375,17 @@ export const Radios: Story = {
             error="Этот вариант недоступен"
           >
             <RadioGroup name="delivery">
-              <div style={options}>
+              <FieldList>
                 <RadioInput label="Самовывоз" value="pickup" defaultChecked />
                 <RadioInput label="Курьер" value="courier" error />
-              </div>
+              </FieldList>
             </RadioGroup>
           </Field>
         </Labeled>
         <Labeled label="disabled" wide maxWidth={360}>
           <Field label="Архивный тариф">
             <RadioGroup name="legacy">
-              <div style={options}>
+              <FieldList>
                 <RadioInput
                   label="Старый"
                   value="old"
@@ -396,9 +393,109 @@ export const Radios: Story = {
                   defaultChecked
                 />
                 <RadioInput label="Ещё старше" value="older" disabled />
-              </div>
+              </FieldList>
             </RadioGroup>
           </Field>
+        </Labeled>
+      </LabeledBlock>
+    </div>
+  ),
+};
+
+const usageExample = `import { Field, Input } from '@de-kit/st-ui';
+
+function NameField() {
+  return (
+    <Field label="Имя" hint="Как в паспорте" required>
+      <Input name="name" autoComplete="given-name" />
+    </Field>
+  );
+}`;
+
+const errorExample = `import { useState } from 'react';
+import { Field, Input } from '@de-kit/st-ui';
+
+function NicknameField() {
+  const [error, setError] = useState<string>();
+
+  const check = async (nick: string) => {
+    const taken = await isNicknameTaken(nick);
+    setError(taken ? 'Ник уже занят' : undefined);
+  };
+
+  return (
+    <Field label="Ник" error={error}>
+      <Input name="nickname" onBlur={e => check(e.target.value)} />
+    </Field>
+  );
+}`;
+
+const groupExample = `import { Field, RadioGroup, RadioInput } from '@de-kit/st-ui';
+
+// Field сам выдаёт группе подпись и ошибку
+function ContactChoice() {
+  return (
+    <Field label="Способ связи" required requiredMessage="Выберите способ связи">
+      <RadioGroup name="contact">
+        <RadioInput label="Телефон" value="phone" />
+        <RadioInput label="Почта" value="email" />
+      </RadioGroup>
+    </Field>
+  );
+}`;
+
+export const Lists: Story = {
+  render: () => (
+    <div style={storyStack}>
+      <LabeledBlock title="FieldList: поля с отступом 10px">
+        <Labeled label="FieldList" wide maxWidth={360}>
+          <FieldList>
+            <Field label="Фамилия">
+              <Input defaultValue="Иванов" />
+            </Field>
+            <Field label="Имя" required>
+              <Input defaultValue="Иван" />
+            </Field>
+            <Field label="Телефон" hint="Для связи по заказу">
+              <Input defaultValue="+7 900 000-00-00" />
+            </Field>
+          </FieldList>
+        </Labeled>
+      </LabeledBlock>
+    </div>
+  ),
+};
+
+const listExample = `import { Field, FieldList, Input } from '@de-kit/st-ui';
+
+function ProfileFields() {
+  return (
+    <FieldList>
+      <Field label="Фамилия">
+        <Input defaultValue="Иванов" />
+      </Field>
+      <Field label="Имя" required>
+        <Input />
+      </Field>
+    </FieldList>
+  );
+}`;
+
+export const Usage: Story = {
+  render: () => (
+    <div style={storyStack}>
+      <LabeledBlock title="Примеры кода">
+        <Labeled label="Подпись и подсказка" wide maxWidth={720}>
+          <CodeBlock code={usageExample} />
+        </Labeled>
+        <Labeled label="Ошибка после проверки" wide maxWidth={720}>
+          <CodeBlock code={errorExample} />
+        </Labeled>
+        <Labeled label="Группа радио" wide maxWidth={720}>
+          <CodeBlock code={groupExample} />
+        </Labeled>
+        <Labeled label="Стопка полей" wide maxWidth={720}>
+          <CodeBlock code={listExample} />
         </Labeled>
       </LabeledBlock>
     </div>

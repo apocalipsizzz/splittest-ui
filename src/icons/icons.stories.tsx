@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { CodeBlock } from '@/stories/code-block';
 import { Labeled, LabeledBlock } from '@/stories/labeled';
 import { storyStack } from '@/stories/story-stack';
 import * as icons from './index';
@@ -68,3 +69,22 @@ export const All = () => (
 export default {
   title: 'Foundations/Icons',
 };
+
+const usageExample = `import { IconClose } from '@de-kit/st-ui/icons';
+
+// Цвет берётся из color, размер задаётся через width и height
+<IconClose
+  width={16}
+  height={16}
+  style={{ color: 'var(--color-accent)' }}
+/>`;
+
+export const Usage = () => (
+  <div style={storyStack}>
+    <LabeledBlock title="Примеры кода">
+      <Labeled label="Импорт и цвет" wide maxWidth={720}>
+        <CodeBlock code={usageExample} />
+      </Labeled>
+    </LabeledBlock>
+  </div>
+);

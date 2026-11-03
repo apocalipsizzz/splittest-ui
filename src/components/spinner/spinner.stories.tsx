@@ -1,6 +1,8 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 
+import { CodeBlock } from '@/stories/code-block';
 import { Labeled, LabeledBlock } from '@/stories/labeled';
+import { storyStack } from '@/stories/story-stack';
 import { Spinner } from './spinner';
 
 const meta = {
@@ -57,5 +59,50 @@ export const Sizes: Story = {
         </div>
       </Labeled>
     </LabeledBlock>
+  ),
+};
+
+const usageExample = `import { Spinner } from '@de-kit/st-ui';
+
+// Спиннер тянется по родителю, поэтому родителю нужна высота
+function CatalogLoader() {
+  return (
+    <div style={{ height: 240 }}>
+      <Spinner label="Загружаем каталог" />
+    </div>
+  );
+}`;
+
+const resultsExample = `import { Spinner } from '@de-kit/st-ui';
+
+function Results({ isLoading, items }) {
+  if (isLoading) {
+    return <Spinner position="top" />;
+  }
+
+  return <ResultList items={items} />;
+}`;
+
+const inlineExample = `import { Spinner } from '@de-kit/st-ui';
+
+function Counter() {
+  return <Spinner size={24} label="Считаем" />;
+}`;
+
+export const Usage: Story = {
+  render: () => (
+    <div style={storyStack}>
+      <LabeledBlock title="Примеры кода">
+        <Labeled label="Блок на всю ширину" wide maxWidth={720}>
+          <CodeBlock code={usageExample} />
+        </Labeled>
+        <Labeled label="Вместо содержимого" wide maxWidth={720}>
+          <CodeBlock code={resultsExample} />
+        </Labeled>
+        <Labeled label="Маленький с подписью" wide maxWidth={720}>
+          <CodeBlock code={inlineExample} />
+        </Labeled>
+      </LabeledBlock>
+    </div>
   ),
 };

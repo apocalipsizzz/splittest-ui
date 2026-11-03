@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
 
+import { CodeBlock } from '../../stories/code-block';
 import { Labeled, LabeledBlock } from '../../stories/labeled';
 import { storyStack } from '../../stories/story-stack';
 import { useMediaQuery } from './use-media-query';
@@ -16,16 +17,6 @@ const frame = { maxWidth: 720 } as const;
 
 const badge = {
   padding: '8px 12px',
-  borderRadius: 'var(--radius-sm)',
-  border: '1px solid var(--color-border)',
-  fontSize: 'var(--text-sm)',
-  lineHeight: 'var(--text-sm--line-height)',
-} as const satisfies CSSProperties;
-
-const code = {
-  margin: 0,
-  padding: 16,
-  overflowX: 'auto',
   borderRadius: 'var(--radius-sm)',
   border: '1px solid var(--color-border)',
   fontSize: 'var(--text-sm)',
@@ -154,13 +145,13 @@ export const Usage: Story = {
     <div style={{ ...storyStack, ...frame }}>
       <LabeledBlock title="Примеры кода">
         <Labeled label="Базовый случай" wide maxWidth={720}>
-          <pre style={code}>{usageExample}</pre>
+          <CodeBlock code={usageExample} />
         </Labeled>
         <Labeled label="Запросы и первое значение" wide maxWidth={720}>
-          <pre style={code}>{queryExample}</pre>
+          <CodeBlock code={queryExample} />
         </Labeled>
         <Labeled label="Кнопки в колонку на мобильном" wide maxWidth={720}>
-          <pre style={code}>{formExample}</pre>
+          <CodeBlock code={formExample} />
         </Labeled>
       </LabeledBlock>
     </div>

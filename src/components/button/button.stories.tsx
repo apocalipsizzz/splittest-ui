@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { IconArrowLeft } from '@/icons/icon-arrow-left';
 import { IconArrowRight } from '@/icons/icon-arrow-right';
 import { IconPreview } from '@/icons';
+import { CodeBlock } from '@/stories/code-block';
 import { Labeled, LabeledBlock } from '@/stories/labeled';
 import { storyStack } from '@/stories/story-stack';
 import { Button, type ButtonSize } from './button';
@@ -438,6 +439,79 @@ export const Sizes: Story = {
             <IconButton size={size} label={`Иконка ${size}`} />
           </Labeled>
         ))}
+      </LabeledBlock>
+    </div>
+  ),
+};
+
+const usageExample = `import { useState } from 'react';
+import { Button } from '@de-kit/st-ui';
+
+function SaveButton() {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const save = async () => {
+    setIsSaving(true);
+    await saveDraft();
+    setIsSaving(false);
+  };
+
+  return (
+    <Button variant="outline" size="lg" loading={isSaving} onClick={save}>
+      Сохранить
+    </Button>
+  );
+}`;
+
+const asChildExample = `import { Button } from '@de-kit/st-ui';
+
+// asChild отдаёт стили кнопки своему ребёнку, например ссылке
+function CatalogLink() {
+  return (
+    <Button asChild variant="link">
+      <a href="/catalog">Смотреть каталог</a>
+    </Button>
+  );
+}`;
+
+const iconExample = `import { Button } from '@de-kit/st-ui';
+import { IconArrowLeft } from '@de-kit/st-ui/icons';
+
+// У кнопки без текста обязателен aria-label
+function BackButton() {
+  return (
+    <Button variant="icon" size="lg" aria-label="Назад" onClick={() => history.back()}>
+      <IconArrowLeft width={20} height={20} />
+    </Button>
+  );
+}`;
+
+const fullWidthExample = `import { Button } from '@de-kit/st-ui';
+
+function ContinueButton() {
+  return (
+    <Button fullWidth size="lg">
+      Продолжить
+    </Button>
+  );
+}`;
+
+export const Usage: Story = {
+  render: () => (
+    <div style={storyStack}>
+      <LabeledBlock title="Примеры кода">
+        <Labeled label="Загрузка и вариант" wide maxWidth={720}>
+          <CodeBlock code={usageExample} />
+        </Labeled>
+        <Labeled label="Ссылка через asChild" wide maxWidth={720}>
+          <CodeBlock code={asChildExample} />
+        </Labeled>
+        <Labeled label="Иконка с aria-label" wide maxWidth={720}>
+          <CodeBlock code={iconExample} />
+        </Labeled>
+        <Labeled label="Полная ширина" wide maxWidth={720}>
+          <CodeBlock code={fullWidthExample} />
+        </Labeled>
       </LabeledBlock>
     </div>
   ),

@@ -11,7 +11,9 @@ export {
 export { CheckboxInput, type CheckboxInputProps } from './components/checkbox';
 export {
   Field,
+  FieldList,
   type FieldHintPlacement,
+  type FieldListProps,
   type FieldProps,
 } from './components/field';
 export {

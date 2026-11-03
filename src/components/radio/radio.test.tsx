@@ -117,4 +117,60 @@ describe('RadioGroup', () => {
       expect(radio).toBeRequired();
     }
   });
+
+  it('без Field показывает hint и связывает его с группой', () => {
+    render(
+      <RadioGroup label="Доставка" name="delivery" hint="Курьер до двери">
+        <RadioInput label="Курьер" value="courier" />
+      </RadioGroup>,
+    );
+
+    const group = screen.getByRole('radiogroup', { name: 'Доставка' });
+    const hint = screen.getByText('Курьер до двери');
+    expect(hint).toHaveClass('field__hint');
+    expect(group).toHaveAttribute('aria-describedby', hint.id);
+    expect(group).not.toHaveAttribute('aria-invalid');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('error без Field показывает alert, красит пункты и связывает группу', () => {
+    render(
+      <RadioGroup label="Доставка" name="delivery" error="Выберите способ">
+        <RadioInput label="Курьер" value="courier" />
+        <RadioInput label="Самовывоз" value="pickup" />
+      </RadioGroup>,
+    );
+
+    const group = screen.getByRole('radiogroup', { name: 'Доставка' });
+    const error = screen.getByRole('alert');
+    expect(error).toHaveTextContent('Выберите способ');
+    expect(error).toHaveClass('field__error');
+    expect(group).toHaveAttribute('aria-invalid', 'true');
+    expect(group).toHaveAttribute('aria-describedby', error.id);
+    expect(group).toHaveAttribute('aria-errormessage', error.id);
+
+    for (const radio of screen.getAllByRole('radio')) {
+      expect(radio.parentElement).toHaveClass('radio--error');
+    }
+  });
+
+  it('hint и error вместе собираются в один aria-describedby', () => {
+    render(
+      <RadioGroup
+        label="Доставка"
+        name="delivery"
+        hint="Курьер до двери"
+        error="Выберите способ"
+      >
+        <RadioInput label="Курьер" value="courier" />
+      </RadioGroup>,
+    );
+
+    const group = screen.getByRole('radiogroup', { name: 'Доставка' });
+    const hint = screen.getByText('Курьер до двери');
+    const error = screen.getByRole('alert');
+    expect(group.getAttribute('aria-describedby')).toBe(
+      `${hint.id} ${error.id}`,
+    );
+  });
 });

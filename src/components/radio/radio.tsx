@@ -11,11 +11,13 @@ import {
 
 import { useFieldControl } from '@/components/field/field-context';
 import { cn, when } from '@/lib/cn';
+import '../field/field.scss';
 import './radio.scss';
 
 interface RadioGroupState {
   name: string;
   required: boolean;
+  invalid: boolean;
   reportValue?: (value: string) => void;
 }
 
@@ -27,6 +29,10 @@ export interface RadioGroupProps {
   name: string;
   /** Внутри `Field` его `required` и так включает группу, здесь — для группы отдельно. */
   required?: boolean;
+  /** Подсказка под пунктами. Внутри `Field` используйте `hint` поля. */
+  hint?: ReactNode;
+  /** Ошибка под пунктами, красит их. Внутри `Field` используйте `error` поля. */
+  error?: ReactNode;
   children: ReactNode;
   className?: string;
 }
@@ -35,19 +41,29 @@ export const RadioGroup = ({
   label,
   name,
   required: requiredProp = false,
+  hint,
+  error,
   children,
   className,
 }: RadioGroupProps) => {
+  const autoId = useId();
   const field = useFieldControl();
   const required = requiredProp || Boolean(field?.required);
+  const invalid = Boolean(error) || Boolean(field?.invalid);
   const labelledBy = !label && field?.labelId ? field.labelId : undefined;
+  const hintId = hint ? `${autoId}-hint` : undefined;
+  const errorId = error ? `${autoId}-error` : undefined;
+  const describedBy =
+    [field?.describedBy, hintId, errorId].filter(Boolean).join(' ') ||
+    undefined;
+  const errormessageId = errorId ?? field?.errorId;
   // Обязательность держат пункты: нативный required на них не даёт отправить
   // форму, а его invalid Field ловит и показывает свою ошибку. Выбор отдаём
   // в reportValue — иначе показанная ошибка так и висела бы после выбора.
   const reportValue = field?.reportValue;
   const group = useMemo<RadioGroupState>(
-    () => ({ name, required, reportValue }),
-    [name, required, reportValue],
+    () => ({ name, required, invalid, reportValue }),
+    [name, required, invalid, reportValue],
   );
 
   return (
@@ -55,15 +71,25 @@ export const RadioGroup = ({
       className={cn('radio-group', className)}
       role="radiogroup"
       {...(labelledBy ? { 'aria-labelledby': labelledBy } : {})}
-      {...(field?.invalid ? { 'aria-invalid': true } : {})}
+      {...(invalid ? { 'aria-invalid': true } : {})}
       {...(required ? { 'aria-required': true } : {})}
-      {...(field?.describedBy ? { 'aria-describedby': field.describedBy } : {})}
-      {...(field?.errorId ? { 'aria-errormessage': field.errorId } : {})}
+      {...(describedBy ? { 'aria-describedby': describedBy } : {})}
+      {...(errormessageId ? { 'aria-errormessage': errormessageId } : {})}
     >
       {label ? <legend className="radio-group__legend">{label}</legend> : null}
       <RadioGroupStateContext.Provider value={group}>
         {children}
       </RadioGroupStateContext.Provider>
+      {hint ? (
+        <p id={hintId} className="field__hint">
+          {hint}
+        </p>
+      ) : null}
+      {error ? (
+        <p id={errorId} className="field__error" role="alert">
+          {error}
+        </p>
+      ) : null}
     </fieldset>
   );
 };
@@ -87,8 +113,10 @@ export const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
       onChange?.(event);
     };
 
+    const invalid = Boolean(error) || Boolean(group?.invalid);
+
     return (
-      <div className={cn('radio', className, when(error, 'radio--error'))}>
+      <div className={cn('radio', className, when(invalid, 'radio--error'))}>
         <input
           {...props}
           ref={ref}

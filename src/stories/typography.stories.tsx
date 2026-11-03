@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
 
+import { CodeBlock } from './code-block';
 import { LabeledBlock, Labeled } from './labeled';
 import { storyStack } from './story-stack';
 
@@ -172,6 +173,32 @@ export const Weight: Story = {
           >
             {sample}
           </p>
+        </Labeled>
+      </LabeledBlock>
+    </div>
+  ),
+};
+
+const usageExample = `import '@de-kit/st-ui/typography.scss';
+
+// Классы для текста и заголовков
+<h1>Персональные данные</h1>
+<p className="text-base">Основной текст блока</p>
+<p className="text-sm">Вспомогательный текст</p>
+
+// Токены размеров и веса в своих стилях
+.note {
+  font-size: var(--text-lg);
+  line-height: var(--text-lg--line-height);
+  font-weight: var(--font-weight-black);
+}`;
+
+export const Usage: Story = {
+  render: () => (
+    <div style={{ ...storyStack, ...frame }}>
+      <LabeledBlock title="Примеры кода">
+        <Labeled label="Классы и токены" wide maxWidth={720}>
+          <CodeBlock code={usageExample} />
         </Labeled>
       </LabeledBlock>
     </div>

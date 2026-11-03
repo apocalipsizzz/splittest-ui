@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { CodeBlock } from '@/stories/code-block';
 import { Labeled, LabeledBlock } from '@/stories/labeled';
 import { storyStack } from '@/stories/story-stack';
 import { Input } from './input';
@@ -98,6 +99,61 @@ export const States: Story = {
         </Labeled>
         <Labeled label="error" wide maxWidth={360}>
           <Input clearable error defaultValue="а" />
+        </Labeled>
+      </LabeledBlock>
+    </div>
+  ),
+};
+
+const usageExample = `import { Input } from '@de-kit/st-ui';
+
+function CityInput() {
+  return <Input name="city" placeholder="Город" autoComplete="address-level2" />;
+}`;
+
+const clearableExample = `import { useState } from 'react';
+import { Input } from '@de-kit/st-ui';
+
+function Search() {
+  const [query, setQuery] = useState('');
+
+  return (
+    <Input
+      placeholder="Название теста"
+      clearable
+      clearLabel="Очистить поиск"
+      value={query}
+      onChange={e => setQuery(e.target.value)}
+      onClear={() => setQuery('')}
+    />
+  );
+}`;
+
+const sizeExample = `import { Input } from '@de-kit/st-ui';
+
+function Sizes() {
+  return (
+    <>
+      <Input size="sm" placeholder="Маленькое" />
+      <Input size="lg" placeholder="Большое" />
+      {/* error — только красная рамка, текст ошибки выводит Field */}
+      <Input size="lg" error defaultValue="пусто" />
+    </>
+  );
+}`;
+
+export const Usage: Story = {
+  render: () => (
+    <div style={storyStack}>
+      <LabeledBlock title="Примеры кода">
+        <Labeled label="Базовый случай" wide maxWidth={720}>
+          <CodeBlock code={usageExample} />
+        </Labeled>
+        <Labeled label="Очистка и контроль значения" wide maxWidth={720}>
+          <CodeBlock code={clearableExample} />
+        </Labeled>
+        <Labeled label="Размеры и ошибка" wide maxWidth={720}>
+          <CodeBlock code={sizeExample} />
         </Labeled>
       </LabeledBlock>
     </div>

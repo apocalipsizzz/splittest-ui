@@ -1,12 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { CodeBlock } from '@/stories/code-block';
 import { Labeled, LabeledBlock } from '@/stories/labeled';
+import { storyStack } from '@/stories/story-stack';
+import { FieldList } from '@/components/field/field-list';
 import { RadioGroup, RadioInput } from './radio';
-
-const options = {
-  display: 'grid',
-  gap: 8,
-} as const;
 
 const meta = {
   title: 'Components/Radio',
@@ -40,12 +38,12 @@ export const Group: Story = {
     <LabeledBlock title="группа">
       <Labeled label="default" wide maxWidth={360}>
         <RadioGroup label="Группа" name="group">
-          <div style={options}>
+          <FieldList>
             <RadioInput label="Первый" value="1" defaultChecked />
             <RadioInput label="Второй" value="2" />
             <RadioInput label="Ошибка" value="3" error />
             <RadioInput label="Выключен" value="5" disabled />
-          </div>
+          </FieldList>
         </RadioGroup>
       </Labeled>
       <Labeled label="error + checked" wide maxWidth={360}>
@@ -64,5 +62,105 @@ export const Group: Story = {
         </RadioGroup>
       </Labeled>
     </LabeledBlock>
+  ),
+};
+
+export const Feedback: Story = {
+  render: () => (
+    <LabeledBlock title="подсказка и ошибка группы">
+      <Labeled label="hint" wide maxWidth={360}>
+        <RadioGroup
+          label="Доставка"
+          name="delivery-hint"
+          hint="Курьер привозит до двери"
+        >
+          <FieldList>
+            <RadioInput label="Курьер" value="courier" />
+            <RadioInput label="Самовывоз" value="pickup" />
+          </FieldList>
+        </RadioGroup>
+      </Labeled>
+      <Labeled label="error" wide maxWidth={360}>
+        <RadioGroup
+          label="Доставка"
+          name="delivery-error"
+          error="Выберите способ доставки"
+        >
+          <FieldList>
+            <RadioInput label="Курьер" value="courier" />
+            <RadioInput label="Самовывоз" value="pickup" />
+          </FieldList>
+        </RadioGroup>
+      </Labeled>
+    </LabeledBlock>
+  ),
+};
+
+const usageExample = `import { RadioGroup, RadioInput } from '@de-kit/st-ui';
+
+function DeliveryChoice() {
+  return (
+    <RadioGroup label="Доставка" name="delivery">
+      <RadioInput label="Курьер" value="courier" defaultChecked />
+      <RadioInput label="Самовывоз" value="pickup" />
+    </RadioGroup>
+  );
+}`;
+
+const controlledExample = `import { useState } from 'react';
+import { RadioGroup, RadioInput } from '@de-kit/st-ui';
+
+function PlanPicker() {
+  const [plan, setPlan] = useState('monthly');
+
+  return (
+    <RadioGroup label="Тариф" name="plan">
+      <RadioInput
+        label="Ежемесячно"
+        value="monthly"
+        checked={plan === 'monthly'}
+        onChange={() => setPlan('monthly')}
+      />
+      <RadioInput
+        label="Ежегодно"
+        value="yearly"
+        checked={plan === 'yearly'}
+        onChange={() => setPlan('yearly')}
+      />
+    </RadioGroup>
+  );
+}`;
+
+const feedbackExample = `import { RadioGroup, RadioInput } from '@de-kit/st-ui';
+
+function DeliveryChoice({ error }: { error?: string }) {
+  return (
+    <RadioGroup
+      label="Доставка"
+      name="delivery"
+      hint="Курьер привозит до двери"
+      error={error}
+    >
+      <RadioInput label="Курьер" value="courier" />
+      <RadioInput label="Самовывоз" value="pickup" />
+    </RadioGroup>
+  );
+}`;
+
+export const Usage: Story = {
+  render: () => (
+    <div style={storyStack}>
+      <LabeledBlock title="Примеры кода">
+        <Labeled label="Группа с легендой" wide maxWidth={720}>
+          <CodeBlock code={usageExample} />
+        </Labeled>
+        <Labeled label="Контролируемый выбор" wide maxWidth={720}>
+          <CodeBlock code={controlledExample} />
+        </Labeled>
+        <Labeled label="Подсказка и ошибка" wide maxWidth={720}>
+          <CodeBlock code={feedbackExample} />
+        </Labeled>
+      </LabeledBlock>
+    </div>
   ),
 };

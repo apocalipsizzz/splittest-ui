@@ -41,3 +41,9 @@
 .field__error {
   color: var(--color-destructive);
 }
+
+.field__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

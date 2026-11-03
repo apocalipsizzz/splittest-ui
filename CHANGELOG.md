@@ -1,5 +1,16 @@
 # @de-kit/st-ui
 
+## 0.1.21
+
+### Patch Changes
+
+- - Добавлен и экспортирован `FieldList` для вертикального списка полей с единым отступом.
+  - `RadioGroup` теперь поддерживает собственные `label`, `hint` и `error` с корректными ARIA-связями.
+  - Состояние ошибки `RadioGroup` передаётся дочерним `RadioInput`, а выбранное значение корректно сбрасывает ошибку поля.
+  - Расширены тесты и Storybook-примеры для `Field`, `RadioGroup` и остальных компонентов.
+  - Добавлен переиспользуемый `CodeBlock` с подсветкой TSX для примеров в Storybook.
+  - Добавлены зависимости `react-syntax-highlighter` и `@types/react-syntax-highlighter`.
+
 ## 0.1.20
 
 ### Patch Changes
