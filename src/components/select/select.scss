@@ -80,10 +80,6 @@
     color: var(--color-foreground);
   }
 
-  &--selected:not(&--active) {
-    font-weight: var(--font-weight-bold);
-  }
-
   &--disabled {
     color: var(--color-muted-foreground);
     cursor: default;
