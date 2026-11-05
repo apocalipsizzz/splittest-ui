@@ -16,20 +16,20 @@
   padding-left: var(--space-1);
   user-select: none;
   cursor: pointer;
-}
 
-.checkbox__link {
-  color: inherit;
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
-
-  &:hover {
+  a {
     color: inherit;
-  }
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
 
-  &:focus-visible {
-    outline: var(--focus-ring-width) solid var(--focus-ring-color);
-    outline-offset: var(--focus-ring-offset);
+    &:hover {
+      color: inherit;
+    }
+
+    &:focus-visible {
+      outline: var(--focus-ring-width) solid var(--focus-ring-color);
+      outline-offset: var(--focus-ring-offset);
+    }
   }
 }
 

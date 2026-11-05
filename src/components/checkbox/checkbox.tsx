@@ -125,7 +125,9 @@ export const CheckboxInput = forwardRef<HTMLInputElement, CheckboxInputProps>(
     const field = useFieldControl();
     const reportValue = field?.reportValue;
     const autoId = useId();
-    const inputId = field?.id ?? id ?? autoId;
+    // Свой id важнее id поля: несколько чекбоксов в одном Field иначе
+    // получают один и тот же, и клик по любому лейблу бьёт в первый.
+    const inputId = id ?? field?.id ?? autoId;
     const inputRef = useRef<HTMLInputElement>(null);
     const unlistenLabel = useRef<(() => void) | null>(null);
     const isInvalid = Boolean(error) || Boolean(field?.invalid);

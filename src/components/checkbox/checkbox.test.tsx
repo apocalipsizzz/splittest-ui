@@ -46,8 +46,8 @@ describe('CheckboxInput', () => {
     expect(input).toHaveProperty('indeterminate', false);
   });
 
-  it('контекст Field перебивает id и не затирает явные aria', () => {
-    render(
+  it('свой id важнее контекста Field, без id берётся id поля', () => {
+    const { rerender } = render(
       <FieldControlProvider
         value={{
           id: 'from-field',
@@ -67,13 +67,26 @@ describe('CheckboxInput', () => {
     );
 
     const input = screen.getByLabelText('Имя');
-    expect(input).toHaveAttribute('id', 'from-field');
-    expect(screen.getByText('Имя')).toHaveAttribute('for', 'from-field');
+    expect(input).toHaveAttribute('id', 'from-props');
+    expect(screen.getByText('Имя')).toHaveAttribute('for', 'from-props');
     expect(input).not.toBeRequired();
     expect(input).not.toHaveAttribute('aria-required');
     expect(input).toHaveAttribute('aria-invalid', 'false');
     expect(input).toHaveAttribute('aria-describedby', 'extra');
     expect(input).toHaveAttribute('aria-errormessage', 'own-error');
+
+    rerender(
+      <FieldControlProvider
+        value={{
+          id: 'from-field',
+          invalid: false,
+          required: false,
+        }}
+      >
+        <CheckboxInput label="Имя" />
+      </FieldControlProvider>,
+    );
+    expect(screen.getByLabelText('Имя')).toHaveAttribute('id', 'from-field');
   });
 
   it('контекст Field ставит required, ошибку и склеивает describedby', () => {
@@ -136,6 +149,27 @@ describe('CheckboxInput', () => {
     expect(input).toBeChecked();
 
     open.mockRestore();
+  });
+
+  it('в одном Field свои id не схлопываются', () => {
+    render(
+      <Field label="Нажмите, чтобы продолжить">
+        <CheckboxInput id="captcha" label="Я не робот" />
+        <CheckboxInput id="offerta" label="Оферта" />
+        <CheckboxInput id="personal-data" label="Персональные данные" />
+      </Field>,
+    );
+
+    expect(
+      screen.getByRole('checkbox', { name: 'Я не робот' }),
+    ).toHaveAttribute('id', 'captcha');
+    expect(screen.getByRole('checkbox', { name: 'Оферта' })).toHaveAttribute(
+      'id',
+      'offerta',
+    );
+    expect(
+      screen.getByRole('checkbox', { name: 'Персональные данные' }),
+    ).toHaveAttribute('id', 'personal-data');
   });
 
   it('error помечает, один required — нет', () => {
