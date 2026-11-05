@@ -6,6 +6,20 @@ import { describe, expect, it, vi } from 'vitest';
 import { Input } from './input';
 
 describe('Input', () => {
+  it('noWrap убирает input__wrap и крестик', () => {
+    const { container, rerender } = render(<Input noWrap placeholder="Имя" />);
+    const input = screen.getByPlaceholderText('Имя');
+
+    expect(container.querySelector('.input__wrap')).toBeNull();
+    expect(input.parentElement).toBe(container);
+
+    rerender(<Input noWrap clearable defaultValue="тест" placeholder="Имя" />);
+    expect(container.querySelector('.input__wrap')).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: 'Очистить' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('error ставит класс и aria-invalid', () => {
     render(<Input error placeholder="Имя" />);
     const input = screen.getByPlaceholderText('Имя');

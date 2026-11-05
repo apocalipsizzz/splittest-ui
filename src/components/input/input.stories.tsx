@@ -13,6 +13,7 @@ const meta = {
   },
   argTypes: {
     clearable: { control: 'boolean' },
+    noWrap: { control: 'boolean' },
   },
 } satisfies Meta<typeof Input>;
 
@@ -88,6 +89,9 @@ export const States: Story = {
         </Labeled>
         <Labeled label="readOnly" wide maxWidth={360}>
           <Input readOnly defaultValue="только чтение" />
+        </Labeled>
+        <Labeled label="noWrap" wide maxWidth={360}>
+          <Input noWrap placeholder="Название теста" />
         </Labeled>
       </LabeledBlock>
       <LabeledBlock title="clearable">

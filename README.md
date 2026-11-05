@@ -102,6 +102,7 @@ import { IconClose, LogoVisa } from '@de-kit/st-ui/icons';
 <Input recommended />
 <Input error />
 <Input size="sm" />
+<Input noWrap />
 <TextArea maxLength={200} />
 <TextArea maxLength={200} counter={false} />
 <CheckboxInput label="18-24" />
@@ -113,7 +114,7 @@ import { IconClose, LogoVisa } from '@de-kit/st-ui/icons';
 <Spinner label="Считаем" size={24} />
 ```
 
-`size` у `Input` и `TextArea` — те же `sm`, `md`, `lg`, что у кнопки. У `Input` высота совпадает с кнопкой ровно: 30, 40 и 52px, включая `type="date"`. У `TextArea` размер меняет паддинги и `min-height`: 120 / 160 / 200px, с 680px — 60 / 80 / 100px. Текст во всех размерах остаётся `--text-sm`. У `Input` проп перекрывает нативный `size` (ширину в символах). `counter={false}` заменяет опечатку `noMaxMoty`. Счётчик `TextArea` показывает остаток символов и связан с полем через `aria-describedby`, сам `maxLength` по-прежнему режет ввод. `CheckboxInput` сам ставит `id`, если его не передали. Общий `name` у радио задаёт `RadioGroup`, она же рисует `fieldset` с `role="radiogroup"`. Её `required` делает обязательной всю группу и вне `Field`: `aria-required` уезжает на группу, нативный `required` — на пункты. Красная рамка у `CheckboxInput` и `RadioInput` — это проп `error`; один `required` больше не красит, он только обязывает. `Spinner` тянется по родителю, `position` раскладывает его по высоте, а `label` (по умолчанию «Загрузка») — подпись для скринридера.
+`size` у `Input` и `TextArea` — те же `sm`, `md`, `lg`, что у кнопки. У `Input` высота совпадает с кнопкой ровно: 30, 40 и 52px, включая `type="date"`. У `TextArea` размер меняет паддинги и `min-height`: 120 / 160 / 200px, с 680px — 60 / 80 / 100px. Текст во всех размерах остаётся `--text-sm`. У `Input` проп перекрывает нативный `size` (ширину в символах). `noWrap` убирает `div.input__wrap`: крестик `clearable` от неё позиционируется, поэтому с `noWrap` не рисуется. `counter={false}` заменяет опечатку `noMaxMoty`. Счётчик `TextArea` показывает остаток символов и связан с полем через `aria-describedby`, сам `maxLength` по-прежнему режет ввод. `CheckboxInput` сам ставит `id`, если его не передали. Общий `name` у радио задаёт `RadioGroup`, она же рисует `fieldset` с `role="radiogroup"`. Её `required` делает обязательной всю группу и вне `Field`: `aria-required` уезжает на группу, нативный `required` — на пункты. Красная рамка у `CheckboxInput` и `RadioInput` — это проп `error`; один `required` больше не красит, он только обязывает. `Spinner` тянется по родителю, `position` раскладывает его по высоте, а `label` (по умолчанию «Загрузка») — подпись для скринридера.
 
 ## Поле
 

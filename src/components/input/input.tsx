@@ -27,6 +27,8 @@ export interface InputProps extends Omit<
   error?: boolean;
   /** Крестик справа. Появляется, только когда в поле есть значение. */
   clearable?: boolean;
+  /** Без `div.input__wrap`. Крестик от этой обёртки и позиционируется, с `noWrap` он не рисуется. */
+  noWrap?: boolean;
   clearLabel?: string;
   onClear?: () => void;
 }
@@ -67,6 +69,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     recommended,
     error,
     clearable = false,
+    noWrap = false,
     clearLabel = 'Очистить',
     onClear,
     className,
@@ -135,34 +138,42 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     input.focus();
   };
 
-  const canClear = clearable && !disabled && !readOnly && current !== '';
+  const canClear =
+    clearable && !noWrap && !disabled && !readOnly && current !== '';
+
+  const input = (
+    <input
+      {...props}
+      ref={setRef}
+      type={type}
+      disabled={disabled}
+      readOnly={readOnly}
+      {...(isControlled ? { value } : { defaultValue })}
+      onChange={handleChange}
+      {...(isInvalid ? { 'aria-invalid': true } : {})}
+      {...(field ? { id: field.id } : {})}
+      {...(field?.required ? { 'required': true, 'aria-required': true } : {})}
+      {...(describedBy ? { 'aria-describedby': describedBy } : {})}
+      {...(field?.errorId ? { 'aria-errormessage': field.errorId } : {})}
+      className={cn(
+        'input',
+        className,
+        when(size !== 'md', `input--${size}`),
+        when(recommended, 'input--recommended'),
+        when(isInvalid, 'input--error'),
+        when(
+          clearable && !noWrap && !disabled && !readOnly,
+          'input--clearable',
+        ),
+      )}
+    />
+  );
+
+  if (noWrap) return input;
 
   return (
     <div className="input__wrap">
-      <input
-        {...props}
-        ref={setRef}
-        type={type}
-        disabled={disabled}
-        readOnly={readOnly}
-        {...(isControlled ? { value } : { defaultValue })}
-        onChange={handleChange}
-        {...(isInvalid ? { 'aria-invalid': true } : {})}
-        {...(field ? { id: field.id } : {})}
-        {...(field?.required
-          ? { 'required': true, 'aria-required': true }
-          : {})}
-        {...(describedBy ? { 'aria-describedby': describedBy } : {})}
-        {...(field?.errorId ? { 'aria-errormessage': field.errorId } : {})}
-        className={cn(
-          'input',
-          className,
-          when(size !== 'md', `input--${size}`),
-          when(recommended, 'input--recommended'),
-          when(isInvalid, 'input--error'),
-          when(clearable && !disabled && !readOnly, 'input--clearable'),
-        )}
-      />
+      {input}
       {canClear ? (
         <button
           type="button"

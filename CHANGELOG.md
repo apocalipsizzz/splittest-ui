@@ -1,5 +1,11 @@
 # @de-kit/st-ui
 
+## 0.1.26
+
+### Patch Changes
+
+- `Input` принимает `noWrap`: `div.input__wrap` не рисуется. С `noWrap` крестик `clearable` тоже не рисуется — он позиционируется от этой обёртки.
+
 ## 0.1.25
 
 ### Patch Changes
