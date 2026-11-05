@@ -27,6 +27,13 @@
       }
     },
     {
+      "files": ["src/components/select/**", "src/components/select-search/**"],
+      "rules": {
+        "react/refs": "off",
+        "jsx-a11y/prefer-tag-over-role": "off"
+      }
+    },
+    {
       "files": ["scripts/**"],
       "rules": {
         "no-console": "off"

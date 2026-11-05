@@ -1,0 +1,23 @@
+.select--search .select__input {
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+.select--search.select--opened .select__input {
+  cursor: text;
+}
+
+.select--search .select__arrow {
+  position: absolute;
+  top: 50%;
+  right: var(--space-3);
+  color: var(--color-muted-foreground);
+  pointer-events: none;
+  transition: transform 0.3s ease;
+  transform: translateY(-50%);
+}
+
+.select--search.select--opened .select__arrow {
+  color: var(--color-foreground);
+  transform: translateY(-50%) rotate(180deg);
+}
