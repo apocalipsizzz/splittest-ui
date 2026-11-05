@@ -51,6 +51,13 @@ export const States: Story = {
       <Labeled label="без label">
         <CheckboxInput />
       </Labeled>
+      <Labeled label="ссылка">
+        <CheckboxInput
+          label="Принимаю "
+          urlLabel="оферту"
+          url="https://splittest.ru/agreement.pdf"
+        />
+      </Labeled>
     </LabeledBlock>
   ),
 };

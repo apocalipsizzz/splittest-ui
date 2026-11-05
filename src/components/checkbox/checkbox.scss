@@ -18,6 +18,21 @@
   cursor: pointer;
 }
 
+.checkbox__link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+
+  &:hover {
+    color: inherit;
+  }
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+}
+
 .checkbox__input {
   --active: var(--color-primary);
   --active-inner: var(--color-primary-foreground);

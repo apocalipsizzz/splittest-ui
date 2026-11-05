@@ -97,6 +97,7 @@
     &:disabled,
     &[aria-disabled='true']:not([aria-busy='true']) {
       background-color: transparent;
+      color: var(--color-foreground);
     }
   }
 
@@ -118,6 +119,7 @@
     &:disabled,
     &[aria-disabled='true']:not([aria-busy='true']) {
       background-color: transparent;
+      color: var(--color-destructive);
     }
   }
 

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { Field } from '@/components/field';
 import { FieldControlProvider } from '@/components/field/field-context';
@@ -97,6 +97,40 @@ describe('CheckboxInput', () => {
     expect(input).toHaveAttribute('aria-invalid', 'true');
     expect(input).toHaveAttribute('aria-describedby', 'hint extra');
     expect(input).toHaveAttribute('aria-errormessage', 'err');
+  });
+
+  it('ссылка в лейбле жирная, клик не ставит галочку', async () => {
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+    render(
+      <CheckboxInput
+        label="Принимаю "
+        urlLabel="оферту"
+        url="https://splittest.ru/agreement.pdf"
+      />,
+    );
+
+    const input = screen.getByRole('checkbox', { name: 'Принимаю оферту' });
+    const link = screen.getByRole('link', { name: 'оферту' });
+    expect(link).toHaveClass('checkbox__link');
+    expect(link).toHaveAttribute('href', 'https://splittest.ru/agreement.pdf');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+
+    await userEvent.click(link);
+    expect(input).not.toBeChecked();
+    expect(open).toHaveBeenCalledWith(
+      'https://splittest.ru/agreement.pdf',
+      '_blank',
+      'noopener,noreferrer',
+    );
+
+    open.mockRestore();
+  });
+
+  it('без url ссылка не рисуется', () => {
+    render(<CheckboxInput label="Принимаю " urlLabel="оферту" />);
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('error помечает, один required — нет', () => {

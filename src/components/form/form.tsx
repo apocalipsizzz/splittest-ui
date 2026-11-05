@@ -6,7 +6,7 @@ import {
   useEffect,
   useRef,
   useState,
-  type FormEvent,
+  type SubmitEvent,
   type FormHTMLAttributes,
   type ForwardedRef,
   type ReactNode,
@@ -51,7 +51,7 @@ export interface FormProps extends Omit<
    */
   onSubmit?: (
     data: FormData,
-    event: FormEvent<HTMLFormElement>,
+    event: SubmitEvent<HTMLFormElement>,
   ) => void | Promise<void>;
   /**
    * Запрос снаружи формы: `onSubmit` ничего не вернул, крутилку держит стор.
@@ -77,6 +77,7 @@ export const Form = forwardRef(function Form(
   {
     children,
     className,
+    action,
     error,
     onSubmit,
     pending = false,
@@ -142,11 +143,11 @@ export const Form = forwardRef(function Form(
     [ref],
   );
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    // Без своего onSubmit остаётся нативный action/method.
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+    // Нативный сабмит только с явным action и без своего обработчика.
+    // Без action браузер делает GET на текущий URL: поля попадают в query, историю и Referer.
+    if (onSubmit || !action) event.preventDefault();
     if (!onSubmit) return;
-
-    event.preventDefault();
     // Кнопка заблокирована, но requestSubmit и Enter её обходят.
     if (busyRef.current || pending) return;
 
@@ -188,6 +189,7 @@ export const Form = forwardRef(function Form(
   return (
     <form
       {...props}
+      action={action}
       ref={setNode}
       className={cn('form', className)}
       onSubmit={handleSubmit}

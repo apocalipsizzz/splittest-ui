@@ -173,6 +173,67 @@ describe('Form', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
+  it('без onSubmit и без action отменяет нативный сабмит', () => {
+    render(
+      <Form>
+        <input name="phone" defaultValue="+79990000000" />
+        <FormSubmit>Отправить</FormSubmit>
+      </Form>,
+    );
+
+    const form = document.querySelector('form');
+    const event = new SubmitEvent('submit', {
+      bubbles: true,
+      cancelable: true,
+    });
+    form?.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(form).not.toHaveAttribute('action');
+  });
+
+  it('без onSubmit, но с action оставляет нативную отправку', () => {
+    render(
+      <Form action="/feedback" method="post">
+        <input name="phone" defaultValue="+79990000000" />
+        <FormSubmit>Отправить</FormSubmit>
+      </Form>,
+    );
+
+    const form = document.querySelector('form');
+    expect(form).toHaveAttribute('action', '/feedback');
+    expect(form).toHaveAttribute('method', 'post');
+
+    const event = new SubmitEvent('submit', {
+      bubbles: true,
+      cancelable: true,
+    });
+    form?.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  it('onSubmit отменяет сабмит даже если задан action', () => {
+    const onSubmit = vi.fn<(data: FormData) => void>();
+    render(
+      <Form action="/feedback" onSubmit={onSubmit}>
+        <input name="name" defaultValue="Jora" />
+        <FormSubmit>Отправить</FormSubmit>
+      </Form>,
+    );
+
+    const form = document.querySelector('form');
+    const event = new SubmitEvent('submit', {
+      bubbles: true,
+      cancelable: true,
+    });
+    form?.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(onSubmit).toHaveBeenCalledOnce();
+    expect(onSubmit.mock.calls[0]?.[0].get('name')).toBe('Jora');
+  });
+
   it('берёт текст ошибки из объекта с message', async () => {
     render(
       <Form onSubmit={() => Promise.reject({ message: 'Лимит запросов' })}>
