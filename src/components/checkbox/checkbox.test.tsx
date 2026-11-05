@@ -99,38 +99,43 @@ describe('CheckboxInput', () => {
     expect(input).toHaveAttribute('aria-errormessage', 'err');
   });
 
-  it('ссылка в лейбле жирная, клик не ставит галочку', async () => {
+  it('ссылка внутри label не переключает чекбокс и открывается отдельно', async () => {
     const open = vi.spyOn(window, 'open').mockImplementation(() => null);
 
     render(
       <CheckboxInput
-        label="Принимаю "
-        urlLabel="оферту"
-        url="https://splittest.ru/agreement.pdf"
+        label={
+          <>
+            Даю согласие на обработку моих{' '}
+            <span>
+              <a href="https://splittest.ru/privacy.pdf">персональных данных</a>
+            </span>
+          </>
+        }
       />,
     );
 
-    const input = screen.getByRole('checkbox', { name: 'Принимаю оферту' });
-    const link = screen.getByRole('link', { name: 'оферту' });
+    const input = screen.getByRole('checkbox', {
+      name: 'Даю согласие на обработку моих персональных данных',
+    });
+    const link = screen.getByRole('link', { name: 'персональных данных' });
     expect(link).toHaveClass('checkbox__link');
-    expect(link).toHaveAttribute('href', 'https://splittest.ru/agreement.pdf');
+    expect(link).toHaveAttribute('href', 'https://splittest.ru/privacy.pdf');
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
 
     await userEvent.click(link);
     expect(input).not.toBeChecked();
     expect(open).toHaveBeenCalledWith(
-      'https://splittest.ru/agreement.pdf',
+      'https://splittest.ru/privacy.pdf',
       '_blank',
       'noopener,noreferrer',
     );
 
-    open.mockRestore();
-  });
+    await userEvent.click(input);
+    expect(input).toBeChecked();
 
-  it('без url ссылка не рисуется', () => {
-    render(<CheckboxInput label="Принимаю " urlLabel="оферту" />);
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    open.mockRestore();
   });
 
   it('error помечает, один required — нет', () => {

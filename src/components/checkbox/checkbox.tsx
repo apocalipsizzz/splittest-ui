@@ -1,12 +1,16 @@
 import {
+  Children,
+  Fragment,
+  cloneElement,
   forwardRef,
+  isValidElement,
   useCallback,
   useEffect,
   useId,
   useRef,
   type ChangeEvent,
   type InputHTMLAttributes,
-  type MouseEvent,
+  type ReactElement,
   type ReactNode,
   type Ref,
 } from 'react';
@@ -15,7 +19,61 @@ import { useFieldControl } from '@/components/field/field-context';
 import { cn, when } from '@/lib/cn';
 import './checkbox.scss';
 
+interface LabelAnchorProps {
+  children?: ReactNode;
+  className?: string;
+  target?: string;
+  rel?: string;
+}
+
+/** Любой `<a>` в лейбле: класс, новая вкладка. Клик ловит сам лейбл. */
+const enhanceLabel = (node: ReactNode): ReactNode =>
+  Children.map(node, child => {
+    if (!isValidElement(child)) return child;
+
+    if (child.type === Fragment) {
+      const fragment = child as ReactElement<{ children?: ReactNode }>;
+      return cloneElement(
+        fragment,
+        undefined,
+        enhanceLabel(fragment.props.children),
+      );
+    }
+
+    if (child.type === 'a') {
+      const anchor = child as ReactElement<LabelAnchorProps>;
+      return cloneElement(
+        anchor,
+        {
+          className: cn('checkbox__link', anchor.props.className),
+          target: '_blank',
+          rel: 'noopener noreferrer',
+        },
+        enhanceLabel(anchor.props.children),
+      );
+    }
+
+    if (
+      typeof child.props === 'object' &&
+      child.props !== null &&
+      'children' in child.props
+    ) {
+      const element = child as ReactElement<{ children?: ReactNode }>;
+      return cloneElement(
+        element,
+        undefined,
+        enhanceLabel(element.props.children),
+      );
+    }
+
+    return child;
+  });
+
 export interface CheckboxInputProps extends InputHTMLAttributes<HTMLInputElement> {
+  /**
+   * Текст рядом с квадратом. `<a>` внутри получает `checkbox__link`,
+   * открывается в новой вкладке и не переключает чекбокс.
+   */
   label?: ReactNode;
   /** Красная рамка. Внутри `Field` состоянием ошибки распоряжается он. */
   error?: boolean;
@@ -26,10 +84,6 @@ export interface CheckboxInputProps extends InputHTMLAttributes<HTMLInputElement
    * Клик по лейблу по-прежнему переключает.
    */
   clickable?: boolean;
-  /** Адрес ссылки в конце лейбла. Новая вкладка. Без `urlLabel` не рисуется. */
-  url?: string;
-  /** Текст ссылки. Рисуется только вместе с `url`. */
-  urlLabel?: string;
 }
 
 const assignRef = (
@@ -64,8 +118,6 @@ export const CheckboxInput = forwardRef<HTMLInputElement, CheckboxInputProps>(
       indeterminate = false,
       checked,
       onChange,
-      url,
-      urlLabel,
       ...props
     },
     ref,
@@ -75,6 +127,7 @@ export const CheckboxInput = forwardRef<HTMLInputElement, CheckboxInputProps>(
     const autoId = useId();
     const inputId = field?.id ?? id ?? autoId;
     const inputRef = useRef<HTMLInputElement>(null);
+    const unlistenLabel = useRef<(() => void) | null>(null);
     const isInvalid = Boolean(error) || Boolean(field?.invalid);
 
     const setRef = useCallback(
@@ -102,25 +155,29 @@ export const CheckboxInput = forwardRef<HTMLInputElement, CheckboxInputProps>(
       onChange?.(event);
     };
 
-    // Ссылка внутри label: отмена click глушит и переход, и активацию чекбокса.
-    const handleLinkClick = (event: MouseEvent<HTMLAnchorElement>) => {
-      event.preventDefault();
-      event.stopPropagation();
-      window.open(event.currentTarget.href, '_blank', 'noopener,noreferrer');
-    };
+    // Нативный listener раньше делегата React: preventDefault успевает отменить
+    // и переход, и активацию чекбокса. stopPropagation — чтобы клик не всплыл второй раз.
+    const setLabelNode = useCallback((node: HTMLLabelElement | null) => {
+      unlistenLabel.current?.();
+      unlistenLabel.current = null;
+      if (!node) return;
 
-    const link =
-      url && urlLabel ? (
-        <a
-          className="checkbox__link"
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={handleLinkClick}
-        >
-          {urlLabel}
-        </a>
-      ) : null;
+      const handleClick = (event: Event) => {
+        if (!(event.target instanceof Element)) return;
+        const anchor = event.target.closest('a');
+        if (!anchor || !node.contains(anchor) || !anchor.hasAttribute('href')) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        window.open(anchor.href, '_blank', 'noopener,noreferrer');
+      };
+
+      node.addEventListener('click', handleClick, true);
+      unlistenLabel.current = () =>
+        node.removeEventListener('click', handleClick, true);
+    }, []);
 
     const describedBy = field
       ? mergeDescribedBy(field.describedBy, props['aria-describedby'])
@@ -153,10 +210,13 @@ export const CheckboxInput = forwardRef<HTMLInputElement, CheckboxInputProps>(
           )}
           {...fieldAttrs}
         />
-        {label || link ? (
-          <label className="checkbox__label" htmlFor={inputId}>
-            {label}
-            {link}
+        {label ? (
+          <label
+            ref={setLabelNode}
+            className="checkbox__label"
+            htmlFor={inputId}
+          >
+            {enhanceLabel(label)}
           </label>
         ) : null}
       </div>
