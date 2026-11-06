@@ -102,12 +102,13 @@ describe('Popover', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('без open открывается и закрывается кликом по якорю', async () => {
+  it('openOnTriggerClick: якорь сам открывает и закрывает панель', async () => {
     const onOpenChange = vi.fn<(open: boolean) => void>();
     const user = userEvent.setup();
 
     render(
       <Popover
+        openOnTriggerClick
         onOpenChange={onOpenChange}
         trigger={<Button type="button">Открыть</Button>}
       >
@@ -127,12 +128,35 @@ describe('Popover', () => {
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
   });
 
+  it('без openOnTriggerClick якорь панель не открывает', async () => {
+    const onClick = vi.fn<() => void>();
+    const user = userEvent.setup();
+
+    render(
+      <Popover
+        trigger={
+          <Button type="button" onClick={onClick}>
+            Открыть
+          </Button>
+        }
+      >
+        Контент
+      </Popover>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Открыть' }));
+
+    expect(onClick).toHaveBeenCalledOnce();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it('свой onClick триггера жив рядом с обработчиком панели', async () => {
     const onClick = vi.fn<() => void>();
     const user = userEvent.setup();
 
     render(
       <Popover
+        openOnTriggerClick
         trigger={
           <Button type="button" onClick={onClick}>
             Открыть

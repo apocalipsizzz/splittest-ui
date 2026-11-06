@@ -71,6 +71,13 @@ export interface PopoverProps extends Omit<
   maxWidth?: number;
   /** Подпись кнопки закрытия для скринридера. */
   closeLabel?: string;
+  /**
+   * Клик по якорю сам переключает панель. По умолчанию выключено: якорь
+   * принадлежит потребителю, и его `onClick` — единственное, что открывает.
+   * Нужен неуправляемый `Popover`, который работает без внешнего состояния, —
+   * включите этот проп.
+   */
+  openOnTriggerClick?: boolean;
 }
 
 const flipPlacementsFor = (preferred: PopoverPlacement): Placement[] => {
@@ -112,6 +119,7 @@ const PopoverFrame = forwardRef<HTMLDivElement, PopoverProps>(
       minWidth = POPOVER_MIN_WIDTH,
       maxWidth = POPOVER_MAX_WIDTH,
       closeLabel = 'Закрыть',
+      openOnTriggerClick = false,
       style,
       ...props
     },
@@ -160,10 +168,10 @@ const PopoverFrame = forwardRef<HTMLDivElement, PopoverProps>(
       },
     });
     const role = useRole(context, { role: 'dialog' });
-    // Клик по якорю переключает только неуправляемую панель. У управляемой
-    // открытием распоряжается потребитель — его обработчик на триггере
-    // остаётся единственным, поведение не меняется.
-    const click = useClick(context, { enabled: openProp === undefined });
+    // По умолчанию выключено: якорь чужой, и его onClick — единственное, что
+    // открывает панель. Включённый проп складывается с обработчиком якоря,
+    // а не вытесняет его: Slot склеивает оба onClick.
+    const click = useClick(context, { enabled: openOnTriggerClick });
     const { getReferenceProps, getFloatingProps } = useInteractions([
       dismiss,
       role,

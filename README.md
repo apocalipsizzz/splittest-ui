@@ -284,7 +284,13 @@ import { Button } from '@de-kit/st-ui/components/button';
 <DatePicker defaultValue={new Date(1990, 2, 15)} onChange={save} />
 ```
 
-`onClose` остаётся как короткая форма «только закрытие». У неуправляемого `Popover` клик по якорю переключает панель сам; у управляемого открытием по-прежнему распоряжается обработчик на триггере.
+`onClose` остаётся как короткая форма «только закрытие».
+
+Якорь `Popover` принадлежит вам, поэтому сам по себе клик по нему панель не открывает — это делает ваш `onClick`. Нужен `Popover`, который живёт без внешнего состояния, — включите `openOnTriggerClick`: тогда якорь переключает панель, а ваш `onClick` на нём продолжает вызываться.
+
+```tsx
+<Popover openOnTriggerClick trigger={<Button>Фильтр</Button>}>…</Popover>
+```
 
 Подписи у слоёв переопределяются: `closeLabel` у `PopupSheet` и `Popover`; у `DatePicker` — `title`, `dayLabel`, `monthLabel`, `yearLabel`, `applyLabel`, `cancelLabel`, а названия месяцев берутся из `Intl.DateTimeFormat` по пропу `locale` (по умолчанию `ru`, родительный падеж — через `formatToParts`).
 
