@@ -1,6 +1,13 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "unicorn", "oxc", "react", "jsx-a11y", "vitest"],
+  "plugins": [
+    "typescript",
+    "unicorn",
+    "oxc",
+    "react",
+    "jsx-a11y",
+    "vitest"
+  ],
   "categories": {
     "correctness": "error"
   },
@@ -18,23 +25,16 @@
     "no-console": "warn",
     "react/react-in-jsx-scope": "off"
   },
-  "ignorePatterns": ["dist", "storybook-static", "node_modules"],
+  "ignorePatterns": [
+    "dist",
+    "storybook-static",
+    "node_modules"
+  ],
   "overrides": [
     {
-      "files": ["src/components/popover/**"],
-      "rules": {
-        "react/refs": "off"
-      }
-    },
-    {
-      "files": ["src/components/select/**", "src/components/select-search/**"],
-      "rules": {
-        "react/refs": "off",
-        "jsx-a11y/prefer-tag-over-role": "off"
-      }
-    },
-    {
-      "files": ["scripts/**"],
+      "files": [
+        "scripts/**"
+      ],
       "rules": {
         "no-console": "off"
       }

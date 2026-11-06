@@ -1,5 +1,5 @@
-import { act, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 
 import { Spinner } from './spinner';
 
@@ -13,7 +13,7 @@ describe('Spinner', () => {
     expect(svg).toHaveAttribute('width', '64');
     expect(svg).toHaveAttribute('height', '64');
     expect(svg).toHaveAttribute('fill', 'var(--color-muted)');
-    expect(container.querySelectorAll('animate')).toHaveLength(8);
+    expect(container.querySelectorAll('circle')).toHaveLength(8);
   });
 
   it('size задаёт ширину и высоту svg', () => {
@@ -44,36 +44,16 @@ describe('Spinner', () => {
     expect(status.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('не рендерит animate при prefers-reduced-motion и возвращает его, если настройка сменилась', () => {
-    let matches = true;
-    let onChange: (() => void) | undefined;
+  it('анимацию ведёт CSS: у каждой точки своя задержка, SMIL нет', () => {
+    const { container } = render(<Spinner />);
 
-    vi.stubGlobal('matchMedia', (query: string) => ({
-      get matches() {
-        return query === '(prefers-reduced-motion: reduce)' && matches;
-      },
-      media: query,
-      addEventListener: (_event: string, listener: () => void) => {
-        onChange = listener;
-      },
-      removeEventListener: () => {
-        onChange = undefined;
-      },
-    }));
-
-    try {
-      const { container } = render(<Spinner />);
-      expect(container.querySelector('animate')).toBeNull();
-      expect(container.querySelectorAll('circle')).toHaveLength(8);
-
-      matches = false;
-      act(() => {
-        onChange?.();
-      });
-      expect(container.querySelectorAll('animate')).toHaveLength(8);
-    } finally {
-      vi.unstubAllGlobals();
-    }
+    expect(container.querySelector('animate')).toBeNull();
+    const dots = container.querySelectorAll('.spinner__dot');
+    expect(dots).toHaveLength(8);
+    expect(dots[0]?.getAttribute('style')).toContain('--spinner-dot-delay: 0s');
+    expect(dots[4]?.getAttribute('style')).toContain(
+      '--spinner-dot-delay: 0.5s',
+    );
   });
 
   it('label переопределяет подпись', () => {

@@ -1,16 +1,25 @@
-import { useMergeRefs } from '@floating-ui/react';
 import {
+  FloatingNode,
+  useFloatingNodeId,
+  useMergeRefs,
+} from '@floating-ui/react';
+import {
+  forwardRef,
   useId,
   useRef,
   useState,
   type FocusEvent,
+  type HTMLAttributes,
   type KeyboardEvent,
   type MouseEvent,
+  type ReactNode,
 } from 'react';
 
 import type { InputSize } from '@/components/input';
 import { IconDrop } from '@/icons/icon-drop';
 import { cn, when } from '@/lib/cn';
+import { FloatingLayerTree } from '@/lib/floating-layer';
+import { useControllableState } from '@/lib/hooks/use-controllable-state';
 import {
   SelectDropdown,
   useSelectDropdown,
@@ -18,9 +27,11 @@ import {
   useSelectValue,
 } from './select-dropdown';
 import {
+  createTypeaheadBuffer,
   handleListKeyDown,
   highlightedIndex,
   isPrintableKey,
+  optionByPrefix,
   selectedEnabledIndex,
   type SelectOption,
 } from './select-option';
@@ -29,7 +40,10 @@ import './select.scss';
 
 export type { SelectOption };
 
-export interface SelectProps {
+export interface SelectProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'onChange' | 'defaultValue'
+> {
   options: readonly SelectOption[];
   value?: string | null;
   defaultValue?: string | null;
@@ -41,211 +55,238 @@ export interface SelectProps {
   /** Имя для FormData: уходит `value` выбранного пункта, не подпись. */
   name?: string;
   size?: InputSize;
-  className?: string;
-  id?: string;
+  /** Текст пустого списка. */
+  emptyText?: string;
+  /** Открытие и закрытие списка. */
+  onOpenChange?: (open: boolean) => void;
+  /**
+   * Своя разметка пункта. `label` при этом остаётся строкой: по нему идут
+   * поиск с клавиатуры и подпись на кнопке.
+   */
+  renderOption?: (option: SelectOption) => ReactNode;
 }
-
-const optionByPrefix = (
-  options: readonly SelectOption[],
-  char: string,
-  from: number,
-) => {
-  const needle = char.toLowerCase().replace(/ё/g, 'е');
-  const ordered = [...options.slice(from + 1), ...options.slice(0, from + 1)];
-  const match = ordered.find(option => {
-    const label = option.label.toLowerCase().replace(/ё/g, 'е');
-    return !option.disabled && label.startsWith(needle);
-  });
-
-  return match ? options.indexOf(match) : -1;
-};
 
 /**
  * Селект как в shadcn: кнопка открывает список в портале, у выбранного пункта галочка.
  * В форму значение уходит скрытым полем, без второго видимого списка.
  * Для поиска по пунктам есть `SelectSearch`.
  */
-export const Select = (props: SelectProps) => {
-  const {
-    options,
-    value,
-    defaultValue = null,
-    onChange,
-    placeholder = 'Выберите',
-    disabled = false,
-    error,
-    name,
-    size = 'md',
-    className,
-    id,
-  } = props;
+const SelectFrame = forwardRef<HTMLDivElement, SelectProps>(
+  function SelectFrame(props, ref) {
+    const {
+      options,
+      value,
+      defaultValue = null,
+      onChange,
+      placeholder = 'Выберите',
+      disabled = false,
+      error,
+      name,
+      size = 'md',
+      className,
+      id,
+      emptyText = 'Нет вариантов',
+      onOpenChange,
+      renderOption,
+      ...rest
+    } = props;
 
-  const listId = useId();
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const [open, setOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const { selectedValue, setSelectedValue } = useSelectValue(
-    value,
-    defaultValue,
-  );
-  const { field, isInvalid, describedBy } = useSelectField(
-    selectedValue,
-    error,
-  );
-  const selected =
-    options.find(option => option.value === selectedValue) ?? null;
-  const highlighted = highlightedIndex(options, activeIndex);
-  const dropdown = useSelectDropdown(open, setOpen);
-  const setTriggerRef = useMergeRefs([triggerRef, dropdown.setReference]);
+    const listId = useId();
+    const triggerRef = useRef<HTMLButtonElement>(null);
+    const typeahead = useRef(createTypeaheadBuffer());
+    const [open, setOpen] = useControllableState<boolean>(
+      undefined,
+      false,
+      onOpenChange,
+    );
+    const [activeIndex, setActiveIndex] = useState(0);
+    const { selectedValue, setSelectedValue } = useSelectValue(
+      value,
+      defaultValue,
+    );
+    const { field, isInvalid, controlProps } = useSelectField(
+      selectedValue,
+      error,
+    );
+    const selected =
+      options.find(option => option.value === selectedValue) ?? null;
+    const highlighted = highlightedIndex(options, activeIndex);
+    const nodeId = useFloatingNodeId();
+    const dropdown = useSelectDropdown(open, setOpen, nodeId);
+    const setTriggerRef = useMergeRefs([triggerRef, dropdown.setReference]);
 
-  const closeList = () => {
-    setOpen(false);
-  };
+    const closeList = () => {
+      typeahead.current.reset();
+      setOpen(false);
+    };
 
-  const openList = () => {
-    if (disabled || open) return;
-    setActiveIndex(selectedEnabledIndex(options, selectedValue));
-    setOpen(true);
-  };
+    const openList = () => {
+      if (disabled || open) return;
+      setActiveIndex(selectedEnabledIndex(options, selectedValue));
+      setOpen(true);
+    };
 
-  const selectOption = (option: SelectOption) => {
-    if (option.disabled) return;
+    const selectOption = (option: SelectOption) => {
+      if (option.disabled) return;
 
-    setSelectedValue(option.value);
-    onChange?.(option.value);
-    closeList();
-    triggerRef.current?.focus();
-  };
-
-  const handleMouseDown = (event: MouseEvent<HTMLButtonElement>) => {
-    if (disabled) return;
-
-    event.preventDefault();
-    if (open) {
+      setSelectedValue(option.value);
+      onChange?.(option.value);
       closeList();
-      return;
-    }
+      triggerRef.current?.focus();
+    };
 
-    setActiveIndex(selectedEnabledIndex(options, selectedValue));
-    setOpen(true);
-    triggerRef.current?.focus();
-  };
+    const handleMouseDown = (event: MouseEvent<HTMLButtonElement>) => {
+      if (disabled) return;
 
-  const handleBlur = (event: FocusEvent<HTMLButtonElement>) => {
-    if (dropdown.containsTarget(event.relatedTarget)) return;
-    closeList();
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (disabled) return;
-
-    if (open) {
-      const handled = handleListKeyDown(
-        event,
-        options,
-        highlighted,
-        setActiveIndex,
-        selectOption,
-        closeList,
-      );
-      if (handled) return;
-
-      if (event.key === ' ') {
-        event.preventDefault();
-        const option = options[highlighted];
-        if (option && !option.disabled) selectOption(option);
+      event.preventDefault();
+      if (open) {
+        closeList();
         return;
       }
-    } else if (
-      event.key === 'ArrowDown' ||
-      event.key === 'ArrowUp' ||
-      event.key === 'Enter' ||
-      event.key === ' '
-    ) {
-      event.preventDefault();
-      openList();
-      return;
-    }
 
-    if (!isPrintableKey(event)) return;
+      setActiveIndex(selectedEnabledIndex(options, selectedValue));
+      setOpen(true);
+      triggerRef.current?.focus();
+    };
 
-    event.preventDefault();
-    const from = open
-      ? highlighted
-      : selectedEnabledIndex(options, selectedValue) - 1;
-    const next = optionByPrefix(options, event.key, from);
-    if (next < 0) return;
+    const handleBlur = (event: FocusEvent<HTMLButtonElement>) => {
+      if (dropdown.containsTarget(event.relatedTarget)) return;
+      closeList();
+    };
 
-    setActiveIndex(next);
-    setOpen(true);
-  };
+    const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+      if (disabled) return;
 
-  const handleValueFocus = () => {
-    triggerRef.current?.focus();
-  };
+      if (open) {
+        const handled = handleListKeyDown(
+          event,
+          options,
+          highlighted,
+          setActiveIndex,
+          selectOption,
+          closeList,
+        );
+        if (handled) return;
 
-  return (
-    <div className={cn('select', when(open, 'select--opened'), className)}>
-      <button
-        ref={setTriggerRef}
-        type="button"
-        role="combobox"
-        id={field?.id ?? id}
-        aria-expanded={open}
-        aria-haspopup="listbox"
-        aria-controls={open ? listId : undefined}
-        aria-activedescendant={
-          open && highlighted >= 0
-            ? `${listId}-option-${highlighted}`
-            : undefined
+        if (event.key === ' ') {
+          event.preventDefault();
+          const option = options[highlighted];
+          if (option && !option.disabled) selectOption(option);
+          return;
         }
-        aria-label={field ? undefined : placeholder}
-        disabled={disabled}
-        onMouseDown={handleMouseDown}
-        onBlur={handleBlur}
-        onKeyDown={handleKeyDown}
-        {...(isInvalid ? { 'aria-invalid': true } : {})}
-        {...(field?.required ? { 'aria-required': true } : {})}
-        {...(describedBy ? { 'aria-describedby': describedBy } : {})}
-        {...(field?.errorId ? { 'aria-errormessage': field.errorId } : {})}
-        className={cn(
-          'input',
-          'select__trigger',
-          when(!selected, 'select__trigger--empty'),
-          when(size !== 'md', `input--${size}`),
-          when(isInvalid, 'input--error'),
-        )}
-      >
-        <span className="select__value">{selected?.label ?? placeholder}</span>
-        <IconDrop className="select__arrow" />
-      </button>
-      <input
-        className="select__value-input"
-        name={name}
-        disabled={disabled}
-        tabIndex={-1}
-        aria-hidden
-        value={selectedValue ?? ''}
-        onChange={() => {}}
-        onFocus={handleValueFocus}
-        {...(field?.required ? { required: true } : {})}
-      />
-      <SelectDropdown
-        open={open}
-        listId={listId}
-        options={options}
-        selectedValue={selectedValue}
-        highlighted={highlighted}
-        emptyText="Нет вариантов"
-        accessibleName={placeholder}
-        labelId={field?.labelId}
-        floatingStyles={dropdown.floatingStyles}
-        setFloating={dropdown.setDropdownRef}
-        getFloatingProps={dropdown.getFloatingProps}
-        onHighlight={setActiveIndex}
-        onSelect={selectOption}
-        marked
-      />
-    </div>
-  );
-};
+      } else if (
+        event.key === 'ArrowDown' ||
+        event.key === 'ArrowUp' ||
+        event.key === 'Enter' ||
+        event.key === ' '
+      ) {
+        event.preventDefault();
+        openList();
+        return;
+      }
+
+      if (!isPrintableKey(event)) return;
+
+      event.preventDefault();
+      const query = typeahead.current.push(event.key);
+      const from = open
+        ? highlighted
+        : selectedEnabledIndex(options, selectedValue) - 1;
+      const next = optionByPrefix(options, query, from);
+      if (next < 0) return;
+
+      setActiveIndex(next);
+      setOpen(true);
+    };
+
+    const handleValueFocus = () => {
+      triggerRef.current?.focus();
+    };
+
+    return (
+      <FloatingNode id={nodeId}>
+        <div
+          {...rest}
+          ref={ref}
+          data-state={open ? 'open' : 'closed'}
+          className={cn('select', when(open, 'select--opened'), className)}
+        >
+          <button
+            ref={setTriggerRef}
+            type="button"
+            // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- комбобокс по APG: кнопка плюс listbox в портале, нативный select так не умеет
+            role="combobox"
+            aria-expanded={open}
+            aria-haspopup="listbox"
+            aria-controls={open ? listId : undefined}
+            aria-activedescendant={
+              open && highlighted >= 0
+                ? `${listId}-option-${highlighted}`
+                : undefined
+            }
+            aria-label={field ? undefined : placeholder}
+            disabled={disabled}
+            onMouseDown={handleMouseDown}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            {...controlProps}
+            id={field?.id ?? id}
+            data-state={open ? 'open' : 'closed'}
+            data-invalid={isInvalid || undefined}
+            data-disabled={disabled || undefined}
+            className={cn(
+              'input',
+              'select__trigger',
+              when(!selected, 'select__trigger--empty'),
+              when(size !== 'md', `input--${size}`),
+              when(isInvalid, 'input--error'),
+            )}
+          >
+            <span className="select__value">
+              {selected?.label ?? placeholder}
+            </span>
+            <IconDrop className="select__arrow" />
+          </button>
+          <input
+            className="select__value-input"
+            name={name}
+            disabled={disabled}
+            tabIndex={-1}
+            aria-hidden
+            value={selectedValue ?? ''}
+            onChange={() => {}}
+            onFocus={handleValueFocus}
+            {...(field?.required ? { required: true } : {})}
+          />
+          <SelectDropdown
+            open={open}
+            listId={listId}
+            options={options}
+            selectedValue={selectedValue}
+            highlighted={highlighted}
+            emptyText={emptyText}
+            accessibleName={placeholder}
+            labelId={field?.labelId}
+            floatingStyles={dropdown.floatingStyles}
+            setFloating={dropdown.setDropdownRef}
+            getFloatingProps={dropdown.getFloatingProps}
+            onHighlight={setActiveIndex}
+            onSelect={selectOption}
+            renderOption={renderOption}
+            marked
+          />
+        </div>
+      </FloatingNode>
+    );
+  },
+);
+
+export const Select = forwardRef<HTMLDivElement, SelectProps>(
+  function Select(props, ref) {
+    return (
+      <FloatingLayerTree>
+        <SelectFrame {...props} ref={ref} />
+      </FloatingLayerTree>
+    );
+  },
+);

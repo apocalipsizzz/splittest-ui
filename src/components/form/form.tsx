@@ -6,14 +6,16 @@ import {
   useEffect,
   useRef,
   useState,
-  type SubmitEvent,
+  type FormEvent,
   type FormHTMLAttributes,
   type ForwardedRef,
+  type HTMLAttributes,
   type ReactNode,
 } from 'react';
 
 import { Button, type ButtonProps } from '@/components/button';
 import { cn } from '@/lib/cn';
+import { assignRef } from '@/lib/compose-refs';
 import './form.scss';
 
 const FormPendingContext = createContext(false);
@@ -26,7 +28,7 @@ const isThenable = (value: unknown): value is PromiseLike<void> =>
   'then' in value &&
   typeof value.then === 'function';
 
-const toMessage = (reason: unknown) => {
+const toMessage = (reason: unknown, fallback: ReactNode) => {
   if (typeof reason === 'string' && reason.trim()) return reason;
   // Error и объекты вида `{ message }` из API-клиентов.
   if (
@@ -38,7 +40,7 @@ const toMessage = (reason: unknown) => {
   ) {
     return reason.message;
   }
-  return 'Не получилось отправить. Попробуйте ещё раз';
+  return fallback;
 };
 
 export interface FormProps extends Omit<
@@ -51,7 +53,7 @@ export interface FormProps extends Omit<
    */
   onSubmit?: (
     data: FormData,
-    event: SubmitEvent<HTMLFormElement>,
+    event: FormEvent<HTMLFormElement>,
   ) => void | Promise<void>;
   /**
    * Запрос снаружи формы: `onSubmit` ничего не вернул, крутилку держит стор.
@@ -60,17 +62,17 @@ export interface FormProps extends Omit<
   pending?: boolean;
   /** Пока задана — она вместо текста из упавшего `onSubmit`. */
   error?: ReactNode;
+  /** Текст, когда `onSubmit` упал без внятного сообщения. */
+  errorFallback?: ReactNode;
 }
 
-export interface FormActionsProps {
+export interface FormActionsProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
-  className?: string;
 }
 
-export interface FormConsentProps {
+export interface FormConsentProps extends HTMLAttributes<HTMLDivElement> {
   /** Текст рядом с кнопкой: оферта, согласие. Ссылки можно класть внутрь. */
   children: ReactNode;
-  className?: string;
 }
 
 export const Form = forwardRef(function Form(
@@ -79,6 +81,7 @@ export const Form = forwardRef(function Form(
     className,
     action,
     error,
+    errorFallback = 'Не получилось отправить. Попробуйте ещё раз',
     onSubmit,
     pending = false,
     ...props
@@ -86,7 +89,7 @@ export const Form = forwardRef(function Form(
   ref: ForwardedRef<HTMLFormElement>,
 ) {
   const [busy, setBusy] = useState(false);
-  const [failure, setFailure] = useState<string | null>(null);
+  const [failure, setFailure] = useState<ReactNode>(null);
   const formNode = useRef<HTMLFormElement | null>(null);
   const busyRef = useRef(false);
   const requestId = useRef(0);
@@ -133,17 +136,13 @@ export const Form = forwardRef(function Form(
   // Стабильная ссылка: иначе React на каждом рендере отцепляет и вешает ref заново.
   const setNode = useCallback(
     (node: HTMLFormElement | null) => {
-      formNode.current = node;
-      if (typeof ref === 'function') {
-        ref(node);
-        return;
-      }
-      if (ref) ref.current = node;
+      assignRef(formNode, node);
+      assignRef(ref, node);
     },
     [ref],
   );
 
-  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     // Нативный сабмит только с явным action и без своего обработчика.
     // Без action браузер делает GET на текущий URL: поля попадают в query, историю и Referer.
     if (onSubmit || !action) event.preventDefault();
@@ -158,7 +157,7 @@ export const Form = forwardRef(function Form(
     try {
       result = onSubmit(data, event);
     } catch (reason) {
-      setFailure(toMessage(reason));
+      setFailure(toMessage(reason, errorFallback));
       return;
     }
 
@@ -181,7 +180,7 @@ export const Form = forwardRef(function Form(
       (reason: unknown) => {
         finish();
         if (!live.current || requestId.current !== id) return;
-        setFailure(toMessage(reason));
+        setFailure(toMessage(reason, errorFallback));
       },
     );
   };
@@ -207,24 +206,39 @@ export const Form = forwardRef(function Form(
   );
 });
 
-export const FormActions = ({ children, className }: FormActionsProps) => (
-  <div className={cn('form__buttons', className)}>{children}</div>
+export const FormActions = forwardRef<HTMLDivElement, FormActionsProps>(
+  function FormActions({ children, className, ...props }, ref) {
+    return (
+      <div {...props} ref={ref} className={cn('form__buttons', className)}>
+        {children}
+      </div>
+    );
+  },
 );
 
-export const FormConsent = ({ children, className }: FormConsentProps) => (
-  <div className={cn('form__consent', className)}>{children}</div>
+export const FormConsent = forwardRef<HTMLDivElement, FormConsentProps>(
+  function FormConsent({ children, className, ...props }, ref) {
+    return (
+      <div {...props} ref={ref} className={cn('form__consent', className)}>
+        {children}
+      </div>
+    );
+  },
 );
 
-export const FormSubmit = ({
-  loading = false,
-  children,
-  ...props
-}: Omit<ButtonProps, 'type' | 'asChild'>) => {
+export const FormSubmit = forwardRef(function FormSubmit(
+  {
+    loading = false,
+    children,
+    ...props
+  }: Omit<ButtonProps, 'type' | 'asChild'>,
+  ref: ForwardedRef<HTMLButtonElement>,
+) {
   const pending = useFormPending();
 
   return (
-    <Button {...props} type="submit" loading={loading || pending}>
+    <Button {...props} ref={ref} type="submit" loading={loading || pending}>
       {children}
     </Button>
   );
-};
+});

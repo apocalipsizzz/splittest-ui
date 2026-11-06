@@ -1,10 +1,13 @@
+import { useMergeRefs } from '@floating-ui/react';
 import {
+  forwardRef,
   useCallback,
   useEffect,
   useId,
   useMemo,
   useRef,
   useState,
+  type HTMLAttributes,
   type ReactNode,
 } from 'react';
 
@@ -17,12 +20,18 @@ import './field.scss';
 
 export type FieldHintPlacement = 'bottom' | 'label';
 
-export interface FieldProps {
+export interface FieldProps extends HTMLAttributes<HTMLDivElement> {
   label?: ReactNode;
   hint?: ReactNode;
   /** `bottom` — под полем, `label` — сразу под лейблом. */
   hintPlacement?: FieldHintPlacement;
   error?: ReactNode;
+  /**
+   * Невалидность снаружи: `aria-invalid` на контроле и красная рамка.
+   * Пока проп задан, собственная проверка обязательности молчит — состоянием
+   * распоряжается потребитель (react-hook-form, ответ сервера).
+   */
+  invalid?: boolean;
   /** Пустое значение после того, как в поле уже что-то было. */
   required?: boolean;
   /**
@@ -30,7 +39,6 @@ export interface FieldProps {
    * Слово «поле» среднего рода, поэтому формулировка не зависит от рода лейбла.
    */
   requiredMessage?: ReactNode;
-  className?: string;
   /**
    * Один контрол без своего id берёт id поля.
    * `CheckboxInput` со своим `id` его сохраняет: иначе несколько чекбоксов
@@ -47,30 +55,43 @@ const requiredText = (label: ReactNode, message: ReactNode | undefined) => {
   return 'Обязательное поле';
 };
 
-export const Field = ({
-  label,
-  hint,
-  hintPlacement = 'bottom',
-  error,
-  required = false,
-  requiredMessage,
-  className,
-  children,
-}: FieldProps) => {
+export const Field = forwardRef<HTMLDivElement, FieldProps>(function Field(
+  {
+    label,
+    hint,
+    hintPlacement = 'bottom',
+    error,
+    invalid: invalidProp,
+    required = false,
+    requiredMessage,
+    className,
+    children,
+    ...props
+  },
+  ref,
+) {
   const inputId = useId();
   const hasLabel = Boolean(label);
   const labelId = hasLabel ? `${inputId}-label` : undefined;
   const rootRef = useRef<HTMLDivElement>(null);
+  const setRootRef = useMergeRefs(useMemo(() => [rootRef, ref], [ref]));
   // ponytail: value/defaultValue больше не читаем с ребёнка. Контрол зовёт
   // reportValue из эффекта — до первого эффекта hadValue ещё false.
   const hadValueRef = useRef(false);
   const [showRequired, setShowRequired] = useState(false);
+  // Свой `invalid` снаружи отключает эвристику «было значение и исчезло»:
+  // две проверки на одно поле противоречили бы друг другу.
+  const managed = invalidProp !== undefined;
   const requiredError =
-    required && showRequired ? requiredText(label, requiredMessage) : null;
+    required && showRequired && !managed
+      ? requiredText(label, requiredMessage)
+      : null;
   const visibleError = error ?? requiredError;
-  const invalid = Boolean(visibleError);
+  const invalid = invalidProp ?? Boolean(visibleError);
   const hintId = hint ? `${inputId}-hint` : undefined;
-  const errorId = invalid ? `${inputId}-error` : undefined;
+  // Привязан к тексту ошибки, а не к `invalid`: с управляемым `invalid` без
+  // своего текста `aria-errormessage` указывал бы в пустоту.
+  const errorId = visibleError ? `${inputId}-error` : undefined;
   const describedBy = [errorId, hintId].filter(Boolean).join(' ');
 
   const reportValue = useCallback(
@@ -149,7 +170,8 @@ export const Field = ({
 
   return (
     <div
-      ref={rootRef}
+      {...props}
+      ref={setRootRef}
       className={cn(
         'field',
         className,
@@ -173,4 +195,4 @@ export const Field = ({
       {hintByPlacement.bottom}
     </div>
   );
-};
+});

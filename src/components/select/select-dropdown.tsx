@@ -6,11 +6,11 @@ import {
   type HTMLAttributes,
   type HTMLProps,
   type MouseEvent,
+  type ReactNode,
 } from 'react';
 import {
   autoUpdate,
   flip,
-  FloatingPortal,
   offset,
   shift,
   size as floatingSize,
@@ -19,9 +19,10 @@ import {
   useInteractions,
 } from '@floating-ui/react';
 
-import { useFieldControl } from '@/components/field/field-context';
+import { useFieldControlProps } from '@/components/field/use-field-control-props';
 import { IconIndicatorTick } from '@/icons/icon-indicator-tick';
 import { cn, when } from '@/lib/cn';
+import { Portal, portalProps } from '@/lib/portal';
 import { type SelectOption } from './select-option';
 
 export const useSelectValue = (
@@ -43,37 +44,25 @@ export const useSelectField = (
   selectedValue: string | null,
   error?: boolean,
 ) => {
-  const field = useFieldControl();
-  const reportValue = field?.reportValue;
-  const isInvalid = Boolean(error) || Boolean(field?.invalid);
-  const describedBy = [field?.describedBy].filter(Boolean).join(' ');
+  // required на кнопке и на поле поиска не проверяет выбор: его держит value-инпут.
+  const control = useFieldControlProps({ error, nativeRequired: false });
+  const reportValue = control.field?.reportValue;
 
   useEffect(() => {
     reportValue?.(selectedValue ?? '');
   }, [reportValue, selectedValue]);
 
-  return { field, isInvalid, describedBy };
+  return control;
 };
-
-export const selectControlProps = (
-  field: ReturnType<typeof useSelectField>['field'],
-  isInvalid: boolean,
-  describedBy: string,
-  id?: string,
-): HTMLAttributes<HTMLInputElement> => ({
-  id: field?.id ?? id,
-  ...(isInvalid ? { 'aria-invalid': true } : {}),
-  ...(field?.required ? { 'required': true, 'aria-required': true } : {}),
-  ...(describedBy ? { 'aria-describedby': describedBy } : {}),
-  ...(field?.errorId ? { 'aria-errormessage': field.errorId } : {}),
-});
 
 export const useSelectDropdown = (
   open: boolean,
   onOpenChange: (open: boolean) => void,
+  nodeId?: string,
 ) => {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const { refs, floatingStyles, context } = useFloating({
+    nodeId,
     open,
     onOpenChange,
     placement: 'bottom-start',
@@ -134,6 +123,8 @@ interface SelectDropdownProps {
   ) => HTMLAttributes<HTMLElement>;
   onHighlight: (index: number) => void;
   onSelect: (option: SelectOption) => void;
+  /** Своя разметка пункта вместо подписи. */
+  renderOption?: (option: SelectOption) => ReactNode;
   /** Галочка у выбранного пункта, как в shadcn Select. */
   marked?: boolean;
 }
@@ -153,6 +144,7 @@ export const SelectDropdown = (props: SelectDropdownProps) => {
     getFloatingProps,
     onHighlight,
     onSelect,
+    renderOption,
     marked = false,
   } = props;
   const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
@@ -164,6 +156,11 @@ export const SelectDropdown = (props: SelectDropdownProps) => {
     option.scrollIntoView({ block: 'nearest' });
   }, [highlighted, open]);
 
+  // Список отфильтровали — в хвосте массива остались бы узлы, которых уже нет.
+  useEffect(() => {
+    optionRefs.current.length = options.length;
+  }, [options.length]);
+
   if (!open) return null;
 
   const handleMouseDown = (event: MouseEvent<HTMLDivElement>) => {
@@ -171,18 +168,18 @@ export const SelectDropdown = (props: SelectDropdownProps) => {
   };
 
   return (
-    <FloatingPortal>
+    <Portal>
       <div
         ref={setFloating}
         className="select__dropdown"
-        data-popover-portal=""
-        data-popup-portal=""
+        {...portalProps}
         {...getFloatingProps({ onMouseDown: handleMouseDown })}
         style={floatingStyles}
       >
-        {/* listbox, не select: нативный список не умеет портал */}
+        {/* listbox, не select: нативный список не умеет ни портал, ни свою разметку пункта */}
         <div
           id={listId}
+          // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- см. комментарий выше
           role="listbox"
           aria-label={labelId ? undefined : accessibleName}
           aria-labelledby={labelId}
@@ -191,16 +188,21 @@ export const SelectDropdown = (props: SelectDropdownProps) => {
             <div className="select__empty">{emptyText}</div>
           ) : (
             options.map((option, index) => (
+              // eslint-disable-next-line jsx-a11y/prefer-tag-over-role, jsx-a11y/click-events-have-key-events -- паттерн aria-activedescendant: фокус остаётся на комбобоксе, клавиши разбирает он
               <div
                 key={option.value}
                 ref={node => {
                   optionRefs.current[index] = node;
                 }}
                 id={`${listId}-option-${index}`}
+                // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- <option> живёт только внутри <select>, а список в портале
                 role="option"
                 tabIndex={-1}
                 aria-selected={option.value === selectedValue}
                 aria-disabled={option.disabled || undefined}
+                data-highlighted={index === highlighted || undefined}
+                data-selected={option.value === selectedValue || undefined}
+                data-disabled={option.disabled || undefined}
                 className={cn(
                   'select__option',
                   when(marked, 'select__option--marked'),
@@ -214,12 +216,18 @@ export const SelectDropdown = (props: SelectDropdownProps) => {
                 onMouseEnter={() => {
                   if (!option.disabled) onHighlight(index);
                 }}
-                onKeyDown={event => {
-                  if (event.key !== 'Enter' && event.key !== ' ') return;
-                  event.preventDefault();
+                onMouseDown={event => {
+                  if (event.button !== 0) return;
                   onSelect(option);
                 }}
-                onClick={() => onSelect(option)}
+                // Выбор делает mousedown: он успевает до blur поля.
+                // Клик нужен для того, что mousedown не шлёт, —
+                // `element.click()` и активация в мобильных скринридерах.
+                // detail > 0 бывает только у клика после указателя.
+                onClick={event => {
+                  if (event.detail !== 0) return;
+                  onSelect(option);
+                }}
               >
                 {marked ? (
                   <span className="select__mark">
@@ -228,12 +236,12 @@ export const SelectDropdown = (props: SelectDropdownProps) => {
                     ) : null}
                   </span>
                 ) : null}
-                {option.label}
+                {renderOption ? renderOption(option) : option.label}
               </div>
             ))
           )}
         </div>
       </div>
-    </FloatingPortal>
+    </Portal>
   );
 };

@@ -1,6 +1,6 @@
 import {
   useId,
-  useSyncExternalStore,
+  type CSSProperties,
   type FC,
   type HTMLAttributes,
   type SVGProps,
@@ -27,61 +27,23 @@ export interface SpinnerProps extends Omit<
   label?: string;
 }
 
-const reducedMotionQuery = '(prefers-reduced-motion: reduce)';
+const DOTS = 8;
 
-const subscribeReducedMotion = (onChange: () => void) => {
-  if (typeof window.matchMedia !== 'function') return () => {};
-
-  const media = window.matchMedia(reducedMotionQuery);
-  media.addEventListener('change', onChange);
-  return () => media.removeEventListener('change', onChange);
-};
-
-const prefersReducedMotion = () =>
-  typeof window.matchMedia === 'function' &&
-  window.matchMedia(reducedMotionQuery).matches;
-
-// ponytail: сервер всегда false — гидрация не расходится, но первый кадр после неё может мигнуть SMIL, пока клиент не прочитает matchMedia. Апгрейд: Sec-CH-Prefers-Reduced-Motion.
-const prefersReducedMotionServer = () => false;
-
-const dotDelays = [
-  '0s',
-  '0.125s',
-  '0.25s',
-  '0.375s',
-  '0.5s',
-  '0.625s',
-  '0.75s',
-  '0.875s',
-] as const;
-
-const Dot = ({
-  begin,
-  rotate,
-  reduced,
-}: {
-  begin: string;
-  rotate: number;
-  reduced: boolean;
-}) => (
-  <circle
-    transform={`rotate(${rotate} 16 16)`}
-    cx="16"
-    cy="3"
-    r={reduced ? 3 : 0}
-  >
-    {reduced ? null : (
-      <animate
-        attributeName="r"
-        values="0;3;0;0"
-        dur="1s"
-        repeatCount="indefinite"
-        begin={begin}
-        keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8"
-        calcMode="spline"
-      />
-    )}
-  </circle>
+/**
+ * Анимацию ведёт CSS, а не SMIL: `prefers-reduced-motion` тогда разбирает
+ * браузер до первой отрисовки — без хука, без серверного снапшота и без
+ * кадра с движением сразу после гидрации.
+ */
+const Dot = ({ index }: { index: number }) => (
+  <g transform={`rotate(${index * (360 / DOTS)} 16 16)`}>
+    <circle
+      className="spinner__dot"
+      style={{ '--spinner-dot-delay': `${index / DOTS}s` } as CSSProperties}
+      cx="16"
+      cy="3"
+      r="3"
+    />
+  </g>
 );
 
 const svgProps: SVGProps<SVGSVGElement> = {
@@ -99,11 +61,6 @@ export const Spinner: FC<SpinnerProps> = ({
   ...props
 }) => {
   const labelId = useId();
-  const reduced = useSyncExternalStore(
-    subscribeReducedMotion,
-    prefersReducedMotion,
-    prefersReducedMotionServer,
-  );
 
   return (
     <div
@@ -121,13 +78,8 @@ export const Spinner: FC<SpinnerProps> = ({
         {label}
       </span>
       <svg {...svgProps} width={size} height={size}>
-        {dotDelays.map((begin, index) => (
-          <Dot
-            key={begin}
-            begin={begin}
-            rotate={index * 45}
-            reduced={reduced}
-          />
+        {Array.from({ length: DOTS }, (_, index) => (
+          <Dot key={index} index={index} />
         ))}
       </svg>
     </div>

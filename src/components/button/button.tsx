@@ -145,9 +145,11 @@ export const Button = forwardRef(function Button(
       }
     };
 
+    // Клик ребёнка уже внутри handleClick. Слот склеивает оба onClick,
+    // поэтому сырой обработчик на элемент не кладём — иначе он сработает дважды.
     const element = cloneElement(
-      children,
-      {},
+      children as ReactElement<ChildElementProps>,
+      { onClick: undefined },
       renderContent(childProps.children, loading),
     );
 

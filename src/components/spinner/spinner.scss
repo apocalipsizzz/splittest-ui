@@ -16,6 +16,38 @@
   }
 }
 
+// Точка растёт и исчезает по кругу. Крутим обёртку-`g` атрибутом, масштаб
+// отдаём CSS: иначе transform из CSS затёр бы поворот из атрибута.
+// backwards нужен, чтобы точка не висела полноразмерной до начала задержки.
+.spinner__dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: spinner-dot 1s var(--spinner-dot-delay, 0s) infinite backwards
+    cubic-bezier(0.2, 0.2, 0.4, 0.8);
+}
+
+@keyframes spinner-dot {
+  0% {
+    transform: scale(0);
+  }
+
+  33.3% {
+    transform: scale(1);
+  }
+
+  66.6%,
+  100% {
+    transform: scale(0);
+  }
+}
+
+// Без анимации точки просто стоят на месте — круг из восьми видимых.
+@media (prefers-reduced-motion: reduce) {
+  .spinner__dot {
+    animation: none;
+  }
+}
+
 .spinner__label {
   position: absolute;
   width: 1px;

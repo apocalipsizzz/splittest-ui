@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import {
   fireEvent,
   render,
@@ -136,10 +137,40 @@ describe('DatePicker', () => {
   it('Escape закрывает лист', async () => {
     render(<DatePicker />);
     await userEvent.click(trigger());
+    const dialog = await screen.findByRole('dialog');
+    await waitFor(() => {
+      expect(dialog).toHaveFocus();
+    });
 
     await userEvent.keyboard('{Escape}');
 
     expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('модальный: страница под листом скрыта и Tab из него не выходит', async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <>
+        <button type="button">Снаружи</button>
+        <DatePicker />
+      </>,
+    );
+
+    await user.click(trigger());
+    const dialog = await screen.findByRole('dialog');
+    await waitFor(() => {
+      expect(dialog).toHaveFocus();
+    });
+
+    expect(dialog).toHaveAttribute('aria-modal', 'true');
+    expect(container).toHaveAttribute('aria-hidden', 'true');
+
+    await user.tab();
+
+    expect(container).not.toContainElement(
+      document.activeElement as HTMLElement,
+    );
+    expect(dialog).toContainElement(document.activeElement as HTMLElement);
   });
 
   it('required из Field блокирует отправку формы', async () => {
@@ -156,5 +187,78 @@ describe('DatePicker', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Отправить' }));
 
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('подписи и месяцы берутся из пропсов и Intl', async () => {
+    render(
+      <DatePicker
+        value={new Date(1990, 2, 15)}
+        locale="en"
+        monthLabel="Month"
+        applyLabel="Apply"
+        onChange={() => {}}
+      />,
+    );
+
+    expect(trigger()).toHaveValue('15 March 1990');
+    await userEvent.click(trigger());
+    expect(
+      screen.getByRole('spinbutton', { name: 'Month' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Apply' })).toBeInTheDocument();
+  });
+
+  it('без value держит дату сам: defaultValue и выбор через лист', async () => {
+    const onChange = vi.fn<(date: Date) => void>();
+    const user = userEvent.setup();
+    render(
+      <DatePicker
+        defaultValue={new Date(1990, 2, 15)}
+        onChange={onChange}
+        locale="en"
+      />,
+    );
+
+    expect(trigger()).toHaveValue('15 March 1990');
+
+    await user.click(trigger());
+    await screen.findByRole('dialog');
+    await user.click(screen.getByRole('button', { name: 'Применить' }));
+
+    expect(onChange).toHaveBeenCalledOnce();
+    expect(trigger()).toHaveValue('15 March 1990');
+  });
+
+  it('вуаль скрыта от скринридера и не попадает в табуляцию', async () => {
+    const user = userEvent.setup();
+    render(<DatePicker />);
+    await user.click(trigger());
+    await screen.findByRole('dialog');
+
+    const mask = document.querySelector('.date-picker__mask');
+    expect(mask).toHaveAttribute('aria-hidden', 'true');
+    expect(mask?.tagName).toBe('DIV');
+    expect(screen.queryByRole('button', { name: 'Закрыть' })).toBeNull();
+  });
+
+  it('закрывается кликом по вуали', async () => {
+    const user = userEvent.setup();
+    render(<DatePicker />);
+    await user.click(trigger());
+    await screen.findByRole('dialog');
+
+    await user.click(document.querySelector('.date-picker__mask') as Element);
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('отдаёт ref и атрибуты корня, title не становится тултипом', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(<DatePicker ref={ref} title="День рождения" data-testid="picker" />);
+
+    const root = screen.getByTestId('picker');
+    expect(root).toHaveClass('date-picker');
+    expect(root).not.toHaveAttribute('title');
+    expect(ref.current).toBe(root);
   });
 });

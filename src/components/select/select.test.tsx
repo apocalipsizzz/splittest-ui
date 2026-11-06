@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { render, screen } from '@testing-library/react';
+import { createRef, useState } from 'react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -95,6 +95,46 @@ describe('Select', () => {
     );
   });
 
+  it('подряд идущие буквы ищут префикс', async () => {
+    render(
+      <Select
+        options={[
+          { value: 'msk', label: 'Москва' },
+          { value: 'muc', label: 'Мюнхен' },
+          { value: 'spb', label: 'Санкт-Петербург' },
+        ]}
+      />,
+    );
+
+    trigger().focus();
+    await userEvent.keyboard('мю');
+
+    expect(screen.getByRole('option', { name: 'Мюнхен' })).toHaveClass(
+      'select__option--active',
+    );
+  });
+
+  it('PageDown и PageUp ходят по странице включённых пунктов', async () => {
+    const many = Array.from({ length: 25 }, (_, index) => ({
+      value: String(index),
+      label: `Пункт ${index + 1}`,
+    }));
+    render(<Select options={many} />);
+
+    trigger().focus();
+    await userEvent.keyboard('{ArrowDown}{PageDown}');
+
+    expect(screen.getByRole('option', { name: 'Пункт 11' })).toHaveClass(
+      'select__option--active',
+    );
+
+    await userEvent.keyboard('{PageUp}');
+
+    expect(screen.getByRole('option', { name: 'Пункт 1' })).toHaveClass(
+      'select__option--active',
+    );
+  });
+
   it('внутри Field пустой селект блокирует отправку', async () => {
     const onSubmit = vi.fn<(data: FormData) => void>();
     render(
@@ -159,5 +199,101 @@ describe('Select', () => {
 
     expect(onClose).not.toHaveBeenCalled();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('пустой список показывает emptyText', async () => {
+    const { rerender } = render(<Select options={[]} />);
+    await userEvent.click(trigger());
+    expect(screen.getByText('Нет вариантов')).toBeInTheDocument();
+
+    rerender(<Select options={[]} emptyText="Пусто" />);
+    expect(screen.getByText('Пусто')).toBeInTheDocument();
+  });
+
+  it('отдаёт ref и атрибуты корня, id остаётся на кнопке', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <Select
+        ref={ref}
+        id="city"
+        options={OPTIONS}
+        data-testid="select"
+        aria-label="Город"
+      />,
+    );
+
+    const root = screen.getByTestId('select');
+    expect(root).toHaveClass('select');
+    expect(root).toHaveAttribute('aria-label', 'Город');
+    expect(root).not.toHaveAttribute('id');
+    expect(screen.getByRole('combobox')).toHaveAttribute('id', 'city');
+    expect(ref.current).toBe(root);
+  });
+
+  it('onOpenChange сообщает про открытие и закрытие', async () => {
+    const onOpenChange = vi.fn<(open: boolean) => void>();
+    const user = userEvent.setup();
+    render(<Select options={OPTIONS} onOpenChange={onOpenChange} />);
+
+    await user.click(screen.getByRole('combobox'));
+    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+
+    await user.click(await screen.findByRole('option', { name: /Москва/ }));
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it('renderOption рисует свою разметку, поиск остаётся по label', async () => {
+    const user = userEvent.setup();
+    render(
+      <Select
+        options={OPTIONS}
+        renderOption={option => (
+          <span>
+            {option.label} <small>({option.value})</small>
+          </span>
+        )}
+      />,
+    );
+
+    await user.click(screen.getByRole('combobox'));
+
+    expect(
+      await screen.findByRole('option', { name: 'Москва (msk)' }),
+    ).toBeInTheDocument();
+  });
+
+  it('data-state и data-* пунктов видны снаружи', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<Select options={OPTIONS} />);
+
+    const combobox = screen.getByRole('combobox');
+    expect(container.firstElementChild).toHaveAttribute('data-state', 'closed');
+
+    await user.click(combobox);
+
+    expect(container.firstElementChild).toHaveAttribute('data-state', 'open');
+    expect(combobox).toHaveAttribute('data-state', 'open');
+
+    const options = await screen.findAllByRole('option');
+    expect(options[0]).toHaveAttribute('data-highlighted', 'true');
+    expect(options[2]).toHaveAttribute('data-disabled', 'true');
+  });
+
+  it('синтетический click выбирает пункт: mousedown не единственный путь', async () => {
+    const onChange = vi.fn<(value: string) => void>();
+    const user = userEvent.setup();
+    render(<Select options={OPTIONS} onChange={onChange} />);
+
+    await user.click(screen.getByRole('combobox'));
+    const option = await screen.findByRole('option', {
+      name: /Санкт-Петербург/,
+    });
+
+    // Так активируют элемент скринридеры на телефоне и программный .click()
+    act(() => {
+      (option as HTMLElement).click();
+    });
+
+    expect(onChange).toHaveBeenCalledWith('spb');
   });
 });

@@ -3,7 +3,9 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'tsdown';
 
 export default defineConfig({
-  entry: ['src/index.ts', 'src/icons/index.ts'],
+  // Каждый компонент — своя точка входа: без этого `@de-kit/st-ui/components/button`
+  // не во что резолвить, а в Jest и RSC корневой баррель тянет весь пакет.
+  entry: ['src/index.ts', 'src/icons/index.ts', 'src/components/*/index.ts'],
   format: ['esm', 'cjs'],
   dts: true,
   clean: true,

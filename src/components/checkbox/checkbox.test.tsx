@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -15,7 +15,8 @@ describe('CheckboxInput', () => {
     expect(input).toHaveAttribute('title', 'Подсказка');
     expect(input).toHaveClass('checkbox__input');
     expect(input).not.toHaveClass('checkbox__input--no-events');
-    expect(input.parentElement).toHaveClass('checkbox');
+    expect(input.parentElement).toHaveClass('checkbox__box');
+    expect(input.closest('.checkbox')).toHaveClass('checkbox');
     expect(screen.getByText('18-24')).toHaveClass('checkbox__label');
   });
 
@@ -67,8 +68,12 @@ describe('CheckboxInput', () => {
     );
 
     const input = screen.getByLabelText('Имя');
+    const caption = screen.getByText('Имя');
     expect(input).toHaveAttribute('id', 'from-props');
-    expect(screen.getByText('Имя')).toHaveAttribute('for', 'from-props');
+    expect(input).toHaveAttribute('aria-labelledby', caption.id);
+    expect(
+      caption.closest('.checkbox')?.querySelector('label'),
+    ).toHaveAttribute('for', 'from-props');
     expect(input).not.toBeRequired();
     expect(input).not.toHaveAttribute('aria-required');
     expect(input).toHaveAttribute('aria-invalid', 'false');
@@ -112,7 +117,7 @@ describe('CheckboxInput', () => {
     expect(input).toHaveAttribute('aria-errormessage', 'err');
   });
 
-  it('ссылка внутри label не переключает чекбокс и открывается отдельно', async () => {
+  it('ссылка внутри текста не переключает чекбокс и сохраняет свои target и rel', async () => {
     const open = vi.spyOn(window, 'open').mockImplementation(() => null);
 
     render(
@@ -121,7 +126,13 @@ describe('CheckboxInput', () => {
           <>
             Даю согласие на обработку моих{' '}
             <span>
-              <a href="https://splittest.ru/privacy.pdf">персональных данных</a>
+              <a
+                href="https://splittest.ru/privacy.pdf"
+                target="_self"
+                onClick={event => event.preventDefault()}
+              >
+                персональных данных
+              </a>
             </span>
           </>
         }
@@ -132,20 +143,16 @@ describe('CheckboxInput', () => {
       name: 'Даю согласие на обработку моих персональных данных',
     });
     const link = screen.getByRole('link', { name: 'персональных данных' });
-    expect(link).toHaveClass('checkbox__link');
     expect(link).toHaveAttribute('href', 'https://splittest.ru/privacy.pdf');
-    expect(link).toHaveAttribute('target', '_blank');
-    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(link).toHaveAttribute('target', '_self');
+    expect(link).not.toHaveAttribute('rel');
+    expect(link).not.toHaveClass('checkbox__link');
 
-    await userEvent.click(link);
+    fireEvent.click(link);
     expect(input).not.toBeChecked();
-    expect(open).toHaveBeenCalledWith(
-      'https://splittest.ru/privacy.pdf',
-      '_blank',
-      'noopener,noreferrer',
-    );
+    expect(open).not.toHaveBeenCalled();
 
-    await userEvent.click(input);
+    fireEvent.click(screen.getByText(/Даю согласие/));
     expect(input).toBeChecked();
 
     open.mockRestore();

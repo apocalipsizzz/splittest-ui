@@ -1,23 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
+
+const getServerSnapshot = () => false;
 
 /**
- * Подписка на matchMedia. Первое значение берётся сразу, без `undefined`:
- * иначе первый рендер уходит с другим вариантом (например, rows у TextArea).
+ * matchMedia без рассинхрона гидрации.
+ * Сервер и первый проход гидрации получают `false`.
+ * В клиентском приложении без SSR первое значение сразу настоящее.
  */
 export const useMediaQuery = (query: string) => {
-  const [matches, setMatches] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia(query).matches,
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      if (typeof window.matchMedia !== 'function') return () => {};
+
+      const media = window.matchMedia(query);
+      media.addEventListener('change', onChange);
+      return () => media.removeEventListener('change', onChange);
+    },
+    [query],
   );
 
-  useEffect(() => {
-    const media = window.matchMedia(query);
-    const handleChange = () => setMatches(media.matches);
+  const getSnapshot = useCallback(
+    () =>
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia(query).matches,
+    [query],
+  );
 
-    handleChange();
-    media.addEventListener('change', handleChange);
-
-    return () => media.removeEventListener('change', handleChange);
-  }, [query]);
-
-  return matches;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 };

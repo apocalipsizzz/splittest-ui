@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { render, screen } from '@testing-library/react';
+import { createRef, useState } from 'react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -114,6 +114,85 @@ describe('SelectSearch', () => {
     expect(optionLabels()).toEqual(['Москва']);
   });
 
+  it('сообщает число найденных вариантов', async () => {
+    render(<SelectSearch options={OPTIONS} />);
+
+    await userEvent.click(combobox());
+    expect(screen.queryByText(/Найдено/)).not.toBeInTheDocument();
+
+    await userEvent.type(combobox(), 'петер');
+    expect(screen.getByText('Найдено 1 вариант')).toBeInTheDocument();
+
+    await userEvent.clear(combobox());
+    await userEvent.type(combobox(), 'рим');
+    expect(screen.getByText('Найдено 0 вариантов')).toBeInTheDocument();
+  });
+
+  it('required при открытом списке не пускает requestSubmit', async () => {
+    const onSubmit = vi.fn<(data: FormData) => void>();
+    render(
+      <Form onSubmit={onSubmit}>
+        <Field label="Город" required>
+          <SelectSearch name="city" options={OPTIONS} />
+        </Field>
+        <FormSubmit>Отправить</FormSubmit>
+      </Form>,
+    );
+
+    const box = screen.getByLabelText('Город');
+    await userEvent.click(box);
+    await userEvent.type(box, 'мос');
+
+    // Клик по кнопке сначала блюрит поле и закрывает список. Дырка — только
+    // requestSubmit, пока в поиске ещё текст запроса, а выбор пустой.
+    expect(box).toHaveValue('мос');
+    expect(box).not.toHaveAttribute('required');
+    expect(box).toHaveAttribute('aria-required', 'true');
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+
+    const valueInput = document.querySelector('input[name="city"]');
+    expect(valueInput).toHaveValue('');
+    expect(valueInput).toBeRequired();
+    expect(valueInput).not.toHaveAttribute('type', 'hidden');
+
+    const form = document.querySelector('form');
+    expect(form?.checkValidity()).toBe(false);
+
+    act(() => {
+      form?.requestSubmit();
+    });
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Поле «Город» обязательно',
+    );
+  });
+
+  it('requestSubmit при открытом поиске отправляет выбранное, не запрос', async () => {
+    const onSubmit = vi.fn<(data: FormData) => void>();
+    render(
+      <Form onSubmit={onSubmit}>
+        <Field label="Город" required>
+          <SelectSearch name="city" options={OPTIONS} defaultValue="msk" />
+        </Field>
+        <FormSubmit>Отправить</FormSubmit>
+      </Form>,
+    );
+
+    const box = screen.getByLabelText('Город');
+    await userEvent.click(box);
+    await userEvent.type(box, 'петер');
+    expect(box).toHaveValue('петер');
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+
+    act(() => {
+      document.querySelector('form')?.requestSubmit();
+    });
+
+    expect(onSubmit).toHaveBeenCalledOnce();
+    expect(onSubmit.mock.calls[0]?.[0].getAll('city')).toEqual(['msk']);
+  });
+
   it('показывает пустой результат', async () => {
     render(<SelectSearch options={OPTIONS} emptyText="Нет совпадений" />);
 
@@ -169,5 +248,23 @@ describe('SelectSearch', () => {
 
     expect(onClose).not.toHaveBeenCalled();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('отдаёт ref и атрибуты корня, id остаётся на поле', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <SelectSearch
+        ref={ref}
+        id="city"
+        options={OPTIONS}
+        data-testid="select"
+      />,
+    );
+
+    const root = screen.getByTestId('select');
+    expect(root).toHaveClass('select');
+    expect(root).not.toHaveAttribute('id');
+    expect(screen.getByRole('combobox')).toHaveAttribute('id', 'city');
+    expect(ref.current).toBe(root);
   });
 });

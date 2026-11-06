@@ -1,7 +1,8 @@
-// База приложения. Шрифт Inter подключает хост — файлы лежат в splittest-frontend/src/app/fonts.
-// Токены (`--color-*`) подключает вход пакета, этот файл их не эмитит.
+// Каркас страницы splittest: раскладка, обёртки, вуаль прежних модалок.
+// Это слой приложения, а не дизайн-системы — в чужой странице не подключать.
+// Нужны только сброс и типографика — берите reset.scss.
 @use './mixins.scss' as mixins;
-@use './typography.scss';
+@use './reset.scss';
 
 :root {
   --window-max-height: 100vh;
@@ -12,35 +13,18 @@
   }
 }
 
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
-}
-
-* {
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
-
 html,
 body {
   height: 100%;
-  scrollbar-gutter: stable;
 }
 
 body {
   display: flex;
   flex-direction: column;
-  margin: 0;
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: var(--color-foreground);
-  background-color: var(--color-background);
-  font-size: var(--text-sm);
-  line-height: var(--text-sm--line-height);
-  font-weight: 400;
 
+  // Вуаль прежних модалок приложения. Слои библиотеки (PopupSheet,
+  // DatePicker, Popover) ею не пользуются: у них свой портал и свой фокус.
+  // Когда в приложении не останется `.body--modal`, оба правила можно убрать.
   &::after {
     content: '';
     display: block;
@@ -59,18 +43,9 @@ body {
   }
 }
 
-.body {
-  &--close {
-    height: 100vh;
-    overflow-y: hidden;
-  }
-
-  &--modal {
-    &::after {
-      opacity: 1;
-      visibility: visible;
-    }
-  }
+.body--modal::after {
+  opacity: 1;
+  visibility: visible;
 }
 
 #root {
@@ -97,74 +72,5 @@ body {
 
   @include mixins.min-width(lg) {
     max-width: 1000px;
-  }
-}
-
-.scroll-block::-webkit-scrollbar {
-  -webkit-appearance: none;
-  width: 8px;
-  height: 8px;
-}
-
-// Ползунок — производная от текста, обводка — от фона: в тёмной теме
-// ползунок светлеет вместе с ней, как и остальные серые в этом файле.
-.scroll-block::-webkit-scrollbar-thumb {
-  border-radius: 4px;
-  background-color: color-mix(
-    in srgb,
-    var(--color-foreground) 24%,
-    var(--color-background)
-  );
-  box-shadow: 0 0 1px
-    color-mix(in srgb, var(--color-background) 50%, transparent);
-}
-
-a {
-  text-decoration: none;
-  transition: color 0.3s ease;
-  color: var(--color-foreground);
-}
-
-button {
-  color: var(--color-foreground);
-  font-size: var(--text-sm);
-  font-family: var(--font-sans);
-
-  &:not(:disabled) {
-    cursor: pointer;
-  }
-}
-
-img {
-  display: block;
-  max-width: 100%;
-  max-height: 100%;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-
-  tr {
-    vertical-align: top;
-  }
-
-  td {
-    word-break: break-word;
-    border-top: 1px solid var(--color-border);
-    padding: 15px 0;
-  }
-
-  tr:last-of-type td {
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  th {
-    color: var(--color-muted-foreground);
-    font-size: var(--text-xs);
-    line-height: var(--text-xs--line-height);
-    text-align: left;
-    font-weight: normal;
-    padding: 15px 0;
   }
 }

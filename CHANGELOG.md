@@ -1,5 +1,47 @@
 # @de-kit/st-ui
 
+## 0.3.0
+
+### Minor Changes
+
+- Слои, доступность и публичный контракт.
+
+  **Ломающее**
+
+  - `PopupSheet`, `Popover` и лист `DatePicker` рендерятся в портале у `body`, а не на месте вызова: правила, опиравшиеся на прежнего родителя, нужно проверить.
+  - У `PopupSheet` больше нет пропа `positionVertical` — он ничего не делал.
+  - У `DatePicker` больше нет пропа `closeLabel`: вуаль перестала быть кнопкой и скрыта от скринридера.
+  - Неуправляемый `Popover` (без пропа `open`) переключается кликом по якорю. У управляемого поведение прежнее.
+
+  **Слои**
+
+  - `PopupSheet` и лист `DatePicker` стали модальными: ловушка фокуса, `role="dialog"` с `aria-modal`, `aria-hidden` на остальной странице, возврат фокуса на триггер. Закрытый лист в DOM не остаётся.
+  - Общий `FloatingTree`: Escape закрывает верхний слой, а не все сразу.
+  - Один `useScrollLock` со счётчиком ссылок вместо двух несовместимых блокировок; `.body--close` убран.
+  - ARIA `Popover` уезжает на сам триггер, а не на обёртку-`span`.
+  - Один селектор порталов на библиотеку: клик по дропдауну внутри листа больше не закрывает лист.
+
+  **Контракт**
+
+  - Единая триада `value` / `defaultValue` / `onChange` и `open` / `defaultOpen` / `onOpenChange`: `PopupSheet`, `Popover`, `DatePicker`, селекты. `onClose` остаётся короткой формой.
+  - `forwardRef` и rest-пропсы у всех составных компонентов.
+  - Из корня экспортируются `cn`, `Slot`, `useFieldControl` и `filterSelectOptions`.
+  - Подпути `@de-kit/st-ui/components/*` и `@de-kit/st-ui/reset.scss`.
+  - `sass` заявлен необязательной peer-зависимостью, требования к сборке описаны в README.
+  - Состояния пишутся в `data-state`, `data-invalid`, `data-disabled`, `data-highlighted`, `data-selected`.
+  - `Field` принимает управляемый `invalid`, `Form` — `errorFallback`, `Select` и `SelectSearch` — `renderOption` и `onOpenChange`.
+
+  **Исправления**
+
+  - `required` из `Field` в `SelectSearch` проверяет выбор, а не набранный запрос: `requestSubmit` при открытом списке больше не отправляет пустое значение.
+  - Typeahead в селектах собирает строку с паузой 500 мс, добавлены PageUp/PageDown. Пункт выбирается на `mousedown`, до blur поля, поэтому клик по нему не закрывает родительский лист. Синтетический `click` (`element.click()`, активация в мобильных скринридерах) тоже выбирает: у него `detail === 0`, и выбор после настоящего указателя не повторяется.
+  - `CheckboxInput` не переписывает содержимое лейбла: ссылка внутри сохраняет свои `target`/`rel`, Ctrl/⌘-клик работает.
+  - `useMediaQuery` на `useSyncExternalStore` — без рассинхрона гидрации.
+  - `Spinner` анимируется CSS, а не SMIL: `prefers-reduced-motion` учитывается до первой отрисовки.
+  - `FormProps.onSubmit` типизирован `FormEvent`, а не `SubmitEvent`: сборка на `@types/react@18` больше не падает.
+  - Подписи вынесены в пропсы, месяцы `DatePicker` — из `Intl.DateTimeFormat` по `locale`.
+  - `reset.scss` отделён от каркаса приложения в `global.scss`.
+
 ## 0.2.0
 
 ### Minor Changes

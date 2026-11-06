@@ -128,7 +128,10 @@ const mergeProps = (
     asClassName(childProps.className),
   );
   if (className) merged.className = className;
-  if (slotProps.onClick) merged.onClick = slotProps.onClick;
+  // onClick как остальные on*: ребёнок, потом слот, пока ребёнок не prevented.
+  // Button клик собирает сам (disabled/loading) и передаёт уже готовый обработчик,
+  // сырой onClick с ребёнка снимает — иначе слот вызвал бы его второй раз.
+  merged.onClick = composeHandlers(childProps.onClick, slotProps.onClick);
 
   return merged;
 };
@@ -150,7 +153,7 @@ export const Slot = forwardRef(function Slot(
   const { children, ...slotProps } = props;
 
   if (!isValidElement(children)) {
-    throw new Error('Button с asChild ждёт ровно один React-элемент.');
+    throw new Error('Slot ждёт ровно один React-элемент.');
   }
 
   const childProps = children.props as Record<string, unknown>;

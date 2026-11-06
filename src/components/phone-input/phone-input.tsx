@@ -6,14 +6,15 @@ import {
   useState,
   type InputHTMLAttributes,
   type MouseEvent,
-  type Ref,
 } from 'react';
 import { IMaskInput } from 'react-imask';
 
-import { useFieldControl } from '@/components/field/field-context';
+import { useFieldControlProps } from '@/components/field/use-field-control-props';
 import type { InputSize } from '@/components/input';
 import { IconCross } from '@/icons/icon-cross';
 import { cn, when } from '@/lib/cn';
+import { composeRefs } from '@/lib/compose-refs';
+import { emitInputValue } from '@/lib/emit-input-value';
 import '../input/input.scss';
 
 export const PHONE_MASK = '+7 (000) 000-00-00';
@@ -23,32 +24,6 @@ export const PHONE_MASK = '+7 (000) 000-00-00';
  * Это атрибут placeholder, а не значение, поэтому required и FormData не меняются.
  */
 export const maskPlaceholder = (mask: string) => mask.replace(/[09]/g, '_');
-
-const assignRef = (
-  ref: Ref<HTMLInputElement> | undefined,
-  node: HTMLInputElement | null,
-) => {
-  if (typeof ref === 'function') {
-    ref(node);
-    return;
-  }
-
-  if (ref) ref.current = node;
-};
-
-/**
- * Прямая запись `input.value` обходит react-imask, поэтому значение пишем через
- * сеттер прототипа и шлём `input`: маска сама обновится и вызовет onAccept.
- */
-const emitInputValue = (input: HTMLInputElement, next: string) => {
-  const setter = Object.getOwnPropertyDescriptor(
-    HTMLInputElement.prototype,
-    'value',
-  )?.set;
-
-  setter?.call(input, next);
-  input.dispatchEvent(new Event('input', { bubbles: true }));
-};
 
 export interface PhoneInputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
@@ -98,23 +73,21 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
     },
     ref,
   ) {
-    const field = useFieldControl();
+    const { field, isInvalid, controlProps } = useFieldControlProps({
+      error,
+      describedBy: [ariaDescribedBy],
+    });
     const reportValue = field?.reportValue;
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [uncontrolledFilled, setUncontrolledFilled] = useState(
       () => defaultValue !== undefined && defaultValue !== '',
     );
-    const isInvalid = Boolean(error) || Boolean(field?.invalid);
     const hasValue = value !== undefined ? value !== '' : uncontrolledFilled;
     const canClear = clearable && !disabled && !readOnly && hasValue;
-    const describedBy = [field?.describedBy, ariaDescribedBy]
-      .filter(part => Boolean(part))
-      .join(' ');
 
     const setRef = useCallback(
       (node: HTMLInputElement | null) => {
-        inputRef.current = node;
-        assignRef(ref, node);
+        composeRefs(inputRef, ref)(node);
       },
       [ref],
     );
@@ -161,13 +134,8 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
           onAccept={handleAccept}
           disabled={disabled}
           readOnly={readOnly}
+          {...controlProps}
           {...(field ? { id: field.id } : { id })}
-          {...(field?.required
-            ? { 'required': true, 'aria-required': true }
-            : {})}
-          {...(isInvalid ? { 'aria-invalid': true } : {})}
-          {...(describedBy ? { 'aria-describedby': describedBy } : {})}
-          {...(field?.errorId ? { 'aria-errormessage': field.errorId } : {})}
           className={cn(
             'input',
             className,

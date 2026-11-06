@@ -7,12 +7,13 @@ import {
   type ChangeEvent,
   type InputHTMLAttributes,
   type MouseEvent,
-  type Ref,
 } from 'react';
 
-import { useFieldControl } from '@/components/field/field-context';
+import { useFieldControlProps } from '@/components/field/use-field-control-props';
 import { IconCross } from '@/icons/icon-cross';
 import { cn, when } from '@/lib/cn';
+import { composeRefs } from '@/lib/compose-refs';
+import { emitInputValue } from '@/lib/emit-input-value';
 import './input.scss';
 
 export type InputSize = 'sm' | 'md' | 'lg';
@@ -33,34 +34,8 @@ export interface InputProps extends Omit<
   onClear?: () => void;
 }
 
-const assignRef = (
-  ref: Ref<HTMLInputElement> | undefined,
-  node: HTMLInputElement | null,
-) => {
-  if (typeof ref === 'function') {
-    ref(node);
-    return;
-  }
-
-  if (ref) ref.current = node;
-};
-
 const toInputValue = (value: InputHTMLAttributes<HTMLInputElement>['value']) =>
   value == null ? '' : String(value);
-
-/**
- * Прямая запись `input.value` обновляет value-tracker React, и onChange не стреляет.
- * Сеттер прототипа трекер не трогает.
- */
-const emitInputValue = (input: HTMLInputElement, next: string) => {
-  const setter = Object.getOwnPropertyDescriptor(
-    HTMLInputElement.prototype,
-    'value',
-  )?.set;
-
-  setter?.call(input, next);
-  input.dispatchEvent(new Event('input', { bubbles: true }));
-};
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   {
@@ -82,7 +57,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   },
   ref,
 ) {
-  const field = useFieldControl();
+  const { field, isInvalid, controlProps } = useFieldControlProps({
+    error,
+    describedBy: [props['aria-describedby']],
+  });
   const reportValue = field?.reportValue;
   const inputRef = useRef<HTMLInputElement>(null);
   const isControlled = value !== undefined;
@@ -90,15 +68,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     toInputValue(defaultValue),
   );
   const current = isControlled ? toInputValue(value) : uncontrolledValue;
-  const isInvalid = Boolean(error) || Boolean(field?.invalid);
-  const describedBy = [field?.describedBy, props['aria-describedby']]
-    .filter(part => Boolean(part))
-    .join(' ');
 
   const setRef = useCallback(
     (node: HTMLInputElement | null) => {
-      inputRef.current = node;
-      assignRef(ref, node);
+      composeRefs(inputRef, ref)(node);
     },
     [ref],
   );
@@ -150,11 +123,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       readOnly={readOnly}
       {...(isControlled ? { value } : { defaultValue })}
       onChange={handleChange}
-      {...(isInvalid ? { 'aria-invalid': true } : {})}
+      {...controlProps}
       {...(field ? { id: field.id } : {})}
-      {...(field?.required ? { 'required': true, 'aria-required': true } : {})}
-      {...(describedBy ? { 'aria-describedby': describedBy } : {})}
-      {...(field?.errorId ? { 'aria-errormessage': field.errorId } : {})}
+      data-invalid={isInvalid || undefined}
+      data-disabled={disabled || undefined}
       className={cn(
         'input',
         className,

@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
@@ -237,5 +238,59 @@ describe('Field', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(
       'Поле «Почта» обязательно',
     );
+  });
+
+  it('invalid снаружи помечает контрол и глушит свою проверку', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <Field label="Почта" required invalid={false}>
+        <Input />
+      </Field>,
+    );
+
+    const input = screen.getByLabelText('Почта');
+    await user.type(input, 'a');
+    await user.clear(input);
+
+    // Своя эвристика «было значение и исчезло» молчит: состоянием владеет потребитель.
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(input).not.toHaveAttribute('aria-invalid');
+
+    rerender(
+      <Field label="Почта" required invalid>
+        <Input />
+      </Field>,
+    );
+
+    expect(screen.getByLabelText('Почта')).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+  });
+
+  it('invalid снаружи не оставляет aria-errormessage без текста', () => {
+    render(
+      <Field label="Почта" invalid>
+        <Input />
+      </Field>,
+    );
+
+    expect(screen.getByLabelText('Почта')).not.toHaveAttribute(
+      'aria-errormessage',
+    );
+  });
+
+  it('отдаёт ref и атрибуты корня', () => {
+    const ref = createRef<HTMLDivElement>();
+    render(
+      <Field ref={ref} data-testid="field" aria-label="Имя">
+        <Input />
+      </Field>,
+    );
+
+    const root = screen.getByTestId('field');
+    expect(root).toHaveClass('field');
+    expect(root).toHaveAttribute('aria-label', 'Имя');
+    expect(ref.current).toBe(root);
   });
 });

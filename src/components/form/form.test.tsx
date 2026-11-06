@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -234,6 +235,18 @@ describe('Form', () => {
     expect(onSubmit.mock.calls[0]?.[0].get('name')).toBe('Jora');
   });
 
+  it('FormSubmit отдаёт ref на button', () => {
+    const ref = createRef<HTMLButtonElement>();
+
+    render(
+      <Form>
+        <FormSubmit ref={ref}>Отправить</FormSubmit>
+      </Form>,
+    );
+
+    expect(ref.current).toBe(screen.getByRole('button', { name: 'Отправить' }));
+  });
+
   it('берёт текст ошибки из объекта с message', async () => {
     render(
       <Form onSubmit={() => Promise.reject({ message: 'Лимит запросов' })}>
@@ -245,6 +258,46 @@ describe('Form', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Лимит запросов',
+    );
+  });
+
+  it('FormActions и FormConsent отдают ref и атрибуты', () => {
+    const actionsRef = createRef<HTMLDivElement>();
+    const consentRef = createRef<HTMLDivElement>();
+    render(
+      <Form>
+        <FormActions ref={actionsRef} data-testid="actions">
+          <FormSubmit>Отправить</FormSubmit>
+          <FormConsent ref={consentRef} data-testid="consent">
+            Оферта
+          </FormConsent>
+        </FormActions>
+      </Form>,
+    );
+
+    const actions = screen.getByTestId('actions');
+    const consent = screen.getByTestId('consent');
+    expect(actions).toHaveClass('form__buttons');
+    expect(consent).toHaveClass('form__consent');
+    expect(actionsRef.current).toBe(actions);
+    expect(consentRef.current).toBe(consent);
+  });
+
+  it('errorFallback заменяет текст для ошибки без сообщения', async () => {
+    const user = userEvent.setup();
+    render(
+      <Form
+        errorFallback="Сервис недоступен"
+        onSubmit={() => Promise.reject(new Error(''))}
+      >
+        <FormSubmit>Отправить</FormSubmit>
+      </Form>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Отправить' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Сервис недоступен',
     );
   });
 });

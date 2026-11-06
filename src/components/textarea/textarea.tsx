@@ -6,12 +6,15 @@ import {
   useRef,
   useState,
   type ChangeEvent,
-  type Ref,
   type TextareaHTMLAttributes,
 } from 'react';
 
-import { useFieldControl } from '@/components/field/field-context';
+import {
+  joinDescribedBy,
+  useFieldControlProps,
+} from '@/components/field/use-field-control-props';
 import { cn, when } from '@/lib/cn';
+import { composeRefs } from '@/lib/compose-refs';
 import './textarea.scss';
 
 export type TextAreaSize = 'sm' | 'md' | 'lg';
@@ -22,19 +25,16 @@ export interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
   error?: boolean;
   /** Счётчик остатка при `maxLength`. `false` — то, что в приложении было `noMaxMoty`. */
   counter?: boolean;
+  /** Текст счётчика. `left` — сколько символов ещё можно ввести. */
+  counterLabel?: (left: number, max: number) => string;
 }
 
-const assignRef = (
-  ref: Ref<HTMLTextAreaElement> | undefined,
-  node: HTMLTextAreaElement | null,
-) => {
-  if (typeof ref === 'function') {
-    ref(node);
-    return;
-  }
+const defaultCounterLabel = (left: number, max: number) =>
+  `Осталось ${left} из ${max} символов`;
 
-  if (ref) ref.current = node;
-};
+const toTextValue = (
+  value: TextareaHTMLAttributes<HTMLTextAreaElement>['value'],
+) => (value == null ? '' : String(value));
 
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
   function TextArea(
@@ -45,36 +45,40 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       recommended,
       error,
       counter = true,
+      counterLabel = defaultCounterLabel,
       className,
       id,
       onChange,
+      defaultValue,
       'aria-describedby': ariaDescribedBy,
       ...props
     },
     ref,
   ) {
     const autoId = useId();
-    const field = useFieldControl();
+    const { field, isInvalid, controlProps } = useFieldControlProps({ error });
     const reportValue = field?.reportValue;
     const textareaId = field?.id ?? id ?? autoId;
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [length, setLength] = useState(0);
     const withCounter = maxLength !== undefined && counter;
-    const isInvalid = Boolean(error) || Boolean(field?.invalid);
+    // Счётчик стоит между ошибкой поля и своим aria-describedby.
+    const describedBy = joinDescribedBy(
+      field?.describedBy,
+      withCounter ? `${textareaId}-counter` : undefined,
+      ariaDescribedBy,
+    );
 
     const setRef = useCallback(
       (node: HTMLTextAreaElement | null) => {
-        textareaRef.current = node;
-        assignRef(ref, node);
+        composeRefs(textareaRef, ref)(node);
       },
       [ref],
     );
 
     /**
-     * ponytail: длину счётчик читает из DOM — одинаково для `value` и `defaultValue`,
-     * включая автозаполнение. Потолок: reset формы в неконтролируемом режиме счётчик
-     * не слышит и догоняет на следующем вводе; апгрейд — слушать `reset`, как `Input`.
-     * Тот же проход отдаёт показанную строку в Field.
+     * Длину счётчик читает из DOM — одинаково для `value` и `defaultValue`,
+     * включая автозаполнение. Тот же проход отдаёт показанную строку в Field.
      */
     useEffect(() => {
       const node = textareaRef.current;
@@ -84,6 +88,21 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       reportValue?.(node.value);
     }, [reportValue, value, withCounter]);
 
+    // reset всплывает от form вверх и до textarea не доходит.
+    useEffect(() => {
+      const form = textareaRef.current?.form;
+      if (!form || value !== undefined) return;
+
+      const handleReset = () => {
+        const next = toTextValue(defaultValue);
+        if (withCounter) setLength(next.length);
+        reportValue?.(next);
+      };
+
+      form.addEventListener('reset', handleReset);
+      return () => form.removeEventListener('reset', handleReset);
+    }, [defaultValue, reportValue, value, withCounter]);
+
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
       if (withCounter) setLength(event.target.value.length);
       if (value === undefined) reportValue?.(event.target.value);
@@ -91,9 +110,6 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     };
 
     const counterId = withCounter ? `${textareaId}-counter` : undefined;
-    const describedBy = [field?.describedBy, counterId, ariaDescribedBy]
-      .filter(part => Boolean(part))
-      .join(' ');
 
     return (
       <div className="textarea__wrap">
@@ -108,20 +124,20 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
             when(recommended, 'textarea--recommended'),
             when(isInvalid, 'textarea--error'),
           )}
-          {...(value !== undefined ? { value } : {})}
+          {...(value !== undefined ? { value } : { defaultValue })}
           maxLength={maxLength}
           onChange={handleChange}
-          {...(isInvalid ? { 'aria-invalid': true } : {})}
-          {...(field?.required
-            ? { 'required': true, 'aria-required': true }
-            : {})}
+          {...controlProps}
+          data-invalid={isInvalid || undefined}
+          data-disabled={props.disabled || undefined}
           {...(describedBy ? { 'aria-describedby': describedBy } : {})}
-          {...(field?.errorId ? { 'aria-errormessage': field.errorId } : {})}
         />
         {withCounter ? (
           <span id={counterId} className="textarea__counter">
-            Осталось {Math.max(0, (maxLength ?? 0) - length)} из {maxLength}{' '}
-            символов
+            {counterLabel(
+              Math.max(0, (maxLength ?? 0) - length),
+              maxLength ?? 0,
+            )}
           </span>
         ) : null}
       </div>

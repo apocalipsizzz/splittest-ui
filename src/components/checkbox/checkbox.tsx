@@ -1,78 +1,24 @@
 import {
-  Children,
-  Fragment,
-  cloneElement,
   forwardRef,
-  isValidElement,
   useCallback,
   useEffect,
   useId,
   useRef,
   type ChangeEvent,
   type InputHTMLAttributes,
-  type ReactElement,
   type ReactNode,
-  type Ref,
 } from 'react';
 
-import { useFieldControl } from '@/components/field/field-context';
+import { useFieldControlProps } from '@/components/field/use-field-control-props';
 import { cn, when } from '@/lib/cn';
+import { composeRefs } from '@/lib/compose-refs';
 import './checkbox.scss';
-
-interface LabelAnchorProps {
-  children?: ReactNode;
-  className?: string;
-  target?: string;
-  rel?: string;
-}
-
-/** Любой `<a>` в лейбле: класс, новая вкладка. Клик ловит сам лейбл. */
-const enhanceLabel = (node: ReactNode): ReactNode =>
-  Children.map(node, child => {
-    if (!isValidElement(child)) return child;
-
-    if (child.type === Fragment) {
-      const fragment = child as ReactElement<{ children?: ReactNode }>;
-      return cloneElement(
-        fragment,
-        undefined,
-        enhanceLabel(fragment.props.children),
-      );
-    }
-
-    if (child.type === 'a') {
-      const anchor = child as ReactElement<LabelAnchorProps>;
-      return cloneElement(
-        anchor,
-        {
-          className: cn('checkbox__link', anchor.props.className),
-          target: '_blank',
-          rel: 'noopener noreferrer',
-        },
-        enhanceLabel(anchor.props.children),
-      );
-    }
-
-    if (
-      typeof child.props === 'object' &&
-      child.props !== null &&
-      'children' in child.props
-    ) {
-      const element = child as ReactElement<{ children?: ReactNode }>;
-      return cloneElement(
-        element,
-        undefined,
-        enhanceLabel(element.props.children),
-      );
-    }
-
-    return child;
-  });
 
 export interface CheckboxInputProps extends InputHTMLAttributes<HTMLInputElement> {
   /**
-   * Текст рядом с квадратом. `<a>` внутри получает `checkbox__link`,
-   * открывается в новой вкладке и не переключает чекбокс.
+   * Текст рядом с квадратом. Имя инпута — `aria-labelledby` на этом тексте.
+   * Клик по тексту переключает. Ссылка внутри остаётся ссылкой:
+   * свои `target` и `rel`, Ctrl/⌘ и средняя кнопка не перехватываются.
    */
   label?: ReactNode;
   /** Красная рамка. Внутри `Field` состоянием ошибки распоряжается он. */
@@ -80,31 +26,11 @@ export interface CheckboxInputProps extends InputHTMLAttributes<HTMLInputElement
   /** «Выбрать все»: IDL `indeterminate`, React его атрибутом не прокидывает. */
   indeterminate?: boolean;
   /**
-   * false — `pointer-events: none` на input (`checkbox__input--no-events`).
-   * Клик по лейблу по-прежнему переключает.
+   * false — `pointer-events: none` на квадрате (`checkbox__input--no-events`).
+   * Клик по тексту по-прежнему переключает.
    */
   clickable?: boolean;
 }
-
-const assignRef = (
-  ref: Ref<HTMLInputElement> | null,
-  node: HTMLInputElement | null,
-) => {
-  if (typeof ref === 'function') {
-    ref(node);
-    return;
-  }
-
-  if (ref) ref.current = node;
-};
-
-const mergeDescribedBy = (
-  fromField: string | undefined,
-  fromProps: string | undefined,
-) => {
-  const value = [fromField, fromProps].filter(part => Boolean(part)).join(' ');
-  return value || undefined;
-};
 
 export const CheckboxInput = forwardRef<HTMLInputElement, CheckboxInputProps>(
   function CheckboxInput(
@@ -122,20 +48,21 @@ export const CheckboxInput = forwardRef<HTMLInputElement, CheckboxInputProps>(
     },
     ref,
   ) {
-    const field = useFieldControl();
-    const reportValue = field?.reportValue;
+    const { field, isInvalid, controlProps } = useFieldControlProps({
+      error,
+      describedBy: [props['aria-describedby']],
+    });
     const autoId = useId();
     // Свой id важнее id поля: несколько чекбоксов в одном Field иначе
     // получают один и тот же, и клик по любому лейблу бьёт в первый.
     const inputId = id ?? field?.id ?? autoId;
+    const captionId = label ? `${inputId}-caption` : undefined;
     const inputRef = useRef<HTMLInputElement>(null);
-    const unlistenLabel = useRef<(() => void) | null>(null);
-    const isInvalid = Boolean(error) || Boolean(field?.invalid);
+    const reportValue = field?.reportValue;
 
     const setRef = useCallback(
       (node: HTMLInputElement | null) => {
-        inputRef.current = node;
-        assignRef(ref, node);
+        composeRefs(inputRef, ref)(node);
       },
       [ref],
     );
@@ -157,68 +84,36 @@ export const CheckboxInput = forwardRef<HTMLInputElement, CheckboxInputProps>(
       onChange?.(event);
     };
 
-    // Нативный listener раньше делегата React: preventDefault успевает отменить
-    // и переход, и активацию чекбокса. stopPropagation — чтобы клик не всплыл второй раз.
-    const setLabelNode = useCallback((node: HTMLLabelElement | null) => {
-      unlistenLabel.current?.();
-      unlistenLabel.current = null;
-      if (!node) return;
-
-      const handleClick = (event: Event) => {
-        if (!(event.target instanceof Element)) return;
-        const anchor = event.target.closest('a');
-        if (!anchor || !node.contains(anchor) || !anchor.hasAttribute('href')) {
-          return;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
-        window.open(anchor.href, '_blank', 'noopener,noreferrer');
-      };
-
-      node.addEventListener('click', handleClick, true);
-      unlistenLabel.current = () =>
-        node.removeEventListener('click', handleClick, true);
-    }, []);
-
-    const describedBy = field
-      ? mergeDescribedBy(field.describedBy, props['aria-describedby'])
-      : undefined;
-
-    const fieldAttrs: InputHTMLAttributes<HTMLInputElement> = {};
-
-    if (field?.required) {
-      fieldAttrs.required = true;
-      fieldAttrs['aria-required'] = true;
-    }
-
-    if (isInvalid) fieldAttrs['aria-invalid'] = true;
-    if (describedBy) fieldAttrs['aria-describedby'] = describedBy;
-    if (field?.errorId) fieldAttrs['aria-errormessage'] = field.errorId;
-
     return (
       <div className={cn('checkbox', className)}>
-        <input
-          {...props}
-          ref={setRef}
-          type="checkbox"
-          id={inputId}
-          disabled={disabled}
-          {...(checked !== undefined ? { checked } : {})}
-          onChange={handleChange}
+        <label
           className={cn(
-            'checkbox__input',
-            when(!clickable, 'checkbox__input--no-events'),
+            'checkbox__box',
+            when(!clickable, 'checkbox__box--no-events'),
           )}
-          {...fieldAttrs}
-        />
+          htmlFor={inputId}
+        >
+          <input
+            {...props}
+            ref={setRef}
+            type="checkbox"
+            id={inputId}
+            disabled={disabled}
+            {...(checked !== undefined ? { checked } : {})}
+            {...(captionId ? { 'aria-labelledby': captionId } : {})}
+            onChange={handleChange}
+            className={cn(
+              'checkbox__input',
+              when(!clickable, 'checkbox__input--no-events'),
+            )}
+            {...controlProps}
+            data-invalid={isInvalid || undefined}
+            data-disabled={disabled || undefined}
+          />
+        </label>
         {label ? (
-          <label
-            ref={setLabelNode}
-            className="checkbox__label"
-            htmlFor={inputId}
-          >
-            {enhanceLabel(label)}
+          <label id={captionId} className="checkbox__label" htmlFor={inputId}>
+            {label}
           </label>
         ) : null}
       </div>

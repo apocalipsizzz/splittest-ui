@@ -54,7 +54,93 @@ export const isPrintableKey = (event: KeyboardEvent) =>
   !event.metaKey &&
   !event.altKey;
 
-/** Стрелки, Home/End, Enter и Escape открытого списка. */
+/** Пауза typeahead: «мо» ищет префикс, а не две отдельные буквы. Как у Radix и APG. */
+export const TYPEAHEAD_TIMEOUT = 500;
+
+const PAGE_STEP = 10;
+
+export interface TypeaheadBuffer {
+  push: (char: string, time?: number) => string;
+  reset: () => void;
+}
+
+/** Буфер набора. Следующий символ позже `timeout` мс начинает строку заново. */
+export const createTypeaheadBuffer = (
+  timeout = TYPEAHEAD_TIMEOUT,
+): TypeaheadBuffer => {
+  let query = '';
+  let last = 0;
+
+  return {
+    push(char, time = Date.now()) {
+      if (query && time - last > timeout) query = '';
+      last = time;
+      query += char;
+      return query;
+    },
+    reset() {
+      query = '';
+      last = 0;
+    },
+  };
+};
+
+const normalizeTypeahead = (value: string) =>
+  value.toLowerCase().replace(/ё/g, 'е');
+
+/**
+ * Первый включённый пункт, чья подпись начинается с `query`, с обходом списка.
+ * `after` — индекс, после которого искать.
+ * Один символ и повтор того же символа пропускают текущий пункт.
+ * Более длинный запрос включает текущий: первая буква уже поставила курсор на него.
+ */
+export const optionByPrefix = (
+  options: readonly SelectOption[],
+  query: string,
+  after: number,
+) => {
+  const chars = Array.from(query);
+  const repeated = chars.length > 1 && chars.every(char => char === chars[0]);
+  const needle = normalizeTypeahead(repeated ? (chars[0] ?? '') : query);
+  if (!needle || options.length === 0) return -1;
+
+  // after < 0 — курсора ещё нет, длинный запрос начинается с первого пункта.
+  const start = repeated || chars.length === 1 ? after : Math.max(after, 0) - 1;
+
+  for (let step = 1; step <= options.length; step += 1) {
+    const index = (start + step + options.length) % options.length;
+    const option = options[index];
+    if (!option || option.disabled) continue;
+    if (normalizeTypeahead(option.label).startsWith(needle)) return index;
+  }
+
+  return -1;
+};
+
+const moveEnabledBy = (
+  options: readonly SelectOption[],
+  from: number,
+  delta: number,
+) => {
+  const step: 1 | -1 = delta > 0 ? 1 : -1;
+  let index = from;
+  let left = Math.abs(delta);
+
+  while (left > 0) {
+    const next = moveEnabledIndex(
+      options,
+      index < 0 ? (step === 1 ? -1 : options.length) : index,
+      step,
+    );
+    if (next < 0 || next === index) break;
+    index = next;
+    left -= 1;
+  }
+
+  return index;
+};
+
+/** Стрелки, Home/End, PageUp/PageDown, Enter и Escape открытого списка. */
 export const handleListKeyDown = (
   event: KeyboardEvent,
   options: readonly SelectOption[],
@@ -87,6 +173,18 @@ export const handleListKeyDown = (
     return true;
   }
 
+  if (event.key === 'PageDown' || event.key === 'PageUp') {
+    event.preventDefault();
+    onHighlight(
+      moveEnabledBy(
+        options,
+        highlighted,
+        event.key === 'PageDown' ? PAGE_STEP : -PAGE_STEP,
+      ),
+    );
+    return true;
+  }
+
   if (event.key === 'Enter') {
     event.preventDefault();
     const option = options[highlighted];
@@ -96,7 +194,6 @@ export const handleListKeyDown = (
 
   if (event.key === 'Escape') {
     event.preventDefault();
-    event.stopPropagation();
     onClose();
     return true;
   }

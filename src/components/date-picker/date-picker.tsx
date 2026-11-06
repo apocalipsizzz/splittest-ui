@@ -1,45 +1,52 @@
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
-import { createPortal } from 'react-dom';
+import {
+  FloatingFocusManager,
+  FloatingNode,
+  useDismiss,
+  useFloating,
+  useFloatingNodeId,
+  useInteractions,
+} from '@floating-ui/react';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type HTMLAttributes,
+  type KeyboardEvent,
+} from 'react';
 
 import { Button } from '@/components/button';
 import { Input } from '@/components/input';
-import '../input/input.scss';
 import { IconCalendar } from '@/icons/icon-calendar';
 import { IconCorrect } from '@/icons/icon-correct';
 import { cn } from '@/lib/cn';
+import { FloatingLayerTree } from '@/lib/floating-layer';
+import { useControllableState } from '@/lib/hooks/use-controllable-state';
+import { Portal, portalProps } from '@/lib/portal';
+import '../input/input.scss';
+import { useScrollLock } from '@/lib/hooks/use-scroll-lock';
 import { WheelColumn } from './wheel-column';
 import './date-picker.scss';
 
-const MONTH_NAMES = [
-  'январь',
-  'февраль',
-  'март',
-  'апрель',
-  'май',
-  'июнь',
-  'июль',
-  'август',
-  'сентябрь',
-  'октябрь',
-  'ноябрь',
-  'декабрь',
-];
+/** Именительный: «март». `month: 'long'` без дня. */
+const monthList = (locale: string) => {
+  const format = new Intl.DateTimeFormat(locale, { month: 'long' });
+  return Array.from({ length: 12 }, (_, month) =>
+    format.format(new Date(2000, month, 1)),
+  );
+};
 
-// В дате пишется родительный падеж: «15 марта 1990».
-const MONTH_NAMES_GENITIVE = [
-  'января',
-  'февраля',
-  'марта',
-  'апреля',
-  'мая',
-  'июня',
-  'июля',
-  'августа',
-  'сентября',
-  'октября',
-  'ноября',
-  'декабря',
-];
+/**
+ * Родительный: «марта». День в шаблоне заставляет Intl просклонять месяц,
+ * из частей берётся только месяц.
+ */
+const genitiveMonth = (date: Date, locale: string) =>
+  new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long' })
+    .formatToParts(date)
+    .find(part => part.type === 'month')?.value ?? '';
 
 /** Месяц здесь 1–12, как в календаре, а не индекс массива. */
 interface DateParts {
@@ -65,8 +72,8 @@ const pad = (value: number) => String(value).padStart(2, '0');
 const toIsoDate = (date: Date) =>
   `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 
-const formatDate = (date: Date) =>
-  `${date.getDate()} ${MONTH_NAMES_GENITIVE[date.getMonth()]} ${date.getFullYear()}`;
+const formatDate = (date: Date, locale: string) =>
+  `${date.getDate()} ${genitiveMonth(date, locale)} ${date.getFullYear()}`;
 
 /** Сегодня минус `minAge` лет. 29 февраля в невисокосном году уходит на 28-е. */
 const maxAllowedDate = (minAge: number, today: Date) => {
@@ -89,8 +96,14 @@ const clampParts = (parts: DateParts, max: Date): DateParts => {
 const range = (from: number, to: number) =>
   from > to ? [] : Array.from({ length: to - from + 1 }, (_, i) => from + i);
 
-export interface DatePickerProps {
+export interface DatePickerProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'onChange' | 'defaultValue' | 'title'
+> {
+  /** Управляемое значение. Без него дату держит сам компонент, см. `defaultValue`. */
   value?: Date | null;
+  /** Стартовая дата неуправляемого поля. */
+  defaultValue?: Date | null;
   onChange?: (date: Date) => void;
   /** Самый ранний год в списке. */
   minYear?: number;
@@ -103,10 +116,16 @@ export interface DatePickerProps {
   name?: string;
   /** Текст в поле, пока дата не выбрана. */
   placeholder?: string;
-  /** Заголовок окна выбора. */
+  /** Заголовок окна выбора, не атрибут `title`. */
   title?: string;
   error?: boolean;
-  className?: string;
+  /** Локаль названий месяцев. Родительный падеж берёт `Intl.DateTimeFormat`. */
+  locale?: string;
+  dayLabel?: string;
+  monthLabel?: string;
+  yearLabel?: string;
+  applyLabel?: string;
+  cancelLabel?: string;
 }
 
 /**
@@ -114,199 +133,271 @@ export interface DatePickerProps {
  * Поле только для чтения с клавиатуры, поэтому `required` из `Field` и
  * нативная проверка формы работают, а телефонная клавиатура не открывается.
  */
-export const DatePicker = ({
-  value,
-  onChange,
-  minYear = 1930,
-  maxYear,
-  minAge = 0,
-  disabled = false,
-  name,
-  placeholder = 'Выберите дату',
-  title = 'Выберите дату',
-  error,
-  className,
-}: DatePickerProps) => {
-  const [today] = useState(() => new Date());
-  const [open, setOpen] = useState(false);
-  const maxBirth = maxAllowedDate(minAge, today);
-  const lastYear = Math.min(
-    maxYear ?? today.getFullYear(),
-    maxBirth.getFullYear(),
-  );
-  const [draft, setDraft] = useState<DateParts>(() =>
-    clampParts(partsOf(value ?? maxBirth), maxBirth),
-  );
-  const triggerRef = useRef<HTMLInputElement>(null);
-  const sheetRef = useRef<HTMLDialogElement>(null);
-  const titleId = useId();
+const DatePickerFrame = forwardRef<HTMLDivElement, DatePickerProps>(
+  function DatePickerFrame(
+    {
+      value: valueProp,
+      defaultValue = null,
+      onChange,
+      minYear = 1930,
+      maxYear,
+      minAge = 0,
+      disabled = false,
+      name,
+      placeholder = 'Выберите дату',
+      title = 'Выберите дату',
+      error,
+      className,
+      locale = 'ru',
+      dayLabel = 'День',
+      monthLabel = 'Месяц',
+      yearLabel = 'Год',
+      applyLabel = 'Применить',
+      cancelLabel = 'Отмена',
+      ...props
+    },
+    ref,
+  ) {
+    const [value, setValue] = useControllableState<Date | null>(
+      valueProp,
+      defaultValue,
+      next => {
+        if (next) onChange?.(next);
+      },
+    );
+    // «Сегодня» пересчитывается на каждом открытии: во вкладке, дожившей до
+    // полуночи, minAge иначе считался бы от вчерашней даты.
+    const [today, setToday] = useState(() => new Date());
+    const months = useMemo(() => monthList(locale), [locale]);
+    const [open, setOpen] = useState(false);
+    const maxBirth = maxAllowedDate(minAge, today);
+    const lastYear = Math.min(
+      maxYear ?? today.getFullYear(),
+      maxBirth.getFullYear(),
+    );
+    const [draft, setDraft] = useState<DateParts>(() =>
+      clampParts(partsOf(value ?? maxBirth), maxBirth),
+    );
+    const focusOnMount = useRef(false);
+    const sheetRef = useRef<HTMLDivElement | null>(null);
+    const titleId = useId();
+    const nodeId = useFloatingNodeId();
+    const { refs, context } = useFloating({
+      nodeId,
+      open,
+      onOpenChange: next => {
+        if (!next) setOpen(false);
+      },
+    });
+    // Ловушка фокуса — у менеджера. Он же через rAF возвращает фокус внешнему
+    // листу, и дерево это не отменяет. Пока слой открыт, чужой focusin
+    // возвращаем на лист — без второго кадра.
+    const dismiss = useDismiss(context, {
+      outsidePressEvent: 'mousedown',
+    });
+    const { getFloatingProps } = useInteractions([dismiss]);
+    const { setFloating, setReference } = refs;
+    const setSheetRef = useCallback(
+      (node: HTMLDivElement | null) => {
+        setFloating(node);
+        sheetRef.current = node;
+        if (!node || !focusOnMount.current) return;
+        focusOnMount.current = false;
+        node.focus();
+      },
+      [setFloating],
+    );
 
-  const years = range(Math.min(minYear, draft.year), lastYear);
-  const days = range(1, daysInMonth(draft.year, draft.month));
+    const years = range(Math.min(minYear, draft.year), lastYear);
+    const days = range(1, daysInMonth(draft.year, draft.month));
 
-  // iOS: без position: fixed фон прокручивается под открытым листом.
-  useEffect(() => {
-    if (!open) return;
+    useScrollLock(open);
 
-    const { position, top, width } = document.body.style;
-    const scrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-    sheetRef.current
-      ?.querySelector<HTMLElement>('[role="spinbutton"]')
-      ?.focus();
+    useEffect(() => {
+      if (!open) return;
 
-    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
+      const handleFocusIn = (event: FocusEvent) => {
+        const sheet = sheetRef.current;
+        const target = event.target;
+        if (!sheet || !(target instanceof Node) || sheet.contains(target))
+          return;
+        sheet.focus();
+      };
 
+      document.addEventListener('focusin', handleFocusIn);
+      return () => document.removeEventListener('focusin', handleFocusIn);
+    }, [open]);
+
+    const openSheet = () => {
+      if (disabled) return;
+
+      const now = new Date();
+      const limit = maxAllowedDate(minAge, now);
+      setToday(now);
+      setDraft(clampParts(partsOf(value ?? limit), limit));
+      focusOnMount.current = true;
+      setOpen(true);
+    };
+
+    const close = () => {
       setOpen(false);
-      triggerRef.current?.focus();
     };
-    document.addEventListener('keydown', handleKeyDown);
 
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.position = position;
-      document.body.style.top = top;
-      document.body.style.width = width;
-      window.scrollTo(0, scrollY);
+    const updateDraft = (patch: Partial<DateParts>) => {
+      setDraft(prev => clampParts({ ...prev, ...patch }, maxBirth));
     };
-  }, [open]);
 
-  const openSheet = () => {
-    if (disabled) return;
+    const apply = () => {
+      setValue(toDate(draft));
+      close();
+    };
 
-    setDraft(clampParts(partsOf(value ?? maxBirth), maxBirth));
-    setOpen(true);
-  };
+    // Текст не вводится: поле только выбирает дату через лист.
+    const handleTriggerKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Tab') return;
 
-  const close = () => {
-    setOpen(false);
-    triggerRef.current?.focus();
-  };
+      event.preventDefault();
+      if (
+        event.key === 'Enter' ||
+        event.key === ' ' ||
+        event.key === 'ArrowDown'
+      ) {
+        openSheet();
+      }
+    };
 
-  const updateDraft = (patch: Partial<DateParts>) => {
-    setDraft(prev => clampParts({ ...prev, ...patch }, maxBirth));
-  };
+    return (
+      <FloatingNode id={nodeId}>
+        <div
+          {...props}
+          ref={ref}
+          data-state={open ? 'open' : 'closed'}
+          className={cn('date-picker', className)}
+        >
+          <Input
+            ref={setReference}
+            className="date-picker__trigger"
+            value={value ? formatDate(value, locale) : ''}
+            onChange={() => {}}
+            onClick={openSheet}
+            onKeyDown={handleTriggerKeyDown}
+            onPaste={event => event.preventDefault()}
+            inputMode="none"
+            autoComplete="off"
+            aria-haspopup="dialog"
+            aria-expanded={open}
+            placeholder={placeholder}
+            disabled={disabled}
+            error={error}
+          />
+          <IconCalendar className="date-picker__icon" aria-hidden />
+          {name ? (
+            <input
+              type="hidden"
+              name={name}
+              value={value ? toIsoDate(value) : ''}
+            />
+          ) : null}
 
-  const apply = () => {
-    onChange?.(toDate(draft));
-    close();
-  };
-
-  // Текст не вводится: поле только выбирает дату через лист.
-  const handleTriggerKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Tab') return;
-
-    event.preventDefault();
-    if (
-      event.key === 'Enter' ||
-      event.key === ' ' ||
-      event.key === 'ArrowDown'
-    ) {
-      openSheet();
-    }
-  };
-
-  return (
-    <div className={cn('date-picker', className)}>
-      <Input
-        ref={triggerRef}
-        className="date-picker__trigger"
-        value={value ? formatDate(value) : ''}
-        onChange={() => {}}
-        onClick={openSheet}
-        onKeyDown={handleTriggerKeyDown}
-        onPaste={event => event.preventDefault()}
-        inputMode="none"
-        autoComplete="off"
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        placeholder={placeholder}
-        disabled={disabled}
-        error={error}
-      />
-      <IconCalendar className="date-picker__icon" aria-hidden />
-      {name ? (
-        <input
-          type="hidden"
-          name={name}
-          value={value ? toIsoDate(value) : ''}
-        />
-      ) : null}
-
-      {open
-        ? createPortal(
-            <div className="date-picker__layer">
-              <button
-                type="button"
-                className="date-picker__mask"
-                aria-label="Закрыть"
-                onClick={close}
-              />
-              <dialog
-                ref={sheetRef}
-                open
-                aria-modal="true"
-                aria-labelledby={titleId}
-                className="date-picker__sheet"
-              >
-                <h2 id={titleId} className="date-picker__title">
-                  {title}
-                </h2>
-                <div className="date-picker__columns">
-                  <div className="date-picker__column">
-                    <span className="date-picker__caption">День</span>
-                    <WheelColumn
-                      label="День"
-                      items={days.map(day => ({
-                        value: day,
-                        label: String(day),
-                      }))}
-                      value={draft.day}
-                      onChange={day => updateDraft({ day })}
-                    />
+          {open ? (
+            <Portal>
+              <div className="date-picker__layer" {...portalProps}>
+                {/*
+                  Вуаль только для указателя: от скринридера она скрыта, а лист
+                  закрывается Escape и кнопкой «Отмена». Кнопкой её делать
+                  нельзя — это лишняя полноэкранная остановка в табуляции.
+                  useDismiss сюда не достаёт: вуаль лежит в том же портале,
+                  что и лист, и для него не «снаружи».
+                */}
+                {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- aria-hidden, дублирует Escape и «Отмена» */}
+                <div
+                  className="date-picker__mask"
+                  aria-hidden="true"
+                  onClick={close}
+                />
+                <FloatingFocusManager context={context} modal initialFocus={-1}>
+                  <div
+                    {...getFloatingProps()}
+                    ref={setSheetRef}
+                    // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- <dialog> без showModal() не модален: ловушку держит FloatingFocusManager
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby={titleId}
+                    tabIndex={-1}
+                    data-state="open"
+                    className="date-picker__sheet"
+                  >
+                    <h2 id={titleId} className="date-picker__title">
+                      {title}
+                    </h2>
+                    <div className="date-picker__columns">
+                      <div className="date-picker__column">
+                        <span className="date-picker__caption">{dayLabel}</span>
+                        <WheelColumn
+                          label={dayLabel}
+                          items={days.map(day => ({
+                            value: day,
+                            label: String(day),
+                          }))}
+                          value={draft.day}
+                          onChange={day => updateDraft({ day })}
+                        />
+                      </div>
+                      <div className="date-picker__column">
+                        <span className="date-picker__caption">
+                          {monthLabel}
+                        </span>
+                        <WheelColumn
+                          label={monthLabel}
+                          items={months.map((month, index) => ({
+                            value: index + 1,
+                            label: month,
+                          }))}
+                          value={draft.month}
+                          onChange={month => updateDraft({ month })}
+                        />
+                      </div>
+                      <div className="date-picker__column">
+                        <span className="date-picker__caption">
+                          {yearLabel}
+                        </span>
+                        <WheelColumn
+                          label={yearLabel}
+                          items={years.map(year => ({
+                            value: year,
+                            label: String(year),
+                          }))}
+                          value={draft.year}
+                          onChange={year => updateDraft({ year })}
+                        />
+                      </div>
+                    </div>
+                    <div className="date-picker__actions">
+                      <Button onClick={apply}>
+                        <IconCorrect />
+                        {applyLabel}
+                      </Button>
+                      <Button variant="link" onClick={close}>
+                        {cancelLabel}
+                      </Button>
+                    </div>
                   </div>
-                  <div className="date-picker__column">
-                    <span className="date-picker__caption">Месяц</span>
-                    <WheelColumn
-                      label="Месяц"
-                      items={MONTH_NAMES.map((month, index) => ({
-                        value: index + 1,
-                        label: month,
-                      }))}
-                      value={draft.month}
-                      onChange={month => updateDraft({ month })}
-                    />
-                  </div>
-                  <div className="date-picker__column">
-                    <span className="date-picker__caption">Год</span>
-                    <WheelColumn
-                      label="Год"
-                      items={years.map(year => ({
-                        value: year,
-                        label: String(year),
-                      }))}
-                      value={draft.year}
-                      onChange={year => updateDraft({ year })}
-                    />
-                  </div>
-                </div>
-                <div className="date-picker__actions">
-                  <Button onClick={apply}>
-                    <IconCorrect />
-                    Применить
-                  </Button>
-                  <Button variant="link" onClick={close}>
-                    Отмена
-                  </Button>
-                </div>
-              </dialog>
-            </div>,
-            document.body,
-          )
-        : null}
-    </div>
-  );
-};
+                </FloatingFocusManager>
+              </div>
+            </Portal>
+          ) : null}
+        </div>
+      </FloatingNode>
+    );
+  },
+);
+
+export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
+  function DatePicker(props, ref) {
+    return (
+      <FloatingLayerTree>
+        <DatePickerFrame {...props} ref={ref} />
+      </FloatingLayerTree>
+    );
+  },
+);

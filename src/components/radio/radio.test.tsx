@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
@@ -172,5 +173,20 @@ describe('RadioGroup', () => {
     expect(group.getAttribute('aria-describedby')).toBe(
       `${hint.id} ${error.id}`,
     );
+  });
+
+  it('отдаёт ref и атрибуты fieldset', () => {
+    const ref = createRef<HTMLFieldSetElement>();
+    render(
+      <RadioGroup ref={ref} name="gender" data-testid="group" aria-label="Пол">
+        <RadioInput label="Женский" />
+      </RadioGroup>,
+    );
+
+    const group = screen.getByTestId('group');
+    expect(group).toHaveClass('radio-group');
+    expect(group).toHaveAttribute('role', 'radiogroup');
+    expect(group).toHaveAttribute('aria-label', 'Пол');
+    expect(ref.current).toBe(group);
   });
 });

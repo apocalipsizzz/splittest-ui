@@ -1,6 +1,6 @@
 {
   "name": "@de-kit/st-ui",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "React-компоненты splittest: глобальный SCSS и токены из основного фронтенда",
   "license": "UNLICENSED",
   "repository": {
@@ -31,6 +31,7 @@
       }
     },
     "./global.scss": "./dist/styles/global.scss",
+    "./reset.scss": "./dist/styles/reset.scss",
     "./vars.scss": "./dist/styles/vars.scss",
     "./mixins.scss": "./dist/styles/mixins.scss",
     "./typography.scss": "./dist/styles/typography.scss",
@@ -42,6 +43,16 @@
       "require": {
         "types": "./dist/icons/index.d.cts",
         "default": "./dist/icons/index.cjs"
+      }
+    },
+    "./components/*": {
+      "import": {
+        "types": "./dist/components/*/index.d.ts",
+        "default": "./dist/components/*/index.js"
+      },
+      "require": {
+        "types": "./dist/components/*/index.d.cts",
+        "default": "./dist/components/*/index.cjs"
       }
     },
     "./package.json": "./package.json"
@@ -63,12 +74,13 @@
     "format:fix": "oxfmt",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check:exports": "publint && attw --pack . --profile node16 --exclude-entrypoints global.scss vars.scss mixins.scss typography.scss",
-    "verify": "pnpm run build:icons && pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run build && pnpm run check:exports",
+    "check:exports": "publint && attw --pack . --profile node16 --exclude-entrypoints global.scss reset.scss vars.scss mixins.scss typography.scss",
+    "verify": "pnpm run build:icons && pnpm run typecheck && pnpm run lint && node scripts/sync-tokens-doc.mjs --check && pnpm run test && pnpm run build && pnpm run check:exports",
     "changeset": "changeset",
     "version": "changeset version",
     "release": "pnpm run verify && changeset publish",
-    "prepack": "pnpm run build"
+    "prepack": "pnpm run build",
+    "docs:tokens": "node scripts/sync-tokens-doc.mjs"
   },
   "dependencies": {
     "@floating-ui/react": "^0.27.20",
@@ -105,10 +117,16 @@
   },
   "peerDependencies": {
     "react": "^18.3.0 || ^19.0.0",
-    "react-dom": "^18.3.0 || ^19.0.0"
+    "react-dom": "^18.3.0 || ^19.0.0",
+    "sass": "^1.0.0"
   },
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "pnpm@11.15.1"
+  "packageManager": "pnpm@11.15.1",
+  "peerDependenciesMeta": {
+    "sass": {
+      "optional": true
+    }
+  }
 }

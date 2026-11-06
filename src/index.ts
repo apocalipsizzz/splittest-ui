@@ -20,6 +20,8 @@ export { CheckboxInput, type CheckboxInputProps } from './components/checkbox';
 export {
   Field,
   FieldList,
+  useFieldControl,
+  type FieldControlContext,
   type FieldHintPlacement,
   type FieldListProps,
   type FieldProps,
@@ -73,3 +75,9 @@ export {
   type TextAreaSize,
 } from './components/textarea';
 export { useMediaQuery } from './lib/hooks/use-media-query';
+export { cn } from './lib/cn';
+export { Slot } from './lib/slot';
+export {
+  filterSelectOptions,
+  type SelectSearchable,
+} from './components/select-search/filter-option';
