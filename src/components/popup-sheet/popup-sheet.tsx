@@ -41,7 +41,7 @@ const insidePortal = (target: EventTarget | null) =>
   Boolean(target.closest(POPUP_SHEET_PORTAL_SELECTOR));
 
 export interface PopupSheetProps extends Omit<
-  HTMLAttributes<HTMLDivElement>,
+  HTMLAttributes<HTMLDialogElement>,
   'title'
 > {
   children: ReactNode;
@@ -64,7 +64,7 @@ export interface PopupSheetProps extends Omit<
  * скрыта от скринридера, скролл заблокирован. Закрытый лист в DOM не остаётся —
  * иначе его содержимое ловило бы Tab и читалось скринридером.
  */
-const PopupSheetFrame = forwardRef<HTMLDivElement, PopupSheetProps>(
+const PopupSheetFrame = forwardRef<HTMLDialogElement, PopupSheetProps>(
   function PopupSheetFrame(
     {
       children,
@@ -81,7 +81,7 @@ const PopupSheetFrame = forwardRef<HTMLDivElement, PopupSheetProps>(
   ) {
     const titleId = useId();
     const nodeId = useFloatingNodeId();
-    const sheetRef = useRef<HTMLDivElement>(null);
+    const sheetRef = useRef<HTMLDialogElement>(null);
     const [open, setOpen] = useControllableState(
       openProp,
       defaultOpen,
@@ -141,12 +141,12 @@ const PopupSheetFrame = forwardRef<HTMLDivElement, PopupSheetProps>(
               Array.from(document.querySelectorAll(POPUP_SHEET_PORTAL_SELECTOR))
             }
           >
-            <div
+            {/* Без showModal() диалог не модален: ловушку держит FloatingFocusManager. */}
+            <dialog
+              open
               ref={setSheetRef}
               {...getFloatingProps(props)}
               {...portalProps}
-              // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- <dialog> без showModal() не даёт ни top layer, ни inert: модальность держит FloatingFocusManager
-              role="dialog"
               aria-modal="true"
               tabIndex={-1}
               data-state={status === 'open' ? 'open' : 'closed'}
@@ -175,7 +175,7 @@ const PopupSheetFrame = forwardRef<HTMLDivElement, PopupSheetProps>(
                   </Button>
                 ) : null}
               </div>
-            </div>
+            </dialog>
           </FloatingFocusManager>
         </Portal>
       </FloatingNode>
@@ -183,7 +183,7 @@ const PopupSheetFrame = forwardRef<HTMLDivElement, PopupSheetProps>(
   },
 );
 
-export const PopupSheet = forwardRef<HTMLDivElement, PopupSheetProps>(
+export const PopupSheet = forwardRef<HTMLDialogElement, PopupSheetProps>(
   function PopupSheet(props, ref) {
     return (
       <FloatingLayerTree>

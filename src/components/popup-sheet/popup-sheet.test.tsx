@@ -129,13 +129,17 @@ describe('PopupSheet', () => {
 
     const trigger = screen.getByRole('button', { name: 'Открыть' });
     await user.click(trigger);
-    const dialog = await screen.findByRole('dialog');
+    const dialog = await sheetReady();
     const portal = portalOf(dialog);
 
     for (let step = 0; step < 4; step += 1) {
       await user.tab();
+      // Конечный focus guard возвращает фокус на лист через rAF. Пока кадр не
+      // прошёл, фокус на guard или за его пределами; ждём, как пользователь.
+      await waitFor(() => {
+        expect(portal).toContainElement(document.activeElement as HTMLElement);
+      });
       expect(trigger).not.toHaveFocus();
-      expect(portal).toContainElement(document.activeElement as HTMLElement);
     }
   });
 
@@ -255,7 +259,7 @@ describe('PopupSheet', () => {
   });
 
   it('отдаёт ref и атрибуты листа', () => {
-    const ref = createRef<HTMLDivElement>();
+    const ref = createRef<HTMLDialogElement>();
     render(
       <PopupSheet
         open
@@ -270,7 +274,7 @@ describe('PopupSheet', () => {
 
     const sheet = screen.getByTestId('sheet');
     expect(sheet).toHaveClass('popup-sheet');
-    expect(sheet).toHaveAttribute('role', 'dialog');
+    expect(sheet.tagName).toBe('DIALOG');
     expect(sheet).toHaveAttribute('aria-modal', 'true');
     expect(sheet).not.toHaveAttribute('title');
     expect(ref.current).toBe(sheet);

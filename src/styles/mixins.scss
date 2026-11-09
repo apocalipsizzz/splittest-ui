@@ -95,3 +95,29 @@ $-length-units: 'px', 'em', 'rem';
   font-weight: var(--font-weight-black);
   line-height: var(--text-xl--line-height);
 }
+
+// Одни и те же стили: :hover, если основной указатель умеет наводиться,
+// иначе :active. Ветки взаимоисключающие, на одном устройстве цвет не
+// попадает в оба состояния. pointer в запрос не кладём — вместе с hover
+// он оставляет дырку: грубый указатель с ховером не красится никак,
+// а (hover: none) + fine не получает :active.
+@mixin hover {
+  @media (hover: hover) {
+    &:hover {
+      @content;
+    }
+  }
+
+  @media (hover: none) {
+    &:active {
+      @content;
+    }
+  }
+}
+
+/* Сбросы стилей */
+@mixin reset-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

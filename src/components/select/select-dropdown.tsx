@@ -179,7 +179,6 @@ export const SelectDropdown = (props: SelectDropdownProps) => {
         {/* listbox, не select: нативный список не умеет ни портал, ни свою разметку пункта */}
         <div
           id={listId}
-          // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- см. комментарий выше
           role="listbox"
           aria-label={labelId ? undefined : accessibleName}
           aria-labelledby={labelId}
@@ -188,14 +187,12 @@ export const SelectDropdown = (props: SelectDropdownProps) => {
             <div className="select__empty">{emptyText}</div>
           ) : (
             options.map((option, index) => (
-              // eslint-disable-next-line jsx-a11y/prefer-tag-over-role, jsx-a11y/click-events-have-key-events -- паттерн aria-activedescendant: фокус остаётся на комбобоксе, клавиши разбирает он
               <div
                 key={option.value}
                 ref={node => {
                   optionRefs.current[index] = node;
                 }}
                 id={`${listId}-option-${index}`}
-                // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- <option> живёт только внутри <select>, а список в портале
                 role="option"
                 tabIndex={-1}
                 aria-selected={option.value === selectedValue}

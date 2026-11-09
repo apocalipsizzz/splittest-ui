@@ -23,13 +23,13 @@ describe('Spinner', () => {
     expect(svg).toHaveAttribute('height', '24');
   });
 
-  it('data-testid садится на обёртку, className не затирает spinner, role остаётся status', () => {
+  it('data-testid садится на обёртку, className не затирает spinner, рендерится как output', () => {
     render(
       <Spinner data-testid="loader" className="extra" role="presentation" />,
     );
     const status = screen.getByTestId('loader');
     expect(status).toHaveClass('spinner', 'extra');
-    expect(status).toHaveAttribute('role', 'status');
+    expect(status.tagName).toBe('OUTPUT');
     expect(status).toHaveAccessibleName('Загрузка');
   });
 

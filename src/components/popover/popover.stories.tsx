@@ -22,7 +22,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
-  render: () => {
+  render: function Render() {
     const [open, setOpen] = useState(false);
 
     return (
@@ -48,7 +48,7 @@ export const Playground: Story = {
 };
 
 export const FlipNearBottom: Story = {
-  render: () => {
+  render: function Render() {
     const [open, setOpen] = useState(false);
 
     return (
@@ -78,7 +78,7 @@ export const FlipNearBottom: Story = {
 };
 
 export const FlipNearTop: Story = {
-  render: () => {
+  render: function Render() {
     const [open, setOpen] = useState(false);
 
     return (
@@ -103,7 +103,7 @@ export const FlipNearTop: Story = {
 };
 
 export const MinWidthOnNarrowTrigger: Story = {
-  render: () => {
+  render: function Render() {
     const [open, setOpen] = useState(false);
 
     return (
@@ -130,7 +130,7 @@ export const MinWidthOnNarrowTrigger: Story = {
 type RowPopoverId = 'save' | 'logout' | 'delete';
 
 export const ThreeButtonsInRow: Story = {
-  render: () => {
+  render: function Render() {
     const [active, setActive] = useState<RowPopoverId | null>(null);
 
     const openOnly = (id: RowPopoverId) => {
@@ -168,7 +168,11 @@ export const ThreeButtonsInRow: Story = {
               title="Выйти?"
               placement="top-start"
               trigger={
-                <Button type="button" variant="link" onClick={() => openOnly('logout')}>
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={() => openOnly('logout')}
+                >
                   Выйти
                 </Button>
               }
@@ -201,7 +205,7 @@ export const ThreeButtonsInRow: Story = {
 };
 
 export const ThreeButtonsInRowAllIndependent: Story = {
-  render: () => {
+  render: function Render() {
     const [openSave, setOpenSave] = useState(false);
     const [openLogout, setOpenLogout] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
@@ -235,7 +239,11 @@ export const ThreeButtonsInRowAllIndependent: Story = {
               onOpenChange={setOpenLogout}
               title="Выйти"
               trigger={
-                <Button type="button" variant="outline" onClick={() => setOpenLogout(true)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setOpenLogout(true)}
+                >
                   Выйти
                 </Button>
               }
@@ -248,7 +256,11 @@ export const ThreeButtonsInRowAllIndependent: Story = {
               onOpenChange={setOpenDelete}
               title="Удалить"
               trigger={
-                <Button type="button" variant="destructive" onClick={() => setOpenDelete(true)}>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => setOpenDelete(true)}
+                >
                   Удалить
                 </Button>
               }

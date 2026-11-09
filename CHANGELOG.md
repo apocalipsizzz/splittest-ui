@@ -1,5 +1,21 @@
 # @de-kit/st-ui
 
+## 0.4.0
+
+### Minor Changes
+
+- Лист `PopupSheet` и диалог `DatePicker` рендерятся как `<dialog open>`, индикатор загрузки `Spinner` — как `<output>`. Модальность по-прежнему держит `FloatingFocusManager`.
+
+  **Ломающее (типы)**
+
+  - Ref `PopupSheet` теперь типизирован как `HTMLDialogElement`, а не `HTMLDivElement`.
+  - `SpinnerProps` наследует атрибуты `HTMLOutputElement`. Роль по умолчанию — `status` от `<output>`; пропс `role` теперь её переопределяет, раньше был зафиксирован.
+
+  **Внутреннее**
+
+  - `Popover` пишет рефы через колбэки, а не читает `refs` в рендере.
+  - Inline `oxlint-disable` убраны. Исключения для ARIA-виджетов `Select` и `WheelColumn` заданы в `.oxlintrc.json`.
+
 ## 0.3.1
 
 ### Patch Changes

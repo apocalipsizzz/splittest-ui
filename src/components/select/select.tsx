@@ -220,7 +220,6 @@ const SelectFrame = forwardRef<HTMLDivElement, SelectProps>(
           <button
             ref={setTriggerRef}
             type="button"
-            // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- комбобокс по APG: кнопка плюс listbox в портале, нативный select так не умеет
             role="combobox"
             aria-expanded={open}
             aria-haspopup="listbox"

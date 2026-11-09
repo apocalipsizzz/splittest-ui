@@ -7,3 +7,4 @@ storybook-static
 .env
 .pnpm-store
 debug-storybook.log
+coverage

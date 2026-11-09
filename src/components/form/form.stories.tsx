@@ -154,3 +154,36 @@ export const Usage: Story = {
     </div>
   ),
 };
+
+export const States: Story = {
+  render: () => (
+    <div style={storyStack}>
+      <LabeledBlock title="Ошибка сервера и отправка">
+        <Labeled label="server error" wide maxWidth={480}>
+          <div style={frame}>
+            <Form error="Сервер не ответил, попробуйте позже">
+              <Field label="Имя" required>
+                <Input name="name" />
+              </Field>
+              <FormActions>
+                <FormSubmit>Отправить</FormSubmit>
+              </FormActions>
+            </Form>
+          </div>
+        </Labeled>
+        <Labeled label="pending" wide maxWidth={480}>
+          <div style={frame}>
+            <Form pending>
+              <Field label="Имя">
+                <Input name="name" disabled />
+              </Field>
+              <FormActions>
+                <FormSubmit>Отправить</FormSubmit>
+              </FormActions>
+            </Form>
+          </div>
+        </Labeled>
+      </LabeledBlock>
+    </div>
+  ),
+};

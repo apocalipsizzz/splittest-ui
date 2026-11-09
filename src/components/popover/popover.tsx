@@ -17,7 +17,8 @@ import {
 import {
   forwardRef,
   isValidElement,
-  useMemo,
+  useCallback,
+  useId,
   type CSSProperties,
   type HTMLAttributes,
   type ReactElement,
@@ -142,6 +143,7 @@ const PopoverFrame = forwardRef<HTMLDivElement, PopoverProps>(
     } as CSSProperties;
 
     const nodeId = useFloatingNodeId();
+    const titleId = useId();
     const { refs, floatingStyles, context } = useFloating({
       nodeId,
       open,
@@ -177,10 +179,16 @@ const PopoverFrame = forwardRef<HTMLDivElement, PopoverProps>(
       role,
       click,
     ]);
-    const setPanelRef = useMergeRefs(
-      // eslint-disable-next-line react/refs -- setFloating это ref-callback, не чтение current
-      useMemo(() => [refs.setFloating, ref], [refs.setFloating, ref]),
+    // Узел пишем через колбэк: refs читаем только внутри него, не в рендере.
+    const setFloatingNode = useCallback(
+      (node: HTMLElement | null) => refs.setFloating(node),
+      [refs],
     );
+    const setReferenceNode = useCallback(
+      (node: HTMLElement | null) => refs.setReference(node),
+      [refs],
+    );
+    const setPanelRef = useMergeRefs([setFloatingNode, ref]);
 
     if (!isValidElement(trigger)) {
       throw new Error('Popover: trigger — один React-элемент.');
@@ -193,7 +201,7 @@ const PopoverFrame = forwardRef<HTMLDivElement, PopoverProps>(
     return (
       <FloatingNode id={nodeId}>
         <Slot
-          ref={refs.setReference}
+          ref={setReferenceNode}
           className={cn('popover-trigger', triggerClassName)}
           {...getReferenceProps({
             'aria-expanded': open,
@@ -209,12 +217,17 @@ const PopoverFrame = forwardRef<HTMLDivElement, PopoverProps>(
                 {...getFloatingProps(props)}
                 {...portalProps}
                 ref={setPanelRef}
+                aria-labelledby={title ? titleId : undefined}
                 data-state="open"
                 className={cn('popover', className)}
                 style={{ ...style, ...floatingStyles, ...panelSizeStyle }}
               >
                 <div className={cn('popover__inner', contentClassName)}>
-                  {title ? <h4 className="popover__title">{title}</h4> : null}
+                  {title ? (
+                    <h4 id={titleId} className="popover__title">
+                      {title}
+                    </h4>
+                  ) : null}
                   <div className="popover__content">{children}</div>
                   <Button
                     className="popover__close"

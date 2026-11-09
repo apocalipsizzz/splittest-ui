@@ -18,7 +18,7 @@ export type SpinnerPosition =
   (typeof spinnerPosition)[keyof typeof spinnerPosition];
 
 export interface SpinnerProps extends Omit<
-  HTMLAttributes<HTMLDivElement>,
+  HTMLAttributes<HTMLOutputElement>,
   'size' | 'position'
 > {
   size?: number;
@@ -63,10 +63,8 @@ export const Spinner: FC<SpinnerProps> = ({
   const labelId = useId();
 
   return (
-    <div
+    <output
       {...props}
-      // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- live region, не <output>
-      role="status"
       aria-labelledby={labelId}
       className={cn(
         'spinner',
@@ -82,6 +80,6 @@ export const Spinner: FC<SpinnerProps> = ({
           <Dot key={index} index={index} />
         ))}
       </svg>
-    </div>
+    </output>
   );
 };

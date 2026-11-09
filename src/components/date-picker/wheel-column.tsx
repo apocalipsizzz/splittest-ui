@@ -143,7 +143,6 @@ export const WheelColumn = ({
       <div
         ref={listRef}
         // У колеса нет нативного тега; spinbutton — ближайшая роль с aria-valuenow.
-        // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role
         role="spinbutton"
         aria-label={label}
         aria-valuemin={items[0]?.value}

@@ -153,14 +153,7 @@ const meta = {
   argTypes: {
     variant: {
       control: 'inline-radio',
-      options: [
-        'default',
-        'outline',
-        'link',
-        'destructive',
-        'image',
-        'icon',
-      ],
+      options: ['default', 'outline', 'link', 'destructive', 'image', 'icon'],
     },
     size: {
       control: 'inline-radio',

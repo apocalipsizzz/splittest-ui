@@ -1,6 +1,6 @@
 {
   "name": "@de-kit/st-ui",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "React-компоненты splittest: глобальный SCSS и токены из основного фронтенда",
   "license": "UNLICENSED",
   "repository": {
@@ -74,8 +74,9 @@
     "format:fix": "oxfmt",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "check:exports": "publint && attw --pack . --profile node16 --exclude-entrypoints global.scss reset.scss vars.scss mixins.scss typography.scss",
-    "verify": "pnpm run build:icons && pnpm run typecheck && pnpm run lint && node scripts/sync-tokens-doc.mjs --check && pnpm run test && pnpm run build && pnpm run check:exports",
+    "verify": "pnpm run build:icons && pnpm run typecheck && pnpm run lint && pnpm run format && node scripts/sync-tokens-doc.mjs --check && pnpm run test:coverage && pnpm run build && pnpm run check:exports",
     "changeset": "changeset",
     "version": "changeset version",
     "release": "pnpm run verify && changeset publish",
@@ -101,6 +102,8 @@
     "@types/react-dom": "^19.3.0",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@vitejs/plugin-react": "^6.1.2",
+    "@vitest/coverage-v8": "5.0.5",
+    "axe-core": "^4.14.0",
     "jsdom": "^30.1.3",
     "oxfmt": "^0.74.0",
     "oxlint": "^1.89.0",
@@ -120,13 +123,13 @@
     "react-dom": "^18.3.0 || ^19.0.0",
     "sass": "^1.0.0"
   },
-  "engines": {
-    "node": ">=20"
-  },
-  "packageManager": "pnpm@11.15.1",
   "peerDependenciesMeta": {
     "sass": {
       "optional": true
     }
-  }
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@11.15.1"
 }

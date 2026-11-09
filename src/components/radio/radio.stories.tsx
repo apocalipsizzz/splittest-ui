@@ -170,3 +170,32 @@ export const Usage: Story = {
     </div>
   ),
 };
+
+export const WithHint: Story = {
+  render: () => (
+    <div style={storyStack}>
+      <LabeledBlock title="Подсказка и ошибка группы">
+        <Labeled label="hint" wide maxWidth={360}>
+          <RadioGroup
+            label="Доставка"
+            name="hint-delivery"
+            hint="Срок — до 5 дней"
+          >
+            <RadioInput value="courier" label="Курьер" />
+            <RadioInput value="post" label="Почта" />
+          </RadioGroup>
+        </Labeled>
+        <Labeled label="error" wide maxWidth={360}>
+          <RadioGroup
+            label="Оплата"
+            name="error-payment"
+            error="Выберите способ оплаты"
+          >
+            <RadioInput value="card" label="Картой" />
+            <RadioInput value="cash" label="Наличными" />
+          </RadioGroup>
+        </Labeled>
+      </LabeledBlock>
+    </div>
+  ),
+};

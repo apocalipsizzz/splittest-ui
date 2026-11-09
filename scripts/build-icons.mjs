@@ -304,7 +304,9 @@ for (const file of readdirSync(svgDir).sort()) {
   }
 
   const kind = kindOf(stem);
-  let source = readFileSync(join(svgDir, file), 'utf8');
+  // Переводы строк в SVG нормализуем до разбора: git на Windows с autocrlf
+  // отдаёт CRLF, и без этого `d` в .tsx получает `\r\n` вместо `\n`.
+  let source = readFileSync(join(svgDir, file), 'utf8').replace(/\r\n?/g, '\n');
   if (kind === 'illustration') {
     source = source.replace(
       /stroke=['"]#(?:000000|000)['"]/gi,

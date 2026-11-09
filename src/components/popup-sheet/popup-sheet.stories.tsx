@@ -21,7 +21,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
-  render: () => {
+  render: function Render() {
     const [open, setOpen] = useState(false);
 
     return (
@@ -73,4 +73,46 @@ export const Usage: Story = {
       </LabeledBlock>
     </div>
   ),
+};
+
+export const WithoutTitle: Story = {
+  render: function Render() {
+    const [open, setOpen] = useState(false);
+
+    return (
+      <>
+        <Button type="button" onClick={() => setOpen(true)}>
+          Открыть без заголовка
+        </Button>
+        <PopupSheet open={open} onClose={() => setOpen(false)}>
+          <p>Без заголовка у диалога нет имени: передайте aria-label.</p>
+          <Button type="button" onClick={() => setOpen(false)}>
+            Готово
+          </Button>
+        </PopupSheet>
+      </>
+    );
+  },
+};
+
+export const LongContent: Story = {
+  render: function Render() {
+    const [open, setOpen] = useState(false);
+
+    return (
+      <>
+        <Button type="button" onClick={() => setOpen(true)}>
+          Открыть с длинным текстом
+        </Button>
+        <PopupSheet open={open} onClose={() => setOpen(false)} title="Условия">
+          {Array.from({ length: 30 }, (_, i) => (
+            <p key={i}>
+              Пункт {i + 1}: длинный текст, который должен скроллиться внутри
+              листа.
+            </p>
+          ))}
+        </PopupSheet>
+      </>
+    );
+  },
 };

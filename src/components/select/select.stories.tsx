@@ -157,3 +157,37 @@ export const Usage: Story = {
     </div>
   ),
 };
+
+export const WithHint: Story = {
+  render: function Render() {
+    const [value, setValue] = useState<string | null>(null);
+
+    return (
+      <div style={storyStack}>
+        <LabeledBlock title="Подсказка, ошибка и размер поля">
+          <Labeled label="hint" wide maxWidth={360}>
+            <Field label="Город" hint="Где вы живёте сейчас">
+              <Select
+                options={CITIES}
+                value={value}
+                onChange={setValue}
+                placeholder="Выберите город"
+              />
+            </Field>
+          </Labeled>
+          <Labeled label="error" wide maxWidth={360}>
+            <Field label="Город" error="Выберите город из списка">
+              <Select
+                options={CITIES}
+                value={value}
+                onChange={setValue}
+                error
+                placeholder="Выберите город"
+              />
+            </Field>
+          </Labeled>
+        </LabeledBlock>
+      </div>
+    );
+  },
+};

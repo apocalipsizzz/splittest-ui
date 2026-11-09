@@ -13,7 +13,7 @@
 
 ## Что уже есть
 
-`Button`, `Input`, `TextArea`, `CheckboxInput`, `RadioInput`, `Spinner`, иконки (`@de-kit/st-ui/icons`).
+`Button`, `Input`, `TextArea`, `CheckboxInput`, `RadioGroup`/`RadioInput`, `Select`, `SelectSearch`, `DatePicker`, `PhoneInput`, `Field`/`FieldList`, `Form`, `Popover`, `PopupSheet`, `Spinner`, `HR`, иконки (`@de-kit/st-ui/icons`). Всего 15 компонентов. Тесты, сторис и axe-проверка (`src/test/a11y.test.tsx`) покрывают их все.
 
 Визуал снят с `src/shared/components/*`. Отличия от приложения:
 
@@ -48,3 +48,7 @@
 Не тащить сюда виджеты с redux, роутером и API (`heatmap`, галереи, dropzone, navbar). Имеет смысл вынести самодостаточные: `Modal`, `Popup`, `Pagination`, `Select` — у модалки сейчас завязка на `react-transition-group`, `Portal` и хелперы `shared/helpers`.
 
 Публичный API — `src/index.ts` и `src/icons/index.ts`.
+
+## Линт и исключения
+
+Inline `oxlint-disable` в коде не используем. Нативный тег или рабочий паттерн — предпочтительнее. Исключения, которых нет в HTML (`combobox`, `listbox`, `option` в портале, `spinbutton` колеса), задаём в `.oxlintrc.json` для `src/components/select/**` и `wheel-column.tsx`. Клик по пункту `Select` исключён из `click-events-have-key-events`: активация через `element.click()` и мобильные скринридеры идёт именно по нему.

@@ -179,7 +179,7 @@ const DatePickerFrame = forwardRef<HTMLDivElement, DatePickerProps>(
       clampParts(partsOf(value ?? maxBirth), maxBirth),
     );
     const focusOnMount = useRef(false);
-    const sheetRef = useRef<HTMLDivElement | null>(null);
+    const sheetRef = useRef<HTMLDialogElement | null>(null);
     const titleId = useId();
     const nodeId = useFloatingNodeId();
     const { refs, context } = useFloating({
@@ -198,7 +198,7 @@ const DatePickerFrame = forwardRef<HTMLDivElement, DatePickerProps>(
     const { getFloatingProps } = useInteractions([dismiss]);
     const { setFloating, setReference } = refs;
     const setSheetRef = useCallback(
-      (node: HTMLDivElement | null) => {
+      (node: HTMLDialogElement | null) => {
         setFloating(node);
         sheetRef.current = node;
         if (!node || !focusOnMount.current) return;
@@ -284,8 +284,8 @@ const DatePickerFrame = forwardRef<HTMLDivElement, DatePickerProps>(
             onPaste={event => event.preventDefault()}
             inputMode="none"
             autoComplete="off"
-            aria-haspopup="dialog"
-            aria-expanded={open}
+            // Текстовое поле не поддерживает aria-expanded и aria-haspopup (axe):
+            // состояние листа объявляет сам модальный диалог при открытии.
             placeholder={placeholder}
             disabled={disabled}
             error={error}
@@ -309,18 +309,19 @@ const DatePickerFrame = forwardRef<HTMLDivElement, DatePickerProps>(
                   useDismiss сюда не достаёт: вуаль лежит в том же портале,
                   что и лист, и для него не «снаружи».
                 */}
-                {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- aria-hidden, дублирует Escape и «Отмена» */}
-                <div
+                {/* Кнопка без своей табуляции: aria-hidden, дублирует Escape и «Отмена». */}
+                <button
+                  type="button"
+                  tabIndex={-1}
                   className="date-picker__mask"
                   aria-hidden="true"
                   onClick={close}
                 />
                 <FloatingFocusManager context={context} modal initialFocus={-1}>
-                  <div
+                  <dialog
+                    open
                     {...getFloatingProps()}
                     ref={setSheetRef}
-                    // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- <dialog> без showModal() не модален: ловушку держит FloatingFocusManager
-                    role="dialog"
                     aria-modal="true"
                     aria-labelledby={titleId}
                     tabIndex={-1}
@@ -381,7 +382,7 @@ const DatePickerFrame = forwardRef<HTMLDivElement, DatePickerProps>(
                         {cancelLabel}
                       </Button>
                     </div>
-                  </div>
+                  </dialog>
                 </FloatingFocusManager>
               </div>
             </Portal>

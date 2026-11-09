@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { CodeBlock } from '@/stories/code-block';
 import { Labeled, LabeledBlock } from '@/stories/labeled';
+import { Field } from '@/components/field';
 import { storyStack } from '@/stories/story-stack';
 import { CheckboxInput } from './checkbox';
 
@@ -76,6 +77,7 @@ function ConsentField() {
 
 const selectAllExample = `import { useState } from 'react';
 import { CheckboxInput } from '@de-kit/st-ui';
+import { Field } from '@/components/field';
 
 const items = ['Почта', 'Телефон', 'Чат'];
 
@@ -118,6 +120,25 @@ export const Usage: Story = {
         </Labeled>
         <Labeled label="Выбрать все с indeterminate" wide maxWidth={720}>
           <CodeBlock code={selectAllExample} />
+        </Labeled>
+      </LabeledBlock>
+    </div>
+  ),
+};
+
+export const WithHint: Story = {
+  render: () => (
+    <div style={storyStack}>
+      <LabeledBlock title="Подсказка и ошибка через Field">
+        <Labeled label="hint" wide maxWidth={360}>
+          <Field hint="Ссылка откроется в новой вкладке">
+            <CheckboxInput label="Принимаю условия" />
+          </Field>
+        </Labeled>
+        <Labeled label="hint + error" wide maxWidth={360}>
+          <Field hint="Нужно для отправки" error="Отметьте, чтобы продолжить">
+            <CheckboxInput label="Подписываюсь на рассылку" />
+          </Field>
         </Labeled>
       </LabeledBlock>
     </div>

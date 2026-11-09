@@ -8,5 +8,5 @@
   "quoteProps": "consistent",
   "arrowParens": "avoid",
   "trailingComma": "all",
-  "ignorePatterns": ["dist", "storybook-static", "pnpm-lock.yaml"]
+  "ignorePatterns": ["dist", "storybook-static", "pnpm-lock.yaml", "README.md"]
 }

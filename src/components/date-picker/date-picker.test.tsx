@@ -237,7 +237,7 @@ describe('DatePicker', () => {
 
     const mask = document.querySelector('.date-picker__mask');
     expect(mask).toHaveAttribute('aria-hidden', 'true');
-    expect(mask?.tagName).toBe('DIV');
+    expect(mask?.tagName).toBe('BUTTON');
     expect(screen.queryByRole('button', { name: 'Закрыть' })).toBeNull();
   });
 

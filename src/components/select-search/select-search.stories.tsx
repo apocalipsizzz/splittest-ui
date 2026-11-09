@@ -127,3 +127,37 @@ export const Usage: Story = {
     </div>
   ),
 };
+
+export const WithHint: Story = {
+  render: function Render() {
+    const [value, setValue] = useState<string | null>(null);
+
+    return (
+      <div style={storyStack}>
+        <LabeledBlock title="Подсказка и ошибка через Field">
+          <Labeled label="hint" wide maxWidth={360}>
+            <Field label="Банк" hint="Начните вводить название">
+              <SelectSearch
+                options={BANKS}
+                value={value}
+                onChange={setValue}
+                placeholder="Выберите банк"
+              />
+            </Field>
+          </Labeled>
+          <Labeled label="error" wide maxWidth={360}>
+            <Field label="Банк" error="Банк не выбран">
+              <SelectSearch
+                options={BANKS}
+                value={value}
+                onChange={setValue}
+                error
+                placeholder="Выберите банк"
+              />
+            </Field>
+          </Labeled>
+        </LabeledBlock>
+      </div>
+    );
+  },
+};
