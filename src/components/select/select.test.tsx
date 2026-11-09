@@ -242,6 +242,25 @@ describe('Select', () => {
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
   });
 
+  it('renderValue рисует выбранное значение на кнопке, список остаётся по label', async () => {
+    const user = userEvent.setup();
+    render(
+      <Select
+        options={OPTIONS}
+        value="msk"
+        renderValue={option => <span>город: {option.label}</span>}
+      />,
+    );
+
+    expect(trigger()).toHaveTextContent('город: Москва');
+
+    await user.click(trigger());
+
+    expect(
+      await screen.findByRole('option', { name: 'Москва' }),
+    ).toBeInTheDocument();
+  });
+
   it('renderOption рисует свою разметку, поиск остаётся по label', async () => {
     const user = userEvent.setup();
     render(

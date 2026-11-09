@@ -22,6 +22,36 @@ describe('PhoneInput', () => {
     );
   });
 
+  it('не принимает 7 и 8 первой цифрой номера', async () => {
+    const onAccept = vi.fn<(value: string, unmasked: string) => void>();
+
+    const { unmount } = render(
+      <PhoneInput placeholder="Телефон" onAccept={onAccept} />,
+    );
+    await userEvent.type(screen.getByPlaceholderText('Телефон'), '89991234567');
+
+    expect(screen.getByPlaceholderText<HTMLInputElement>('Телефон').value).toBe(
+      '+7 (999) 123-45-67',
+    );
+    expect(onAccept).toHaveBeenLastCalledWith(
+      '+7 (999) 123-45-67',
+      '9991234567',
+    );
+
+    unmount();
+    onAccept.mockClear();
+    render(<PhoneInput placeholder="Телефон" onAccept={onAccept} />);
+    await userEvent.type(screen.getByPlaceholderText('Телефон'), '79991234567');
+
+    expect(screen.getByPlaceholderText<HTMLInputElement>('Телефон').value).toBe(
+      '+7 (999) 123-45-67',
+    );
+    expect(onAccept).toHaveBeenLastCalledWith(
+      '+7 (999) 123-45-67',
+      '9991234567',
+    );
+  });
+
   it('без placeholder показывает маску из цифр-подчёркиваний', () => {
     render(<PhoneInput />);
 

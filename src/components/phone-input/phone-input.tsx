@@ -17,13 +17,24 @@ import { composeRefs } from '@/lib/compose-refs';
 import { emitInputValue } from '@/lib/emit-input-value';
 import '../input/input.scss';
 
-export const PHONE_MASK = '+7 (000) 000-00-00';
+/**
+ * Российский номер. Первая цифра — `#`, не `0`: 7 и 8 в неё не входят.
+ * Иначе набор «8999…» становится `+7 (899) 9…`, последняя цифра отрезается
+ * и СМС уходит на другой номер. Набранная в начале 7 остаётся кодом страны.
+ */
+export const PHONE_MASK = '+7 (#00) 000-00-00';
+
+/** Как в прежней маске: 0–6 и 9. 7 — код страны, 8 — междугородний префикс. */
+const PHONE_DEFINITIONS = {
+  '#': /[01234569]/,
+};
 
 /**
- * Плейсхолдер в виде маски: цифры маски заменяются на «_», литералы остаются.
- * Это атрибут placeholder, а не значение, поэтому required и FormData не меняются.
+ * Плейсхолдер в виде маски: слоты цифр (`0`, `9`, `#`) заменяются на «_»,
+ * литералы остаются. Это атрибут placeholder, а не значение, поэтому
+ * required и FormData не меняются.
  */
-export const maskPlaceholder = (mask: string) => mask.replace(/[09]/g, '_');
+export const maskPlaceholder = (mask: string) => mask.replace(/[09#]/g, '_');
 
 export interface PhoneInputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
@@ -128,6 +139,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
           inputMode="tel"
           autoComplete="tel"
           mask={mask}
+          {...(mask === PHONE_MASK ? { definitions: PHONE_DEFINITIONS } : {})}
           inputRef={setRef}
           value={value}
           defaultValue={defaultValue}

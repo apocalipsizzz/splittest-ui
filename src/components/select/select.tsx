@@ -60,10 +60,15 @@ export interface SelectProps extends Omit<
   /** Открытие и закрытие списка. */
   onOpenChange?: (open: boolean) => void;
   /**
-   * Своя разметка пункта. `label` при этом остаётся строкой: по нему идут
-   * поиск с клавиатуры и подпись на кнопке.
+   * Своя разметка пункта списка. `label` остаётся строкой: по нему идёт
+   * поиск с клавиатуры.
    */
   renderOption?: (option: SelectOption) => ReactNode;
+  /**
+   * Своя разметка выбранного значения на кнопке.
+   * Без неё кнопка показывает `label`.
+   */
+  renderValue?: (option: SelectOption) => ReactNode;
 }
 
 /**
@@ -88,6 +93,7 @@ const SelectFrame = forwardRef<HTMLDivElement, SelectProps>(
       emptyText = 'Нет вариантов',
       onOpenChange,
       renderOption,
+      renderValue,
       ...rest
     } = props;
 
@@ -243,7 +249,9 @@ const SelectFrame = forwardRef<HTMLDivElement, SelectProps>(
             )}
           >
             <span className="select__value">
-              {selected?.label ?? placeholder}
+              {selected
+                ? (renderValue?.(selected) ?? selected.label)
+                : placeholder}
             </span>
             <IconDrop className="select__arrow" />
           </button>
