@@ -36,6 +36,14 @@ export {
   type FormProps,
 } from './components/form';
 export { DatePicker, type DatePickerProps } from './components/date-picker';
+export {
+  Dropzone,
+  dropzonePreset,
+  type DropzoneAccept,
+  type DropzonePreset,
+  type DropzoneProps,
+  type DropzoneVariant,
+} from './components/dropzone';
 export { HR, type HRProps } from './components/hr';
 export { Input, type InputProps, type InputSize } from './components/input';
 export {
@@ -64,6 +72,7 @@ export {
   PopupSheet,
   type PopupSheetProps,
 } from './components/popup-sheet';
+export { Progress, type ProgressProps } from './components/progress';
 export {
   Spinner,
   type SpinnerPosition,

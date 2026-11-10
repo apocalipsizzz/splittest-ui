@@ -1,5 +1,13 @@
 # @de-kit/st-ui
 
+## 0.4.1
+
+### Patch Changes
+
+- Добавлен `Dropzone`: выбор файла кликом и перетаскиванием. Пресеты `image`, `video` и `audio` или свой `accept`. `square` — медиа, `wide` — вложение в форме. Лимит размера и прочие проверки задаёт потребитель через `maxSize` и `validate`, превью рисует он же.
+
+  Добавлен `Progress`: полоска без подписи. Трек и заливка задаются `--progress-track` и `--progress-value`.
+
 ## 0.4.0
 
 ### Minor Changes

@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { Button } from '@/components/button';
 import { CheckboxInput } from '@/components/checkbox';
 import { DatePicker } from '@/components/date-picker';
+import { Dropzone } from '@/components/dropzone';
 import { Field } from '@/components/field';
 import { Form, FormActions, FormSubmit } from '@/components/form';
 import { HR } from '@/components/hr';
@@ -13,6 +14,7 @@ import { Input } from '@/components/input';
 import { PhoneInput } from '@/components/phone-input';
 import { Popover } from '@/components/popover';
 import { PopupSheet } from '@/components/popup-sheet';
+import { Progress } from '@/components/progress';
 import { RadioGroup, RadioInput } from '@/components/radio';
 import { Select } from '@/components/select';
 import { SelectSearch } from '@/components/select-search';
@@ -97,11 +99,41 @@ describe('доступность компонентов (axe)', () => {
     expect(await axeViolations()).toEqual([]);
   });
 
+  it('Dropzone: пустая зона, ошибка, прогресс и превью', async () => {
+    render(
+      <>
+        <Dropzone label="Фото" accept="image" onFiles={() => {}} />
+        <Dropzone
+          label="Аудио"
+          accept="audio"
+          error="Файл слишком большой"
+          onFiles={() => {}}
+        />
+        <Dropzone
+          label="Видео"
+          accept="video"
+          progress={40}
+          progressLabel="Загрузка: 40%"
+          onFiles={() => {}}
+        />
+        <Dropzone
+          label="Фото 1"
+          accept="image"
+          preview={<img src="/photo.png" alt="Загруженное фото" />}
+          onClear={() => {}}
+          onFiles={() => {}}
+        />
+      </>,
+    );
+    expect(await axeViolations()).toEqual([]);
+  });
+
   it('Spinner и HR', async () => {
     render(
       <>
         <Spinner />
         <HR />
+        <Progress value={40} aria-label="Загрузка: 40%" />
       </>,
     );
     expect(await axeViolations()).toEqual([]);
