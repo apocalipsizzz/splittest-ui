@@ -73,7 +73,6 @@
 
   &:focus-within:not(&--disabled) {
     outline: var(--focus-ring-width) solid var(--focus-ring-color);
-    outline-offset: var(--focus-ring-offset);
   }
 
   &--disabled {
