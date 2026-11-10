@@ -130,6 +130,8 @@ import { Button } from '@de-kit/st-ui/components/button';
 | `--text-3xl--line-height` | `40px` |
 | `--text-4xl` | `45px` |
 | `--text-4xl--line-height` | `50px` |
+| `--text-5xl` | `55px` |
+| `--text-5xl--line-height` | `60px` |
 
 **Отступы**
 
