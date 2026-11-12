@@ -235,7 +235,7 @@ const SelectFrame = forwardRef<HTMLDivElement, SelectProps>(
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             {...controlProps}
-            id={field?.id ?? id}
+            id={id ?? field?.id}
             data-state={open ? 'open' : 'closed'}
             data-invalid={isInvalid || undefined}
             data-disabled={disabled || undefined}

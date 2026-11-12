@@ -87,6 +87,7 @@ export const Dropzone = forwardRef<HTMLDivElement, DropzoneProps>(
       clearLabel = 'Удалить файл',
       children,
       className,
+      id,
       ...props
     },
     ref,
@@ -118,7 +119,8 @@ export const Dropzone = forwardRef<HTMLDivElement, DropzoneProps>(
       errorId,
       nativeRequired: false,
     });
-    const inputId = field?.id ?? ownId;
+    // Свой id важнее id поля и не остаётся на корне: иначе лейбл бьёт мимо инпута.
+    const inputId = id ?? field?.id ?? ownId;
     const labelId = label ? `${inputId}-label` : undefined;
     const progressText =
       progressLabel ??

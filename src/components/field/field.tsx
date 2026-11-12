@@ -41,8 +41,8 @@ export interface FieldProps extends HTMLAttributes<HTMLDivElement> {
   requiredMessage?: ReactNode;
   /**
    * Один контрол без своего id берёт id поля.
-   * `CheckboxInput` со своим `id` его сохраняет: иначе несколько чекбоксов
-   * в одном Field получают одинаковый, и лейбл бьёт в первый.
+   * Свой `id` контрол сохраняет: иначе несколько контролов в одном Field
+   * получают одинаковый, и лейбл бьёт в первый.
    */
   children: ReactNode;
 }

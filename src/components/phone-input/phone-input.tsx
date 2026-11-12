@@ -59,8 +59,9 @@ export interface PhoneInputProps extends Omit<
 }
 
 /**
- * Телефон на react-imask. Внутри `Field` берёт id, required и ошибку у поля,
- * а в `reportValue` отдаёт цифры, чтобы пустое значение считалось пустым.
+ * Телефон на react-imask. Внутри `Field` берёт required и ошибку у поля.
+ * Свой `id` важнее id поля. В `reportValue` уходят цифры, чтобы пустое
+ * значение считалось пустым.
  */
 export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
   function PhoneInput(
@@ -147,7 +148,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
           disabled={disabled}
           readOnly={readOnly}
           {...controlProps}
-          {...(field ? { id: field.id } : { id })}
+          id={id ?? field?.id}
           className={cn(
             'input',
             className,

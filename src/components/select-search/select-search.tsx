@@ -287,7 +287,7 @@ const SelectSearchFrame = forwardRef<HTMLDivElement, SelectSearchProps>(
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
             {...controlProps}
-            id={field?.id ?? id}
+            id={id ?? field?.id}
             data-state={open ? 'open' : 'closed'}
             data-invalid={isInvalid || undefined}
             data-disabled={disabled || undefined}

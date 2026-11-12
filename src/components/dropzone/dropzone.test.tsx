@@ -248,6 +248,18 @@ describe('Dropzone', () => {
     expect(input).toHaveAttribute('aria-errormessage');
   });
 
+  it('свой id уходит на инпут файла, не на корень', () => {
+    render(
+      <Field label="Вложение">
+        <Dropzone id="file" data-testid="zone" onFiles={() => {}} />
+      </Field>,
+    );
+
+    const input = document.getElementById('file');
+    expect(input).toHaveAttribute('type', 'file');
+    expect(screen.getByTestId('zone')).not.toHaveAttribute('id');
+  });
+
   it('multiple: чужой файл в пачке отклоняет всю пачку', async () => {
     const onFiles = vi.fn<(files: File[]) => void>();
     render(<Dropzone label="Фото" accept="image" multiple onFiles={onFiles} />);

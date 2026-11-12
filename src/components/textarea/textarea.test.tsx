@@ -2,6 +2,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
+import { Field } from '@/components/field';
+
 import { TextArea } from './textarea';
 
 describe('TextArea', () => {
@@ -86,5 +88,15 @@ describe('TextArea', () => {
 
     rerender(<TextArea size="lg" placeholder="Текст" />);
     expect(screen.getByPlaceholderText('Текст')).toHaveClass('textarea--lg');
+  });
+
+  it('свой id важнее id поля', () => {
+    render(
+      <Field label="Комментарий">
+        <TextArea id="note" aria-label="заметка" />
+      </Field>,
+    );
+
+    expect(screen.getByLabelText('заметка')).toHaveAttribute('id', 'note');
   });
 });

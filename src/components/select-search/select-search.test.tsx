@@ -267,4 +267,14 @@ describe('SelectSearch', () => {
     expect(screen.getByRole('combobox')).toHaveAttribute('id', 'city');
     expect(ref.current).toBe(root);
   });
+
+  it('свой id важнее id поля', () => {
+    render(
+      <Field label="Город">
+        <SelectSearch id="city" options={OPTIONS} />
+      </Field>,
+    );
+
+    expect(screen.getByRole('combobox')).toHaveAttribute('id', 'city');
+  });
 });

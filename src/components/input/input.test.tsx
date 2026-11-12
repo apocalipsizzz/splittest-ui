@@ -3,6 +3,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { Field } from '@/components/field';
+
 import { Input } from './input';
 
 describe('Input', () => {
@@ -112,6 +114,27 @@ describe('Input', () => {
     expect(
       screen.getByRole('button', { name: 'Очистить' }),
     ).toBeInTheDocument();
+  });
+
+  it('свой id важнее id поля', () => {
+    render(
+      <Field label="Код">
+        {['0', '1', '2', '3'].map(index => (
+          <Input
+            key={index}
+            id={`${index}-sms`}
+            aria-label={`цифра ${index}`}
+          />
+        ))}
+      </Field>,
+    );
+
+    for (const index of ['0', '1', '2', '3']) {
+      expect(screen.getByLabelText(`цифра ${index}`)).toHaveAttribute(
+        'id',
+        `${index}-sms`,
+      );
+    }
   });
 
   it('size ставит модификатор, md — без класса, нативный size не уезжает в DOM', () => {

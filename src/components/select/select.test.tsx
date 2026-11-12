@@ -315,4 +315,14 @@ describe('Select', () => {
 
     expect(onChange).toHaveBeenCalledWith('spb');
   });
+
+  it('свой id важнее id поля', () => {
+    render(
+      <Field label="Город">
+        <Select id="city" options={OPTIONS} />
+      </Field>,
+    );
+
+    expect(screen.getByRole('combobox')).toHaveAttribute('id', 'city');
+  });
 });

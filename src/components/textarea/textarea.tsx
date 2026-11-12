@@ -58,7 +58,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     const autoId = useId();
     const { field, isInvalid, controlProps } = useFieldControlProps({ error });
     const reportValue = field?.reportValue;
-    const textareaId = field?.id ?? id ?? autoId;
+    const textareaId = id ?? field?.id ?? autoId;
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [length, setLength] = useState(0);
     const withCounter = maxLength !== undefined && counter;

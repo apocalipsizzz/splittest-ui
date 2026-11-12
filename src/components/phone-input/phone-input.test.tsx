@@ -137,4 +137,14 @@ describe('PhoneInput', () => {
     expect(onSubmit).toHaveBeenCalledOnce();
     expect(onSubmit.mock.calls[0]?.[0].get('phone')).toBe('+7 (999) 123-45-67');
   });
+
+  it('свой id важнее id поля', () => {
+    render(
+      <Field label="Телефон">
+        <PhoneInput id="phone" aria-label="номер" />
+      </Field>,
+    );
+
+    expect(screen.getByLabelText('номер')).toHaveAttribute('id', 'phone');
+  });
 });

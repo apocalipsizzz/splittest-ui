@@ -53,6 +53,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     value,
     defaultValue,
     onChange,
+    id,
     ...props
   },
   ref,
@@ -113,6 +114,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 
   const canClear =
     clearable && !noWrap && !disabled && !readOnly && current !== '';
+  // Свой id важнее id поля: несколько инпутов в одном Field иначе получают один и тот же.
+  const inputId = id ?? field?.id;
 
   const input = (
     <input
@@ -124,7 +127,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       {...(isControlled ? { value } : { defaultValue })}
       onChange={handleChange}
       {...controlProps}
-      {...(field ? { id: field.id } : {})}
+      id={inputId}
       data-invalid={isInvalid || undefined}
       data-disabled={disabled || undefined}
       className={cn(
