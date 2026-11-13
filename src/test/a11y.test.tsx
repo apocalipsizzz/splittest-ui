@@ -130,15 +130,7 @@ describe('доступность компонентов (axe)', () => {
   });
 
   it('Pagination: текущая страница, края и многоточие', async () => {
-    render(
-      <Pagination
-        page={1}
-        pageCount={99}
-        layout="inline"
-        range="regular"
-        onPageChange={() => {}}
-      />,
-    );
+    render(<Pagination page={1} pageCount={99} onPageChange={() => {}} />);
     expect(await axeViolations()).toEqual([]);
   });
 

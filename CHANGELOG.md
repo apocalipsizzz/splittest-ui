@@ -1,5 +1,13 @@
 # @de-kit/st-ui
 
+## 0.4.4
+
+### Patch Changes
+
+- `Pagination` сам выбирает раскладку по ширине экрана. Пропы `layout` и `range` убраны. Из корня больше не экспортируются `getPaginationState`, `paginationRangeCompact`, `paginationRangeRegular`, `PaginationItem`, `PaginationLayout`, `PaginationRange`, `PaginationRangePreset` и `PaginationState`.
+
+  От 680px ряд в одну строку: восемь номеров у края (`1…8 … N`). Уже — пять номеров строкой сверху, «Назад» и «Вперёд» по краям второй. Меньше пяти страниц на узком экране всё остаётся одной строкой, у шагов видны только стрелки, подписи остаются именем кнопки.
+
 ## 0.4.3
 
 ### Patch Changes

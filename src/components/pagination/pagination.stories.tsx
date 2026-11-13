@@ -4,12 +4,7 @@ import { useState } from 'react';
 import { CodeBlock } from '@/stories/code-block';
 import { Labeled, LabeledBlock } from '@/stories/labeled';
 import { storyStack } from '@/stories/story-stack';
-import {
-  Pagination,
-  type PaginationLayout,
-  type PaginationProps,
-  type PaginationRangePreset,
-} from './pagination';
+import { Pagination, type PaginationProps } from './pagination';
 
 function Demo(props: PaginationProps) {
   const { page: initialPage, onPageChange, ...rest } = props;
@@ -33,19 +28,7 @@ const meta = {
   args: {
     page: 1,
     pageCount: 99,
-    layout: 'inline',
-    range: 'regular',
     onPageChange: () => {},
-  },
-  argTypes: {
-    layout: {
-      control: 'inline-radio',
-      options: ['responsive', 'inline', 'stacked'],
-    },
-    range: {
-      control: 'inline-radio',
-      options: ['compact', 'regular'],
-    },
   },
 } satisfies Meta<typeof Pagination>;
 
@@ -53,97 +36,28 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
-  render: args => (
-    <Demo key={`${args.page}-${args.pageCount}-${args.layout}`} {...args} />
-  ),
+  render: args => <Demo key={`${args.page}-${args.pageCount}`} {...args} />,
 };
-
-const layouts = [
-  'inline',
-  'stacked',
-] as const satisfies readonly PaginationLayout[];
 
 const positions = [
   { page: 1, label: 'начало' },
+  { page: 8, label: 'сразу за началом' },
   { page: 50, label: 'середина' },
   { page: 99, label: 'конец' },
 ] as const;
 
-export const Layouts: Story = {
+export const Positions: Story = {
   render: () => (
     <div style={storyStack}>
-      {layouts.map(layout => (
-        <LabeledBlock key={layout} title={layout}>
-          <Labeled
-            label={layout === 'stacked' ? '320px' : 'на всю ширину'}
-            wide
-          >
-            <div style={layout === 'stacked' ? { width: 320 } : undefined}>
-              <Demo
-                page={1}
-                pageCount={99}
-                layout={layout}
-                range={layout === 'stacked' ? 'compact' : 'regular'}
-                aria-label={`Страницы, ${layout}`}
-                onPageChange={() => {}}
-              />
-            </div>
-          </Labeled>
-        </LabeledBlock>
-      ))}
-    </div>
-  ),
-};
-
-const fewCounts = [2, 3, 4] as const;
-
-export const FewPages: Story = {
-  render: () => (
-    <div style={storyStack}>
-      <LabeledBlock title="меньше пяти страниц — только стрелки">
-        {fewCounts.map(pageCount => (
-          <Labeled key={pageCount} label={`${pageCount} стр., 280px`} wide>
-            <div style={{ width: 280 }}>
-              <Demo
-                page={pageCount === 2 ? 2 : 1}
-                pageCount={pageCount}
-                layout="inline"
-                aria-label={`Страницы, ${pageCount}`}
-                onPageChange={() => {}}
-              />
-            </div>
-          </Labeled>
-        ))}
-        <Labeled label="4 стр., stacked 320px" wide>
-          <div style={{ width: 320 }}>
+      <LabeledBlock title="99 страниц">
+        {positions.map(position => (
+          <Labeled key={position.label} label={position.label} wide>
             <Demo
-              page={1}
-              pageCount={4}
-              layout="stacked"
-              aria-label="Страницы, 4, stacked"
+              page={position.page}
+              pageCount={99}
+              aria-label={`Страницы, ${position.label}`}
               onPageChange={() => {}}
             />
-          </div>
-        </Labeled>
-      </LabeledBlock>
-      <LabeledBlock title="пять страниц — на узкой ширине номера сверху">
-        {(
-          [
-            { page: 1, label: 'начало' },
-            { page: 3, label: 'середина' },
-            { page: 5, label: 'конец' },
-          ] as const
-        ).map(item => (
-          <Labeled key={item.label} label={`${item.label}, 320px`} wide>
-            <div style={{ width: 320 }}>
-              <Demo
-                page={item.page}
-                pageCount={5}
-                layout="inline"
-                aria-label={`Страницы, 5, ${item.label}`}
-                onPageChange={() => {}}
-              />
-            </div>
           </Labeled>
         ))}
       </LabeledBlock>
@@ -151,30 +65,23 @@ export const FewPages: Story = {
   ),
 };
 
-const ranges = [
-  'compact',
-  'regular',
-] as const satisfies readonly PaginationRangePreset[];
+const counts = [2, 4, 5, 10, 11] as const;
 
-export const Window: Story = {
+export const PageCounts: Story = {
   render: () => (
     <div style={storyStack}>
-      {ranges.map(range => (
-        <LabeledBlock key={range} title={range}>
-          {positions.map(position => (
-            <Labeled key={position.label} label={position.label} wide>
-              <Demo
-                page={position.page}
-                pageCount={99}
-                layout="inline"
-                range={range}
-                aria-label={`Страницы, ${range}, ${position.label}`}
-                onPageChange={() => {}}
-              />
-            </Labeled>
-          ))}
-        </LabeledBlock>
-      ))}
+      <LabeledBlock title="сколько номеров видно">
+        {counts.map(pageCount => (
+          <Labeled key={pageCount} label={`${pageCount} стр.`} wide>
+            <Demo
+              page={1}
+              pageCount={pageCount}
+              aria-label={`Страницы, ${pageCount}`}
+              onPageChange={() => {}}
+            />
+          </Labeled>
+        ))}
+      </LabeledBlock>
     </div>
   ),
 };
@@ -187,47 +94,24 @@ function ListPager(props: { total: number; limit: number }) {
   const pageCount = Math.ceil(props.total / props.limit);
 
   return (
-    <Pagination
-      page={page}
-      pageCount={pageCount}
-      onPageChange={setPage}
-    />
+    <Pagination page={page} pageCount={pageCount} onPageChange={setPage} />
   );
 }`;
 
-const layoutExample = `import { Pagination } from '@de-kit/st-ui';
-
-// responsive — до 680px номера сверху и compact (1–5 … N),
-// от 680px одна строка и regular (1–8 … N).
+const propsExample = `// Больше пропсов у компонента нет: ряд и раскладку он выбирает сам.
 <Pagination page={page} pageCount={99} onPageChange={setPage} />
 
-// Жёстко, как на макете узкой колонки.
+// Свои подписи шагов — они же имена кнопок для скринридера.
 <Pagination
   page={page}
   pageCount={99}
-  layout="stacked"
-  range="compact"
+  prevLabel="Previous"
+  nextLabel="Next"
   onPageChange={setPage}
 />
 
-// Всегда одна строка, своё окно.
-<Pagination
-  page={page}
-  pageCount={99}
-  layout="inline"
-  range={{
-    showAllUntil: 10,
-    headUntil: 6,
-    headSize: 8,
-    siblingCount: 2,
-    tailFrom: 7,
-  }}
-  onPageChange={setPage}
-/>
-
-// Меньше пяти страниц: текст «Назад»/«Вперёд» скрыт, остаются стрелки.
-// Имя кнопок для скринридера берётся из тех же подписей.
-<Pagination page={page} pageCount={4} onPageChange={setPage} />`;
+// Ряд целиком недоступен, пока грузится страница.
+<Pagination page={page} pageCount={99} disabled onPageChange={setPage} />`;
 
 export const Usage: Story = {
   render: () => (
@@ -236,8 +120,25 @@ export const Usage: Story = {
         <Labeled label="страница и размер выборки" wide maxWidth={720}>
           <CodeBlock code={usageExample} />
         </Labeled>
-        <Labeled label="раскладка и окно номеров" wide maxWidth={720}>
-          <CodeBlock code={layoutExample} />
+        <Labeled label="подписи и disabled" wide maxWidth={720}>
+          <CodeBlock code={propsExample} />
+        </Labeled>
+      </LabeledBlock>
+      <LabeledBlock title="Раскладка">
+        <Labeled label="как компонент решает сам" wide maxWidth={720}>
+          <CodeBlock
+            code={`от 680px — одна строка: ← Назад | 1 2 3 4 5 6 7 8 … 99 | Вперёд →
+
+до 680px и от 5 страниц:
+        1 2 3 4 5 … 99
+← Назад              Вперёд →
+
+до 680px и меньше 5 страниц — одна строка, у шагов только стрелки:
+←   1 2 3 4   →
+
+Ширину компонент берёт у окна, поэтому мобильную раскладку
+видно, если сузить окно браузера, а не колонку вокруг него.`}
+          />
         </Labeled>
       </LabeledBlock>
     </div>

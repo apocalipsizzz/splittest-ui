@@ -6,54 +6,25 @@
 
   box-sizing: border-box;
   width: 100%;
-  container: pagination / inline-size;
 
   &__row {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
-  }
-
-  @include mixins.min-width(md) {
-    .pagination__row {
-      flex-wrap: nowrap;
-    }
-  }
-
-  &--inline &__row {
-    flex-wrap: nowrap;
-  }
-
-  &--stacked &__row {
-    flex-wrap: wrap;
   }
 
   &__list {
     @include mixins.reset-list;
 
     display: flex;
+    // Перенос — страховка: четырёхзначные номера в узкой колонке уедут на
+    // вторую строку, а не в горизонтальный скролл страницы.
     flex-wrap: wrap;
+    flex: 1 1 auto;
     align-items: center;
     justify-content: center;
     gap: var(--space-2);
-  }
-
-  &--responsive &__list {
-    @include mixins.min-width(md) {
-      flex: 1 1 auto;
-    }
-  }
-
-  &--stacked &__list {
-    order: -1;
-    width: 100%;
-    flex-wrap: nowrap;
-  }
-
-  &--inline &__list {
-    flex: 1 1 auto;
   }
 
   &__page {
@@ -114,6 +85,10 @@
     user-select: none;
   }
 
+  &__step-label {
+    white-space: nowrap;
+  }
+
   // У link disabled остаётся цвет текста. На первой странице «Назад» серый.
   &__step.button--link:disabled,
   &__step.button--link[aria-disabled='true'] {
@@ -122,17 +97,43 @@
   }
 }
 
-// Пять и больше страниц: в узкой колонке номера не делят строку с кнопками.
-// Считаем ширину самого компонента, а не окна: колонка уже вьюпорта.
-@container pagination (max-width: #{mixins.breakpoint(md) - 0.02px}) {
-  .pagination--labeled .pagination__row {
+// Мобилка: номера отдельной строкой по центру, «Назад» и «Вперёд» — по краям
+// второй строки.
+@include mixins.max-width(md) {
+  .pagination__row {
     flex-wrap: wrap;
   }
 
-  .pagination--labeled .pagination__list {
+  .pagination__list {
     order: -1;
-    flex: none;
     width: 100%;
-    flex-wrap: nowrap;
+    flex: none;
+  }
+
+  // Меньше пяти страниц ряд влезает целиком и остаётся одной строкой, а
+  // подписи шагов прячем — остаются стрелки. Текст при этом в разметке:
+  // он и есть имя кнопки для скринридера.
+  .pagination--few {
+    .pagination__row {
+      flex-wrap: nowrap;
+    }
+
+    .pagination__list {
+      order: 0;
+      width: auto;
+      flex: 1 1 auto;
+    }
+
+    .pagination__step-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
   }
 }
