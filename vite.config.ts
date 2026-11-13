@@ -15,6 +15,11 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    // Один jsdom на воркер, не на файл: изоляция поднимала окружение
+    // десятки раз и забирала большую часть прогона. DOM между тестами
+    // снимает cleanup() в setup.ts. Модульный счётчик useScrollLock
+    // живёт в том же воркере и снимается cleanup-ом эффекта при размонтировании.
+    isolate: false,
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],

@@ -33,7 +33,7 @@ describe('Button', () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
-  it('loading ставит aria-busy и не вызывает onClick', async () => {
+  it('loading ставит aria-busy, не выключает кнопку и не вызывает onClick', async () => {
     const onClick = vi.fn<() => void>();
     render(
       <Button loading onClick={onClick}>
@@ -43,14 +43,46 @@ describe('Button', () => {
 
     const button = screen.getByRole('button', { name: 'Сохранить' });
     expect(button).toHaveAttribute('aria-busy', 'true');
-    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    // Нативный disabled снял бы фокус и унёс его в body — объявлять aria-busy
+    // стало бы некому. Клик гасит обработчик, кнопка остаётся фокусируемой.
+    expect(button).toBeEnabled();
     expect(button.querySelector('.button__label')).toHaveTextContent(
       'Сохранить',
     );
     expect(button.querySelector('.button__icon--spin')).toBeInTheDocument();
 
+    button.focus();
+    expect(button).toHaveFocus();
+
     await userEvent.click(button);
     expect(onClick).not.toHaveBeenCalled();
+    expect(button).toHaveFocus();
+  });
+
+  it('loading не затирает aria-disabled и aria-busy потребителя', () => {
+    render(
+      <Button aria-disabled aria-busy={false}>
+        Назад
+      </Button>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Назад' });
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).toHaveAttribute('aria-busy', 'false');
+  });
+
+  it('явный disabled по-прежнему выключает кнопку нативно', () => {
+    render(
+      <Button disabled loading>
+        Сохранить
+      </Button>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Сохранить' });
+    expect(button).toBeDisabled();
+    expect(button).not.toHaveAttribute('aria-disabled');
+    expect(button).toHaveAttribute('aria-busy', 'true');
   });
 
   it('variant и size попадают в className', () => {

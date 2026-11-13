@@ -25,16 +25,47 @@ const GROUPS = [
   },
   { title: 'Отступы', match: name => name.startsWith('--space-') },
   { title: 'Фокус и тень', match: name => /^--(focus|shadow)-/.test(name) },
+  { title: 'Слои', match: name => name.startsWith('--z-') },
 ];
 
+/**
+ * Значение собирается до `;`: `color-mix()` длиннее 80 символов, и oxfmt
+ * разносит его на пять строк. Пока склейки не было, такой токен молча
+ * выпадал из таблицы — ровно то расхождение, от которого скрипт и написан.
+ */
 const readTokens = () => {
   const source = readFileSync(varsPath, 'utf8');
   const tokens = [];
+  let name = null;
+  let value = '';
 
-  for (const line of source.split('\n')) {
-    // Многострочные значения (color-mix) в таблицу не тянем: в ней важно имя.
-    const match = /^\s{2}(--[\w-]+):\s*([^;]*);/.exec(line);
-    if (match?.[1] && match[2]) tokens.push([match[1], match[2].trim()]);
+  for (const raw of source.split('\n')) {
+    // Хвостовой `// #ccc` — комментарий, а не часть значения.
+    const line = raw.replace(/\/\/.*$/, '');
+
+    if (name === null) {
+      // Ровно два отступа: вложенные объявления (@each ниже) не токены.
+      const start = /^\s{2}(--[\w-]+):\s*(.*)$/.exec(line);
+      if (!start) continue;
+
+      name = start[1];
+      value = start[2];
+    } else {
+      value += ` ${line.trim()}`;
+    }
+
+    const end = value.indexOf(';');
+    if (end < 0) continue;
+
+    const text = value
+      .slice(0, end)
+      .replace(/\s+/g, ' ')
+      .replace(/\(\s/g, '(')
+      .replace(/\s\)/g, ')')
+      .trim();
+    if (text) tokens.push([name, text]);
+    name = null;
+    value = '';
   }
 
   return tokens;
@@ -72,7 +103,9 @@ const block = [
   END,
 ].join('\n');
 
-const readme = readFileSync(readmePath, 'utf8');
+const readmeRaw = readFileSync(readmePath, 'utf8');
+const eol = readmeRaw.includes('\r\n') ? '\r\n' : '\n';
+const readme = readmeRaw.replace(/\r\n/g, '\n');
 const from = readme.indexOf(START);
 const to = readme.indexOf(END);
 
@@ -95,5 +128,5 @@ if (process.argv.includes('--check')) {
   process.exit(1);
 }
 
-writeFileSync(readmePath, next);
+writeFileSync(readmePath, next.replace(/\n/g, eol));
 console.log('tokens: README обновлён из vars.scss');

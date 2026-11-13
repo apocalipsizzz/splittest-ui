@@ -30,6 +30,19 @@ export interface WheelColumnProps {
 const clamp = (index: number, max: number) => Math.min(Math.max(index, 0), max);
 
 /**
+ * Высота пункта из DOM, а не из константы. Арифметика выбора идёт по
+ * `scrollTop`, поэтому она должна считаться по той высоте, которая на экране:
+ * `--wheel-item-height` переопределяют снаружи, да и при другом масштабе
+ * страницы или `line-height` строка выходит выше — колесо начало бы выбирать
+ * не тот пункт, что видно в окне. В jsdom размеров нет, там остаётся константа.
+ */
+const itemHeightOf = (list: HTMLElement | null) => {
+  const item = list?.querySelector<HTMLElement>('.wheel__item');
+  const height = item?.offsetHeight ?? 0;
+  return height > 0 ? height : WHEEL_ITEM_HEIGHT;
+};
+
+/**
  * Колесо с прокруткой и snap. Выбранный пункт — тот, что посередине окна.
  * Колесо мыши, тач и стрелки меняют значение, клик по пункту выбирает его.
  */
@@ -62,7 +75,7 @@ export const WheelColumn = ({
     const node = listRef.current;
     if (!node || scrolling.current) return;
 
-    const target = index * WHEEL_ITEM_HEIGHT;
+    const target = index * itemHeightOf(node);
     if (Math.abs(node.scrollTop - target) > 1) node.scrollTop = target;
   }, [index, items.length]);
 
@@ -85,7 +98,7 @@ export const WheelColumn = ({
 
     const item =
       list[
-        clamp(Math.round(node.scrollTop / WHEEL_ITEM_HEIGHT), list.length - 1)
+        clamp(Math.round(node.scrollTop / itemHeightOf(node)), list.length - 1)
       ];
     if (item && item.value !== current) emit(item.value);
   };
@@ -125,19 +138,19 @@ export const WheelColumn = ({
     select(clamp(next, items.length - 1));
   };
 
-  const spacer = (
-    <div
-      className="wheel__spacer"
-      style={{ height: WHEEL_ITEM_HEIGHT * Math.floor(VISIBLE_ROWS / 2) }}
-      aria-hidden
-    />
-  );
+  const spacer = <div className="wheel__spacer" aria-hidden />;
 
   return (
     <div
       className="wheel-frame"
+      // Высоты пункта, окна и отбивок считает CSS от этих двух переменных:
+      // с инлайновой высотой на пунктах переопределить `--wheel-item-height`
+      // снаружи было нельзя.
       style={
-        { '--wheel-item-height': `${WHEEL_ITEM_HEIGHT}px` } as CSSProperties
+        {
+          '--wheel-item-height': `${WHEEL_ITEM_HEIGHT}px`,
+          '--wheel-rows': String(VISIBLE_ROWS),
+        } as CSSProperties
       }
     >
       <div
@@ -151,7 +164,6 @@ export const WheelColumn = ({
         aria-valuetext={selected?.label}
         tabIndex={0}
         className={cn('wheel', className)}
-        style={{ height: WHEEL_ITEM_HEIGHT * VISIBLE_ROWS }}
         onScroll={handleScroll}
         onKeyDown={handleKeyDown}
       >
@@ -165,7 +177,6 @@ export const WheelColumn = ({
               'wheel__item',
               when(i === index, 'wheel__item--active'),
             )}
-            style={{ height: WHEEL_ITEM_HEIGHT }}
             onClick={() => select(i)}
           >
             {item.label}

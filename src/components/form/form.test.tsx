@@ -83,14 +83,15 @@ describe('Form', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Отправить' }));
 
     expect(onSubmit).toHaveBeenCalledOnce();
-    expect(screen.getByRole('button')).toBeDisabled();
+    // Кнопка ждёт через aria-disabled: нативный disabled унёс бы фокус в body.
+    expect(screen.getByRole('button')).toHaveAttribute('aria-disabled', 'true');
     expect(document.querySelector('form')).toHaveAttribute('aria-busy', 'true');
 
     await act(async () => {
       release();
     });
 
-    expect(screen.getByRole('button')).toBeEnabled();
+    expect(screen.getByRole('button')).not.toHaveAttribute('aria-disabled');
     expect(document.querySelector('form')).not.toHaveAttribute('aria-busy');
   });
 
@@ -155,7 +156,8 @@ describe('Form', () => {
       </Form>,
     );
 
-    expect(screen.getByRole('button')).toBeDisabled();
+    expect(screen.getByRole('button')).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button')).toHaveAttribute('aria-busy', 'true');
     expect(document.querySelector('form')).toHaveAttribute('aria-busy', 'true');
   });
 

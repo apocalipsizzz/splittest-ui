@@ -15,24 +15,54 @@
   --color-primary-foreground: #fff;
   --color-primary-hover: #000;
 
-  // Ховер outline. Выключенный контрол и вторичный текст/иконка.
-  --color-secondary: #f7f7f7;
-  --color-muted: #e5e5e5;
-  --color-muted-foreground: #808080; // #727272
+  // Серые ниже — доля --color-foreground, подмешанная в --color-background,
+  // ступенями 3/10/15/20 %. Тема переопределяет эти две роли, и шкала
+  // инвертируется сама. Непрозрачные там, где это поверхность или рамка
+  // контрола (secondary, muted, input): прозрачная просветила бы подложку
+  // под карточкой. Прозрачные там, где это метка поверх чужого фона
+  // (inactive, border, sidebar) — такой слой подложку как раз должен видеть.
+
+  // Ховер outline.
+  --color-secondary: color-mix(
+    in srgb,
+    var(--color-foreground) 3%,
+    var(--color-background)
+  ); // #f7f7f7
+
+  // Выключенный контрол. 10 % — это srgb 0.9, то есть прежний #e5e5e5
+  // с точностью до половины деления: 229.5 вместо 229.
+  --color-muted: color-mix(
+    in srgb,
+    var(--color-foreground) 10%,
+    var(--color-background)
+  );
+
+  // Вторичный текст и иконка. Середина шкалы: 50 % foreground в background.
+  // На белом это #808080. В тёмной теме роли меняются местами и серый тот же.
+  --color-muted-foreground: color-mix(
+    in srgb,
+    var(--color-foreground) 50%,
+    var(--color-background)
+  ); // #808080
   --color-inactive: color-mix(
     in srgb,
     var(--color-foreground) 20%,
     transparent
   ); // #ccc
 
+  // Рамка инпута: на ступень темнее --color-border, поэтому отдельная роль.
+  --color-input: color-mix(
+    in srgb,
+    var(--color-foreground) 15%,
+    var(--color-background)
+  ); // #d9d9d9
   --color-border: color-mix(in srgb, var(--color-foreground) 10%, transparent);
-  --color-input: #d9d9d9;
+  --color-sidebar: color-mix(in srgb, var(--color-foreground) 3%, transparent); // #d9d9d9
   --color-ring: var(--color-foreground);
   // Вуаль модалки и тень не от foreground: в тёмной теме свет не падает снизу,
   // они остаются тёмными. Нужен другой оттенок — переопределять эти две роли.
   --color-overlay: rgb(0 0 0 / 0.3);
   --color-shadow: rgb(0 0 0 / 0.15);
-  --color-sidebar: color-mix(in srgb, var(--color-foreground) 3%, transparent);
 
   // Акцент, ошибка, успех. Текст на акценте отдельный: в тёмной теме primary-foreground инвертируется, этот нет.
   --color-accent: #0000ff;
@@ -106,6 +136,16 @@
   --focus-ring-offset: 2px;
 
   --shadow-xl: 0 10px 40px 0 var(--color-shadow);
+
+  // Шкала слоёв. Четыре ступени: потребитель переопределяет их и вписывает
+  // библиотеку в свой стек. Числа те же, что были литералами.
+  // floating — Popover и PopupSheet: кто выше, решает порядок порталов в DOM.
+  // dropdown — список селекта, он выше листа. overlay — вуаль приложения.
+  // modal — слой DatePicker.
+  --z-floating: 12;
+  --z-dropdown: 30;
+  --z-overlay: 100;
+  --z-modal: 1000;
 
   @each $name, $value in mixins.$breakpoints {
     --breakpoint-#{$name}: #{$value};

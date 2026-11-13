@@ -17,6 +17,9 @@
 }
 
 .wheel {
+  // Окно на `--wheel-rows` пунктов. Обе переменные приходят из JS: число
+  // строк оттуда же считает шаг PageUp/PageDown, так что источник один.
+  height: calc(var(--wheel-item-height) * var(--wheel-rows));
   overflow-y: auto;
   overscroll-behavior: contain;
   scroll-snap-type: y mandatory;
@@ -34,13 +37,16 @@
   }
 }
 
+// Отбивки сверху и снизу: крайний пункт тоже должен доезжать до середины.
 .wheel__spacer {
   flex: none;
+  height: calc(var(--wheel-item-height) * (var(--wheel-rows) - 1) / 2);
   pointer-events: none;
 }
 
 .wheel__item {
   display: flex;
+  height: var(--wheel-item-height);
   align-items: center;
   justify-content: center;
   width: 100%;

@@ -425,4 +425,51 @@ describe('Dropzone', () => {
       'Не удалось проверить файл',
     );
   });
+
+  it('смена accept и maxSize снимает прежнюю ошибку выбора', () => {
+    const onFiles = vi.fn<(files: File[]) => void>();
+    const { rerender } = render(
+      <Dropzone label="Медиа" accept="image" onFiles={onFiles} />,
+    );
+
+    drop(new File(['a'], 'doc.pdf', { type: 'application/pdf' }));
+    expect(screen.getByRole('alert')).toHaveTextContent('Выберите файл фото');
+
+    // Зона теперь про видео — жалоба про фото к ней уже не относится.
+    rerender(<Dropzone label="Медиа" accept="video" onFiles={onFiles} />);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    drop(image('shot.png', 'image/png', 40));
+    expect(screen.getByRole('alert')).toHaveTextContent('Выберите файл видео');
+
+    // Лимит размера — те же правила: прежняя ошибка снимается.
+    rerender(
+      <Dropzone label="Медиа" accept="video" maxSize={10} onFiles={onFiles} />,
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('в Field required сообщает про выбранный файл и его пропажу', () => {
+    const onFiles = vi.fn<(files: File[]) => void>();
+    const { rerender } = render(
+      <Field label="Фото" required>
+        <Dropzone accept="image" onFiles={onFiles} preview={<img alt="" />} />
+      </Field>,
+    );
+
+    // Файл выбран — полю жаловаться не на что.
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    rerender(
+      <Field label="Фото" required>
+        <Dropzone accept="image" onFiles={onFiles} />
+      </Field>,
+    );
+
+    // Файл сняли: нативной обязательности у зоны нет, об этом поле узнаёт
+    // только из reportValue.
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Поле «Фото» обязательно',
+    );
+  });
 });

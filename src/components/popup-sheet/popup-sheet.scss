@@ -2,7 +2,7 @@
 
 .popup-sheet {
   position: fixed;
-  z-index: 12;
+  z-index: var(--z-floating);
   opacity: 0;
   width: 100%;
   height: auto;

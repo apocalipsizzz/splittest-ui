@@ -1,4 +1,65 @@
+@use 'sass:list';
 @use '../../styles/mixins.scss' as mixins;
+
+// Одно имя на состояния, которые иначе копируются в каждый вариант.
+// hover — покой и доступна. pressed — :active / data-active, кроме выключенной.
+// disabled — :disabled и aria-disabled, кроме aria-busy: loading не приглушаем.
+// @content один раз на весь список: цикл с @content внутри печатает правило
+// на каждое состояние и режет специфичность. :active:disabled у link попадал
+// в селектор (0, 3, 0); отдельная ветка :disabled — это уже (0, 2, 0).
+// Исключать :disabled из pressed нужно только когда блоки разные: иначе
+// :active (0, 3, 0) перебивает более поздний disabled (0, 2, 0).
+@mixin interactive-state($states: hover) {
+  $selectors: ();
+  $shares-block: list.index($states, disabled) and list.index($states, pressed);
+
+  @each $state in $states {
+    @if $state == hover {
+      $selectors: list.append(
+        $selectors,
+        '&:hover:not(:active, [data-active], :disabled, [aria-disabled="true"])',
+        comma
+      );
+    } @else if $state == pressed {
+      @if $shares-block {
+        $selectors: list.append(
+          $selectors,
+          '&:active:not([aria-disabled="true"])',
+          comma
+        );
+        $selectors: list.append(
+          $selectors,
+          '&[data-active]:not([aria-disabled="true"])',
+          comma
+        );
+      } @else {
+        $selectors: list.append(
+          $selectors,
+          '&:active:not(:disabled, [aria-disabled="true"])',
+          comma
+        );
+        $selectors: list.append(
+          $selectors,
+          '&[data-active]:not(:disabled, [aria-disabled="true"])',
+          comma
+        );
+      }
+    } @else if $state == disabled {
+      $selectors: list.append($selectors, '&:disabled', comma);
+      $selectors: list.append(
+        $selectors,
+        '&[aria-disabled="true"]:not([aria-busy="true"])',
+        comma
+      );
+    } @else {
+      @error 'interactive-state: hover, pressed или disabled. Не «#{$state}».';
+    }
+  }
+
+  #{$selectors} {
+    @content;
+  }
+}
 
 .button {
   box-sizing: border-box;
@@ -6,7 +67,7 @@
   display: flex;
   align-items: center;
   padding: 8px 16px;
-  border-radius: 30px;
+  border-radius: var(--radius-lg);
   font-size: var(--text-sm);
   line-height: var(--text-sm--line-height);
   background-color: var(--color-primary);
@@ -21,7 +82,7 @@
   gap: var(--space-1);
   text-decoration: none;
 
-  &:hover:not(:active, [data-active], :disabled, [aria-disabled='true']) {
+  @include interactive-state {
     background-color: var(--color-primary-hover);
     border-color: var(--color-primary-hover);
   }
@@ -39,8 +100,7 @@
     outline-offset: var(--focus-ring-offset);
   }
 
-  &:active:not(:disabled, [aria-disabled='true']),
-  &[data-active]:not(:disabled, [aria-disabled='true']) {
+  @include interactive-state(pressed) {
     background-color: var(--color-primary);
     color: var(--color-primary-foreground);
     fill: currentColor;
@@ -51,8 +111,7 @@
   // на кнопку можно навести тултип «почему недоступна». aria-disabled — для
   // asChild на ссылке: :disabled у <a> не срабатывает. loading уже aria-busy,
   // его вид не приглушаем.
-  &:disabled,
-  &[aria-disabled='true']:not([aria-busy='true']) {
+  @include interactive-state(disabled) {
     background-color: var(--color-muted);
     color: var(--color-muted-foreground);
     fill: currentColor;
@@ -67,15 +126,14 @@
     fill: currentColor;
     border: 2px solid var(--color-foreground);
 
-    &:hover:not(:active, [data-active], :disabled, [aria-disabled='true']) {
+    @include interactive-state {
       background-color: transparent;
       border-color: var(--color-foreground);
       color: var(--color-foreground);
       fill: currentColor;
     }
 
-    &:disabled,
-    &[aria-disabled='true']:not([aria-busy='true']) {
+    @include interactive-state(disabled) {
       background-color: transparent;
     }
   }
@@ -88,14 +146,11 @@
     border-radius: var(--radius-sm);
     padding: 0;
 
-    &:hover:not(:active, [data-active], :disabled, [aria-disabled='true']) {
+    @include interactive-state {
       background-color: transparent;
     }
 
-    &:active:not([aria-disabled='true']),
-    &[data-active]:not([aria-disabled='true']),
-    &:disabled,
-    &[aria-disabled='true']:not([aria-busy='true']) {
+    @include interactive-state(pressed disabled) {
       background-color: transparent;
       color: var(--color-foreground);
     }
@@ -109,15 +164,12 @@
     border-radius: var(--radius-sm);
     padding: 0;
 
-    &:hover:not(:active, [data-active], :disabled, [aria-disabled='true']) {
+    @include interactive-state {
       background-color: transparent;
       color: var(--color-destructive);
     }
 
-    &:active:not([aria-disabled='true']),
-    &[data-active]:not([aria-disabled='true']),
-    &:disabled,
-    &[aria-disabled='true']:not([aria-busy='true']) {
+    @include interactive-state(pressed disabled) {
       background-color: transparent;
       color: var(--color-destructive);
     }
@@ -138,12 +190,11 @@
       --size: 100px;
     }
 
-    &:hover:not(:active, [data-active], :disabled, [aria-disabled='true']) {
+    @include interactive-state {
       background-color: var(--color-secondary);
     }
 
-    &:active:not(:disabled, [aria-disabled='true']),
-    &[data-active]:not(:disabled, [aria-disabled='true']) {
+    @include interactive-state(pressed) {
       background-color: var(--color-secondary);
     }
 

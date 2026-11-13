@@ -28,7 +28,7 @@ import {
 import { Button } from '@/components/button';
 import { IconClose } from '@/icons/icon-close';
 import { cn } from '@/lib/cn';
-import { FloatingLayerTree } from '@/lib/floating-layer';
+import { withFloatingLayer } from '@/lib/floating-layer';
 import { useControllableState } from '@/lib/hooks/use-controllable-state';
 import { PORTAL_SELECTOR, Portal, portalProps } from '@/lib/portal';
 import { Slot } from '@/lib/slot';
@@ -248,12 +248,4 @@ const PopoverFrame = forwardRef<HTMLDivElement, PopoverProps>(
   },
 );
 
-export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
-  function Popover(props, ref) {
-    return (
-      <FloatingLayerTree>
-        <PopoverFrame {...props} ref={ref} />
-      </FloatingLayerTree>
-    );
-  },
-);
+export const Popover = withFloatingLayer(PopoverFrame, 'Popover');

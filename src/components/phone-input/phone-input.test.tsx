@@ -90,6 +90,28 @@ describe('PhoneInput', () => {
     expect(screen.queryByRole('button', { name: 'Очистить' })).toBeNull();
   });
 
+  it('recommended ставит класс', () => {
+    render(<PhoneInput recommended />);
+    expect(screen.getByRole('textbox')).toHaveClass(
+      'input',
+      'input--recommended',
+    );
+  });
+
+  it('noWrap убирает input__wrap и крестик', () => {
+    const { container, rerender } = render(<PhoneInput noWrap />);
+    const input = screen.getByRole('textbox');
+
+    expect(container.querySelector('.input__wrap')).toBeNull();
+    expect(input.parentElement).toBe(container);
+
+    rerender(<PhoneInput noWrap clearable defaultValue="+7 (999) 123-45-67" />);
+    expect(container.querySelector('.input__wrap')).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: 'Очистить' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('тип tel и класс input, error ставит aria-invalid', () => {
     render(<PhoneInput placeholder="Телефон" error />);
 

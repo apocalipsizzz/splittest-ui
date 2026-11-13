@@ -18,6 +18,9 @@ const LockPair = ({ outer, inner }: { outer: boolean; inner: boolean }) => (
 describe('useScrollLock', () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    // isolate: false делит window между файлами. Свой scrollY затеняет
+    // геттер jsdom — снимаем, чтобы следующий лок не увидел 80.
+    Reflect.deleteProperty(window, 'scrollY');
   });
 
   it('фиксирует body и возвращает прежние стили после снятия', () => {

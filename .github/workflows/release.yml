@@ -1,0 +1,63 @@
+# Релиз на changesets. Пуш в main с новыми changeset-файлами открывает PR
+# «Version Packages» (версия + CHANGELOG); влитый PR публикует пакет.
+#
+# Пока в репозитории нет секрета NPM_TOKEN, workflow делает только PR с версией,
+# шаг публикации пропускается с предупреждением — красного main из-за этого нет.
+name: release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      # registry-url кладёт .npmrc с подстановкой NODE_AUTH_TOKEN — без него
+      # `changeset publish` уходит в реестр неаутентифицированным.
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - run: pnpm install --frozen-lockfile
+
+      # Контекст `secrets` в условиях шагов недоступен, поэтому проверяем через env.
+      - name: Проверить токен публикации
+        id: npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NPM_TOKEN" ]; then
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo '::warning::NPM_TOKEN не задан: публикация пропущена, PR с версией создаётся.'
+          else
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      # `pnpm release` внутри сам прогоняет verify перед публикацией.
+      - uses: changesets/action@v1
+        with:
+          version: pnpm run version
+          publish: ${{ steps.npm.outputs.ready == 'true' && 'pnpm run release' || '' }}
+          commit: 'chore: release'
+          title: 'chore: release'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

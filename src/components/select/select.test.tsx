@@ -224,10 +224,52 @@ describe('Select', () => {
 
     const root = screen.getByTestId('select');
     expect(root).toHaveClass('select');
-    expect(root).toHaveAttribute('aria-label', 'Город');
     expect(root).not.toHaveAttribute('id');
-    expect(screen.getByRole('combobox')).toHaveAttribute('id', 'city');
+    // Имя садится на combobox, а не на корневой div: у div нет роли, и
+    // aria-label на нём вспомогательные технологии игнорируют.
+    expect(root).not.toHaveAttribute('aria-label');
+    expect(screen.getByRole('combobox', { name: 'Город' })).toHaveAttribute(
+      'id',
+      'city',
+    );
     expect(ref.current).toBe(root);
+  });
+
+  it('aria-label потребителя важнее плейсхолдера', () => {
+    render(
+      <Select options={OPTIONS} placeholder="Выберите" aria-label="Город" />,
+    );
+
+    expect(screen.getByRole('combobox')).toHaveAccessibleName('Город');
+  });
+
+  it('aria-labelledby потребителя называет и кнопку, и список', async () => {
+    render(
+      <>
+        <span id="city-label">Город</span>
+        <Select options={OPTIONS} aria-labelledby="city-label" />
+      </>,
+    );
+
+    const trigger = screen.getByRole('combobox');
+    expect(trigger).toHaveAccessibleName('Город');
+    expect(trigger).not.toHaveAttribute('aria-label');
+
+    await userEvent.click(trigger);
+    expect(screen.getByRole('listbox')).toHaveAccessibleName('Город');
+  });
+
+  it('aria-describedby потребителя доезжает до кнопки', () => {
+    render(
+      <>
+        <span id="city-hint">Только города РФ</span>
+        <Select options={OPTIONS} aria-describedby="city-hint" />
+      </>,
+    );
+
+    expect(screen.getByRole('combobox')).toHaveAccessibleDescription(
+      'Только города РФ',
+    );
   });
 
   it('onOpenChange сообщает про открытие и закрытие', async () => {

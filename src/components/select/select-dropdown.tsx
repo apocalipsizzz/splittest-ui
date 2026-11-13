@@ -20,6 +20,7 @@ import {
 } from '@floating-ui/react';
 
 import { useFieldControlProps } from '@/components/field/use-field-control-props';
+import type { InputSize } from '@/components/input';
 import { IconIndicatorTick } from '@/icons/icon-indicator-tick';
 import { cn, when } from '@/lib/cn';
 import { Portal, portalProps } from '@/lib/portal';
@@ -43,9 +44,14 @@ export const useSelectValue = (
 export const useSelectField = (
   selectedValue: string | null,
   error?: boolean,
+  describedBy?: string,
 ) => {
   // required на кнопке и на поле поиска не проверяет выбор: его держит value-инпут.
-  const control = useFieldControlProps({ error, nativeRequired: false });
+  const control = useFieldControlProps({
+    error,
+    nativeRequired: false,
+    describedBy: [describedBy],
+  });
   const reportValue = control.field?.reportValue;
 
   useEffect(() => {
@@ -53,6 +59,115 @@ export const useSelectField = (
   }, [reportValue, selectedValue]);
 
   return control;
+};
+
+interface SelectNamingOptions {
+  /** `aria-label` потребителя. */
+  label?: string;
+  /** `aria-labelledby` потребителя. */
+  labelledBy?: string;
+  placeholder: string;
+  /** id лейбла поля, если контрол внутри `Field`. */
+  fieldLabelId?: string;
+  /** Внутри `Field` имя кнопке даёт `<label htmlFor>`, плейсхолдер туда не идёт. */
+  insideField: boolean;
+}
+
+/**
+ * Имя для combobox и для списка. `aria-*` потребителя важнее умолчаний:
+ * иначе заданное снаружи имя молча проигрывало бы плейсхолдеру. Атрибуты
+ * садятся на combobox, а не на корневой `div`, — у `div` нет роли, и
+ * `aria-label` на нём вспомогательные технологии игнорируют.
+ */
+export const selectNaming = (options: SelectNamingOptions) => {
+  const { label, labelledBy, placeholder, fieldLabelId, insideField } = options;
+  const resolvedLabel =
+    label ?? (labelledBy || insideField ? undefined : placeholder);
+
+  return {
+    control: {
+      ...(resolvedLabel ? { 'aria-label': resolvedLabel } : {}),
+      ...(labelledBy ? { 'aria-labelledby': labelledBy } : {}),
+    },
+    /** Список ссылается на тот же лейбл, что и кнопка. */
+    listLabelId: labelledBy ?? fieldLabelId,
+    listLabel: label ?? placeholder,
+  };
+};
+
+interface SelectControlOptions<T extends { value: string }> {
+  items: readonly T[];
+  value?: string | null;
+  defaultValue?: string | null;
+  error?: boolean;
+  describedBy?: string;
+  label?: string;
+  labelledBy?: string;
+  placeholder: string;
+}
+
+type SelectControlClassOptions = {
+  size: InputSize;
+  invalid: boolean;
+} & (
+  | {
+      kind: 'select__trigger';
+      /** Приглушённый плейсхолдер. У поиска своего модификатора нет. */
+      empty?: boolean;
+    }
+  | { kind: 'select__input' }
+);
+
+export const selectControlClassName = (options: SelectControlClassOptions) => {
+  const { kind, size, invalid } = options;
+  const empty = kind === 'select__trigger' && options.empty;
+
+  return cn(
+    'input',
+    kind,
+    when(empty, `${kind}--empty`),
+    when(size !== 'md', `input--${size}`),
+    when(invalid, 'input--error'),
+  );
+};
+
+/** Значение, поле и имя combobox — общее у `Select` и `SelectSearch`. */
+export const useSelectControl = <T extends { value: string }>(
+  options: SelectControlOptions<T>,
+) => {
+  const {
+    items,
+    value,
+    defaultValue = null,
+    error,
+    describedBy,
+    label,
+    labelledBy,
+    placeholder,
+  } = options;
+  const { selectedValue, setSelectedValue } = useSelectValue(
+    value,
+    defaultValue,
+  );
+  const fieldState = useSelectField(selectedValue, error, describedBy);
+  const naming = selectNaming({
+    label,
+    labelledBy,
+    placeholder,
+    fieldLabelId: fieldState.field?.labelId,
+    insideField: Boolean(fieldState.field),
+  });
+  const selected = items.find(item => item.value === selectedValue) ?? null;
+
+  return {
+    selectedValue,
+    setSelectedValue,
+    field: fieldState.field,
+    isInvalid: fieldState.isInvalid,
+    controlProps: fieldState.controlProps,
+    naming,
+    selected,
+  };
 };
 
 export const useSelectDropdown = (

@@ -51,6 +51,12 @@ export const States: Story = {
         <Labeled label="error" wide maxWidth={360}>
           <PhoneInput error defaultValue="+7 (999) 1" />
         </Labeled>
+        <Labeled label="recommended" wide maxWidth={360}>
+          <PhoneInput recommended />
+        </Labeled>
+        <Labeled label="noWrap" wide maxWidth={360}>
+          <PhoneInput noWrap />
+        </Labeled>
       </LabeledBlock>
     </div>
   ),

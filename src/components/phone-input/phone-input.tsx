@@ -5,16 +5,14 @@ import {
   useRef,
   useState,
   type InputHTMLAttributes,
-  type MouseEvent,
 } from 'react';
 import { IMaskInput } from 'react-imask';
 
 import { useFieldControlProps } from '@/components/field/use-field-control-props';
 import type { InputSize } from '@/components/input';
-import { IconCross } from '@/icons/icon-cross';
+import { InputClearButton } from '@/components/input/input-clear-button';
 import { cn, when } from '@/lib/cn';
 import { composeRefs } from '@/lib/compose-refs';
-import { emitInputValue } from '@/lib/emit-input-value';
 import '../input/input.scss';
 
 /**
@@ -48,9 +46,12 @@ export interface PhoneInputProps extends Omit<
   value?: string;
   defaultValue?: string;
   size?: InputSize;
+  recommended?: boolean;
   error?: boolean;
   /** Крестик справа. Появляется, только когда в поле есть значение. */
   clearable?: boolean;
+  /** Без `div.input__wrap`. Крестик от этой обёртки и позиционируется, с `noWrap` он не рисуется. */
+  noWrap?: boolean;
   clearLabel?: string;
   /** Вызывается после очистки крестиком; `onAccept` получит пустые значения. */
   onClear?: () => void;
@@ -71,8 +72,10 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       value,
       defaultValue,
       size = 'md',
+      recommended,
       error,
       clearable = false,
+      noWrap = false,
       clearLabel = 'Очистить',
       onClear,
       className,
@@ -95,7 +98,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       () => defaultValue !== undefined && defaultValue !== '',
     );
     const hasValue = value !== undefined ? value !== '' : uncontrolledFilled;
-    const canClear = clearable && !disabled && !readOnly && hasValue;
+    const canClear = clearable && !noWrap && !disabled && !readOnly && hasValue;
 
     const setRef = useCallback(
       (node: HTMLInputElement | null) => {
@@ -118,55 +121,48 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       onAccept?.(nextValue, maskRef.unmaskedValue);
     };
 
-    const handleClearMouseDown = (event: MouseEvent<HTMLButtonElement>) => {
-      event.preventDefault();
-    };
+    const input = (
+      <IMaskInput
+        {...props}
+        type="tel"
+        placeholder={placeholder}
+        inputMode="tel"
+        autoComplete="tel"
+        mask={mask}
+        {...(mask === PHONE_MASK ? { definitions: PHONE_DEFINITIONS } : {})}
+        inputRef={setRef}
+        value={value}
+        defaultValue={defaultValue}
+        onAccept={handleAccept}
+        disabled={disabled}
+        readOnly={readOnly}
+        {...controlProps}
+        id={id ?? field?.id}
+        className={cn(
+          'input',
+          className,
+          when(size !== 'md', `input--${size}`),
+          when(recommended, 'input--recommended'),
+          when(isInvalid, 'input--error'),
+          when(
+            clearable && !noWrap && !disabled && !readOnly,
+            'input--clearable',
+          ),
+        )}
+      />
+    );
 
-    const handleClear = () => {
-      const input = inputRef.current;
-      if (!input) return;
-
-      emitInputValue(input, '');
-      onClear?.();
-      input.focus();
-    };
+    if (noWrap) return input;
 
     return (
       <div className="input__wrap">
-        <IMaskInput
-          {...props}
-          type="tel"
-          placeholder={placeholder}
-          inputMode="tel"
-          autoComplete="tel"
-          mask={mask}
-          {...(mask === PHONE_MASK ? { definitions: PHONE_DEFINITIONS } : {})}
-          inputRef={setRef}
-          value={value}
-          defaultValue={defaultValue}
-          onAccept={handleAccept}
-          disabled={disabled}
-          readOnly={readOnly}
-          {...controlProps}
-          id={id ?? field?.id}
-          className={cn(
-            'input',
-            className,
-            when(size !== 'md', `input--${size}`),
-            when(isInvalid, 'input--error'),
-            when(clearable && !disabled && !readOnly, 'input--clearable'),
-          )}
-        />
+        {input}
         {canClear ? (
-          <button
-            type="button"
-            className="input__clear"
-            aria-label={clearLabel}
-            onMouseDown={handleClearMouseDown}
-            onClick={handleClear}
-          >
-            <IconCross width={16} height={16} />
-          </button>
+          <InputClearButton
+            inputRef={inputRef}
+            label={clearLabel}
+            onClear={onClear}
+          />
         ) : null}
       </div>
     );

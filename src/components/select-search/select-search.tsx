@@ -21,14 +21,15 @@ import {
 import type { InputSize } from '@/components/input';
 import { IconDrop } from '@/icons/icon-drop';
 import { cn, when } from '@/lib/cn';
-import { FloatingLayerTree } from '@/lib/floating-layer';
+import { withFloatingLayer } from '@/lib/floating-layer';
 import { useControllableState } from '@/lib/hooks/use-controllable-state';
 import {
   SelectDropdown,
+  selectControlClassName,
+  useSelectControl,
   useSelectDropdown,
-  useSelectField,
-  useSelectValue,
 } from '../select/select-dropdown';
+import { SelectValueInput } from '../select/select-value-input';
 import {
   handleListKeyDown,
   highlightedIndex,
@@ -114,6 +115,11 @@ const SelectSearchFrame = forwardRef<HTMLDivElement, SelectSearchProps>(
       onOpenChange,
       renderOption,
       id,
+      // aria-* уезжают на combobox, а не на корневой div: у div нет роли,
+      // и имя на нём вспомогательные технологии не читают.
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledBy,
+      'aria-describedby': ariaDescribedBy,
       ...rest
     } = props;
 
@@ -126,16 +132,24 @@ const SelectSearchFrame = forwardRef<HTMLDivElement, SelectSearchProps>(
     );
     const [query, setQuery] = useState('');
     const [activeIndex, setActiveIndex] = useState(0);
-    const { selectedValue, setSelectedValue } = useSelectValue(
+    const {
+      selectedValue,
+      setSelectedValue,
+      field,
+      isInvalid,
+      controlProps,
+      naming,
+      selected,
+    } = useSelectControl({
+      items: options,
       value,
       defaultValue,
-    );
-    const { field, isInvalid, controlProps } = useSelectField(
-      selectedValue,
       error,
-    );
-    const selected =
-      options.find(option => option.value === selectedValue) ?? null;
+      describedBy: ariaDescribedBy,
+      label: ariaLabel,
+      labelledBy: ariaLabelledBy,
+      placeholder,
+    });
     const filtered = useMemo(
       () => filterSelectOptions(options, query, filterOption),
       [filterOption, options, query],
@@ -166,10 +180,12 @@ const SelectSearchFrame = forwardRef<HTMLDivElement, SelectSearchProps>(
     const openList = (initialQuery: string) => {
       if (disabled) return;
 
-      const next = filterSelectOptions(options, initialQuery, filterOption);
+      // Фильтр один — в useMemo выше. Пустой запрос оставляет options как есть,
+      // поэтому индекс выбранного считается по ним. Непустой всегда стартует
+      // с нуля: selectedEnabledIndex(filtered, null) давал то же самое.
       setQuery(initialQuery);
       setActiveIndex(
-        selectedEnabledIndex(next, initialQuery ? null : selectedValue),
+        initialQuery ? 0 : selectedEnabledIndex(options, selectedValue),
       );
       setOpen(true);
     };
@@ -275,7 +291,7 @@ const SelectSearchFrame = forwardRef<HTMLDivElement, SelectSearchProps>(
                 ? `${listId}-option-${highlighted}`
                 : undefined
             }
-            aria-label={field ? undefined : placeholder}
+            {...naming.control}
             disabled={disabled}
             autoComplete="off"
             spellCheck={false}
@@ -291,12 +307,11 @@ const SelectSearchFrame = forwardRef<HTMLDivElement, SelectSearchProps>(
             data-state={open ? 'open' : 'closed'}
             data-invalid={isInvalid || undefined}
             data-disabled={disabled || undefined}
-            className={cn(
-              'input',
-              'select__input',
-              when(size !== 'md', `input--${size}`),
-              when(isInvalid, 'input--error'),
-            )}
+            className={selectControlClassName({
+              kind: 'select__input',
+              size,
+              invalid: isInvalid,
+            })}
           />
           <IconDrop className="select__arrow" />
           <span
@@ -306,16 +321,12 @@ const SelectSearchFrame = forwardRef<HTMLDivElement, SelectSearchProps>(
           >
             {open && query ? formatFoundCount(filtered.length) : ''}
           </span>
-          <input
-            className="select__value-input"
+          <SelectValueInput
             name={name}
             disabled={disabled}
-            tabIndex={-1}
-            aria-hidden
-            value={selectedValue ?? ''}
-            onChange={() => {}}
+            value={selectedValue}
+            required={field?.required}
             onFocus={handleValueFocus}
-            {...(field?.required ? { required: true } : {})}
           />
           <SelectDropdown
             open={open}
@@ -324,8 +335,8 @@ const SelectSearchFrame = forwardRef<HTMLDivElement, SelectSearchProps>(
             selectedValue={selectedValue}
             highlighted={highlighted}
             emptyText={emptyText}
-            accessibleName={placeholder}
-            labelId={field?.labelId}
+            accessibleName={naming.listLabel}
+            labelId={naming.listLabelId}
             floatingStyles={dropdown.floatingStyles}
             setFloating={dropdown.setDropdownRef}
             getFloatingProps={dropdown.getFloatingProps}
@@ -339,12 +350,7 @@ const SelectSearchFrame = forwardRef<HTMLDivElement, SelectSearchProps>(
   },
 );
 
-export const SelectSearch = forwardRef<HTMLDivElement, SelectSearchProps>(
-  function SelectSearch(props, ref) {
-    return (
-      <FloatingLayerTree>
-        <SelectSearchFrame {...props} ref={ref} />
-      </FloatingLayerTree>
-    );
-  },
+export const SelectSearch = withFloatingLayer(
+  SelectSearchFrame,
+  'SelectSearch',
 );

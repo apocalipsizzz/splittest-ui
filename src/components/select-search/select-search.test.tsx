@@ -277,4 +277,18 @@ describe('SelectSearch', () => {
 
     expect(screen.getByRole('combobox')).toHaveAttribute('id', 'city');
   });
+
+  it('aria-label потребителя садится на combobox, а не на корень', () => {
+    render(
+      <SelectSearch
+        options={OPTIONS}
+        placeholder="Выберите"
+        aria-label="Город"
+        data-testid="search"
+      />,
+    );
+
+    expect(screen.getByTestId('search')).not.toHaveAttribute('aria-label');
+    expect(combobox()).toHaveAccessibleName('Город');
+  });
 });

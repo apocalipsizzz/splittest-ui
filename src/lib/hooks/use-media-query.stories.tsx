@@ -80,8 +80,8 @@ function Header() {
   return isDesktop ? <DesktopNav /> : <BurgerNav />;
 }`;
 
-const queryExample = `// Запрос меняется — подписка переоформляется автоматически
-const isCompact = useMediaQuery(\`(max-width: \${maxWidth}px)\`);
+const queryExample = `// Строка запроса статическая: кеш MediaQueryList не чистится
+const isDesktop = useMediaQuery('(min-width: 680px)');
 
 // Первое значение берётся сразу, без undefined,
 // поэтому первый рендер уже с правильным вариантом

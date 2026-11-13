@@ -20,7 +20,7 @@ import {
 import { Button } from '@/components/button';
 import { IconClose } from '@/icons/icon-close';
 import { cn, when } from '@/lib/cn';
-import { FloatingLayerTree } from '@/lib/floating-layer';
+import { withFloatingLayer } from '@/lib/floating-layer';
 import { useControllableState } from '@/lib/hooks/use-controllable-state';
 import { useScrollLock } from '@/lib/hooks/use-scroll-lock';
 import { PORTAL_SELECTOR, Portal, portalProps } from '@/lib/portal';
@@ -183,12 +183,4 @@ const PopupSheetFrame = forwardRef<HTMLDialogElement, PopupSheetProps>(
   },
 );
 
-export const PopupSheet = forwardRef<HTMLDialogElement, PopupSheetProps>(
-  function PopupSheet(props, ref) {
-    return (
-      <FloatingLayerTree>
-        <PopupSheetFrame {...props} ref={ref} />
-      </FloatingLayerTree>
-    );
-  },
-);
+export const PopupSheet = withFloatingLayer(PopupSheetFrame, 'PopupSheet');

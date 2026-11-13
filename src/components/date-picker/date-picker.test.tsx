@@ -60,6 +60,13 @@ describe('DatePicker', () => {
     render(<DatePicker value={new Date(1990, 2, 15)} onChange={onChange} />);
 
     await userEvent.click(trigger());
+    // Начальный фокус ставит FloatingFocusManager, и делает это в эффекте:
+    // забрать фокус внутрь можно только после того, как лист его получил.
+    const sheet = screen.getByRole('dialog', { name: 'Выберите дату' });
+    await waitFor(() => {
+      expect(sheet).toHaveFocus();
+    });
+
     wheel('Месяц').focus();
     await userEvent.keyboard('{ArrowDown}');
     await userEvent.click(screen.getByRole('button', { name: 'Применить' }));

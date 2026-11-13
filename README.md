@@ -35,11 +35,23 @@ import { IconClose, LogoVisa } from '@de-kit/st-ui/icons';
 import { Button } from '@de-kit/st-ui/components/button';
 ```
 
+⚠️ Токены приезжают только с корневым входом. При импорте по подпути подключите их сами, один раз на приложение, — иначе компонент получит `var(--color-*)` без значений: класс в DOM и правило в CSS будут на месте, а стилей не будет.
+
+```tsx
+// в точке входа приложения, рядом с остальными глобальными стилями
+import '@de-kit/st-ui/vars.scss';
+```
+
+```scss
+// или в своём scss-входе, если стили собираются отдельно от JS
+@use '@de-kit/st-ui/vars.scss';
+```
+
 `reset.scss` — сброс, типографика и нейтральные стили тегов. `global.scss` — каркас страницы splittest поверх него (`#root`, флексовый `body`, `.wrapper`, вуаль `.body--modal`); в чужой странице подключать только `reset.scss`. Шрифт Inter библиотека не везёт, его по-прежнему грузит фронтенд.
 
 Служебное наружу: `cn` для склейки классов, `Slot` для своего `asChild`, `useFieldControl` для своего контрола внутри `Field`, `filterSelectOptions` для своего фильтра пунктов.
 
-Токены подключаются один раз вместе с пакетом (`import './styles/vars.scss'` в `src/index.ts`). В своих scss это обычные `var()`, `@use` не нужен. `@use '@de-kit/st-ui/vars.scss'` — только если стили собираются без JS.
+Токены подключаются один раз вместе с пакетом — `import './styles/vars.scss'` сидит в `src/index.ts`, то есть в корневом входе. В своих scss это дальше обычные `var()`, `@use` не нужен. Подключать `vars.scss` руками нужно в двух случаях: стили собираются без JS и при импорте по подпути (см. выше).
 
 Миксины — только брейкпоинты для адаптивной вёрстки:
 
@@ -61,9 +73,9 @@ import { Button } from '@de-kit/st-ui/components/button';
 
 `sm` 480, `md` 680, `lg` 1000, `xl` 1200. Это единственный источник: `--breakpoint-*` в `vars.scss` генерируются из того же списка, так что новый брейкпоинт в `$breakpoints` сразу даёт и миксин, и токен. Отдельный список нужен потому, что в `@media` custom properties не работают. `min-width` включает брейкпоинт, `max-width` — нет (граница `679.98px`), поэтому на ровно 680px срабатывает только `min-width`. Вместо имени можно передать размер: `min-width(900px)`. Список доступен как `mixins.$breakpoints`, значение — `mixins.breakpoint(md)`.
 
-`var(--color-foreground)`, `var(--color-primary)`, `var(--font-sans)`, `var(--radius-sm)`, `var(--breakpoint-md)`. Цвета — роли как у Tailwind v4, не пигмент: `--color-foreground` текст, `--color-background` страница, `--color-primary` / `--color-primary-foreground` залитая кнопка и текст на ней. Outline берёт `--color-foreground` (текст и рамка, фон прозрачный). `--color-accent` синий, `--color-destructive` ошибка, `--color-success` успех, `--color-warning` жёлтый — из него разбавлен фон `--color-recommended`. Тема — переопределение этих переменных, компоненты не перекрашивать. `--color-overlay` и `--color-shadow` из темы не выводятся: вуаль и тень остаются тёмными и в светлой, и в тёмной, нужен другой оттенок — переопределять их отдельно.
+`var(--color-foreground)`, `var(--color-primary)`, `var(--font-sans)`, `var(--radius-sm)`, `var(--breakpoint-md)`. Цвета — роли как у Tailwind v4, не пигмент: `--color-foreground` текст, `--color-background` страница, `--color-primary` / `--color-primary-foreground` залитая кнопка и текст на ней. Outline берёт `--color-foreground` (текст и рамка, фон прозрачный). `--color-accent` синий, `--color-destructive` ошибка, `--color-success` успех, `--color-warning` жёлтый — из него разбавлен фон `--color-recommended`. Тема — переопределение этих переменных, компоненты не перекрашивать. Серые выведены из `--color-foreground` и `--color-background` ступенями 3/10/15/20 %, поэтому тема задаёт две базовые роли, а не семь: `--color-secondary` (ховер) — `#f7f7f7`, `--color-muted` (выключенный контрол) — `#e5e5e5`, `--color-input` (рамка контрола) — `#d9d9d9`; `--color-border`, `--color-inactive` и `--color-sidebar` те же ступени, но прозрачные — это метки поверх чужого фона. `--color-overlay` и `--color-shadow` из темы не выводятся: вуаль и тень остаются тёмными и в светлой, и в тёмной, нужен другой оттенок — переопределять их отдельно.
 
-Текст — пара токенов на размер: сам размер и `--text-*--line-height` рядом. Заголовки `reset.scss` собраны из них: h1 и h2 — `2xl` (h1 с 680px — `3xl`), h3 — `lg`, h4 — `sm`. Размеры `Button` `sm` (12/16) и `lg` (16/24) в шкалу не попадают и остаются литералами. Отступы — сетка 5px; паддинги кнопки и инпута сняты с макета вне сетки и тоже литералы. Обводка фокуса — `--focus-ring-width`, `--focus-ring-color` и `--focus-ring-offset`, одна на `box-shadow` инпута и `outline` остальных контролов.
+Текст — пара токенов на размер: сам размер и `--text-*--line-height` рядом. Заголовки `reset.scss` собраны из них: h1 и h2 — `2xl` (h1 с 680px — `3xl`), h3 — `lg`, h4 — `sm`. Размеры `Button` `sm` (12/16) и `lg` (16/24) в шкалу не попадают и остаются литералами. Отступы — сетка 5px; паддинги кнопки и инпута сняты с макета вне сетки и тоже литералы. Обводка фокуса — `--focus-ring-width`, `--focus-ring-color` и `--focus-ring-offset`, одна на `box-shadow` инпута и `outline` остальных контролов. Слои — `--z-floating` (Popover и PopupSheet), `--z-dropdown`, `--z-overlay`, `--z-modal`: потребитель сдвигает ступень, в компонентах чисел нет.
 
 Полный список — ниже, он собирается из `vars.scss` скриптом `pnpm run docs:tokens`, а `verify` проверяет, что он не разъехался.
 
@@ -80,20 +92,22 @@ import { Button } from '@de-kit/st-ui/components/button';
 | `--color-primary` | `#000` |
 | `--color-primary-foreground` | `#fff` |
 | `--color-primary-hover` | `#000` |
-| `--color-secondary` | `#f7f7f7` |
-| `--color-muted` | `#e5e5e5` |
-| `--color-muted-foreground` | `#808080` |
+| `--color-secondary` | `color-mix(in srgb, var(--color-foreground) 3%, var(--color-background))` |
+| `--color-muted` | `color-mix(in srgb, var(--color-foreground) 10%, var(--color-background))` |
+| `--color-muted-foreground` | `color-mix(in srgb, var(--color-foreground) 50%, var(--color-background))` |
+| `--color-inactive` | `color-mix(in srgb, var(--color-foreground) 20%, transparent)` |
+| `--color-input` | `color-mix(in srgb, var(--color-foreground) 15%, var(--color-background))` |
 | `--color-border` | `color-mix(in srgb, var(--color-foreground) 10%, transparent)` |
-| `--color-input` | `#d9d9d9` |
+| `--color-sidebar` | `color-mix(in srgb, var(--color-foreground) 3%, transparent)` |
 | `--color-ring` | `var(--color-foreground)` |
 | `--color-overlay` | `rgb(0 0 0 / 0.3)` |
 | `--color-shadow` | `rgb(0 0 0 / 0.15)` |
-| `--color-sidebar` | `color-mix(in srgb, var(--color-foreground) 3%, transparent)` |
 | `--color-accent` | `#0000ff` |
 | `--color-accent-foreground` | `#fff` |
 | `--color-destructive` | `#ff0000` |
 | `--color-success` | `#00a66f` |
 | `--color-warning` | `#ffbf00` |
+| `--color-recommended` | `color-mix(in srgb, var(--color-warning) 10%, transparent)` |
 
 **Радиусы**
 
@@ -163,6 +177,15 @@ import { Button } from '@de-kit/st-ui/components/button';
 | `--focus-ring-offset` | `2px` |
 | `--shadow-xl` | `0 10px 40px 0 var(--color-shadow)` |
 
+**Слои**
+
+| Токен | Значение |
+| --- | --- |
+| `--z-floating` | `12` |
+| `--z-dropdown` | `30` |
+| `--z-overlay` | `100` |
+| `--z-modal` | `1000` |
+
 <!-- tokens:end -->
 
 ## Стили
@@ -171,7 +194,10 @@ import { Button } from '@de-kit/st-ui/components/button';
 
 - в проекте должен стоять `sass` (он заявлен как необязательная peer-зависимость, менеджер пакетов о нём напомнит);
 - бандлер должен уметь `import './button.scss'` из `node_modules` — Vite и CRA умеют из коробки;
-- в Jest нужен трансформер для `.scss` (`identity-obj-proxy` или `jest-transform-stub`), в Vitest — `css: false` либо установленный `sass`.
+- в Jest нужен трансформер для `.scss` (`identity-obj-proxy` или `jest-transform-stub`), в Vitest — `css: false` либо установленный `sass`;
+- токены (`vars.scss`) приезжают с корневым входом пакета. Импортируете по подпути (`@de-kit/st-ui/components/*`) — подключите `@de-kit/st-ui/vars.scss` сами, один раз на приложение.
+
+**Браузеры.** Планку задаёт CSS, а не JS: **Chrome/Edge 111+, Safari 16.2+, Firefox 113+** (весна 2023). Ограничивает `color-mix()` — на нём держатся `--color-border`, `--color-inactive`, `--color-recommended`, рамка ошибки и ползунок скролла; автопрефиксер его не раскрывает, полифила нет, в старом браузере эти цвета просто не применятся. Остальное мягче: `aspect-ratio` и `:is()` — с 2021 года, `scroll-snap-type` и `overscroll-behavior` в колесе `DatePicker` — давно, `scrollbar-gutter` в `reset.scss` до Safari 18.2 просто игнорируется и ничего не ломает. JS собран в es2022 (`?.`, `.at(-1)`) — это Chrome 92+ и Safari 15.4+, то есть заведомо ниже планки CSS. Поля `browserslist` в пакете нет намеренно: готовый CSS библиотека не эмитит, а JS-таргет задан в `tsdown.config.ts` — лишнее поле только вводило бы в заблуждение, будто сборка под него подстраивается.
 
 Класс в DOM буквальный: `button`, `input`, `checkbox`, `radio`, `textarea`, `spinner`. Корень и модификаторы одинарные (`.button`, `.button--outline`). Внутренние элементы — BEM: `checkbox__input`, `textarea__counter`.
 
@@ -213,7 +239,7 @@ import { Button } from '@de-kit/st-ui/components/button';
 <Button loading>Сохранение</Button>
 ```
 
-Иконка — обычный `children`, слева или справа, какой набор нужен. `loading` оставляет подпись в потоке (`opacity: 0`) и кладёт спиннер поверх, поэтому ширина не прыгает. Ставит `aria-busy`. Пока `loading`, `<button>` получает `disabled`. У `asChild` на не-кнопке клик отменяется и ставится `aria-disabled`.
+Иконка — обычный `children`, слева или справа, какой набор нужен. `loading` оставляет подпись в потоке (`opacity: 0`) и кладёт спиннер поверх, поэтому ширина не прыгает. Ставит `aria-busy` и `aria-disabled`, клик гасит сам, а нативный `disabled` не ставит: браузер снял бы фокус с выключенной кнопки и унёс его в body — после отправки формы клавиатурный пользователь оказался бы в начале документа, а объявлять `aria-busy` стало бы некому. Нативный `disabled` остаётся только за одноимённым пропом. То же в `asChild` — и на ссылке, и на кнопке-ребёнке.
 
 | Prop        | По умолчанию |                                                         |
 | ----------- | ------------ | ------------------------------------------------------- |
@@ -221,7 +247,7 @@ import { Button } from '@de-kit/st-ui/components/button';
 | `size`      | `md`         | `sm` компактная, `md` обычная, `lg` крупная             |
 | `fullWidth` | `false`      | ширина 100%, не зависит от `size`                       |
 | `asChild`   | `false`      | классы и пропы на единственном ребёнке, без своего тега |
-| `loading`   | `false`      | `aria-busy`, клик блокируется, ширина как у подписи     |
+| `loading`   | `false`      | `aria-busy` + `aria-disabled`, клик блокируется, фокус остаётся, ширина как у подписи |
 
 `variant="link"` — это вид кнопки (`font-weight: 400`), не тип элемента. Ссылка — `asChild` вокруг своего `<a>` или `Link`: классы, `ref` и обработчики сливаются в единственного ребёнка, свой `<button>` не рисуется. Ребёнок должен принять `className` и `ref`.
 
@@ -232,6 +258,9 @@ import { Button } from '@de-kit/st-ui/components/button';
 <Input error />
 <Input size="sm" />
 <Input noWrap />
+<PhoneInput recommended />
+<PhoneInput noWrap />
+<TextArea recommended />
 <TextArea maxLength={200} />
 <TextArea maxLength={200} counter={false} />
 <CheckboxInput label="18-24" />
@@ -243,9 +272,11 @@ import { Button } from '@de-kit/st-ui/components/button';
 <Spinner label="Считаем" size={24} />
 ```
 
+`Dropzone` стоит особняком: файл он отдаёт колбэком `onFiles`, а не через форму. Сам `input[type=file]` после выбора обнуляется, поэтому в `new FormData(form)` файла не будет и пропа `name` у зоны нет — храните файл в своём состоянии и отправляйте сами. В `Field` зона при этом полноценный контрол: про выбранный файл и про его пропажу она сообщает полю, так что `<Field required>` вокруг `Dropzone` покажет ошибку, когда файл сняли.
+
 Тексты, которые видит пользователь, — пропсы: `clearLabel` у `Input` и `PhoneInput`, `counterLabel` у `TextArea` (функция от остатка и максимума), `label` у `Spinner`, `errorFallback` у `Form` — он подставляется, когда `onSubmit` упал без внятного сообщения.
 
-`size` у `Input` и `TextArea` — те же `sm`, `md`, `lg`, что у кнопки. У `Input` высота совпадает с кнопкой ровно: 30, 40 и 52px, включая `type="date"`. У `TextArea` размер меняет паддинги и `min-height`: 120 / 160 / 200px, с 680px — 60 / 80 / 100px. Текст во всех размерах остаётся `--text-sm`. У `Input` проп перекрывает нативный `size` (ширину в символах). `noWrap` убирает `div.input__wrap`: крестик `clearable` от неё позиционируется, поэтому с `noWrap` не рисуется. `counter={false}` заменяет опечатку `noMaxMoty`. Счётчик `TextArea` показывает остаток символов и связан с полем через `aria-describedby`, сам `maxLength` по-прежнему режет ввод. `CheckboxInput` сам ставит `id`, если его не передали. Общий `name` у радио задаёт `RadioGroup`, она же рисует `fieldset` с `role="radiogroup"`. Её `required` делает обязательной всю группу и вне `Field`: `aria-required` уезжает на группу, нативный `required` — на пункты. Красная рамка у `CheckboxInput` и `RadioInput` — это проп `error`; один `required` больше не красит, он только обязывает. `Spinner` тянется по родителю, `position` раскладывает его по высоте, а `label` (по умолчанию «Загрузка») — подпись для скринридера.
+`size` у `Input` и `TextArea` — те же `sm`, `md`, `lg`, что у кнопки. У `Input` высота совпадает с кнопкой ровно: 30, 40 и 52px, включая `type="date"`. У `TextArea` размер меняет паддинги и `min-height`: 120 / 160 / 200px, с 680px — 60 / 80 / 100px. Текст во всех размерах остаётся `--text-sm`. У `Input` проп перекрывает нативный `size` (ширину в символах). `recommended` красит фон в `--color-recommended` у `Input`, `TextArea` и `PhoneInput`. `noWrap` у `Input` и `PhoneInput` убирает `div.input__wrap`: крестик `clearable` от неё позиционируется, поэтому с `noWrap` не рисуется. `counter={false}` заменяет опечатку `noMaxMoty`. Счётчик `TextArea` показывает остаток символов и связан с полем через `aria-describedby`, сам `maxLength` по-прежнему режет ввод. `CheckboxInput` сам ставит `id`, если его не передали. Общий `name` у радио задаёт `RadioGroup`, она же рисует `fieldset` с `role="radiogroup"`. Её `required` делает обязательной всю группу и вне `Field`: `aria-required` уезжает на группу, нативный `required` — на пункты. Красная рамка у `CheckboxInput` и `RadioInput` — это проп `error`; один `required` больше не красит, он только обязывает. `Spinner` тянется по родителю, `position` раскладывает его по высоте, а `label` (по умолчанию «Загрузка») — подпись для скринридера.
 
 ## Поле
 
@@ -267,7 +298,7 @@ import { Button } from '@de-kit/st-ui/components/button';
 
 Валидацией можно распоряжаться снаружи: проп `invalid` ставит `aria-invalid` на контрол, а собственная проверка обязательности при этом молчит — так поле подключается к react-hook-form или к ответу сервера без борьбы с внутренней эвристикой. Свой контрол внутри `Field` пишется через `useFieldControl` из корня пакета.
 
-Контрол внутри должен быть один: id он берёт у поля, поэтому свой `id` на ребёнке перебивается, а два контрола получат одинаковый. `required` ставит `aria-required` на контрол и показывает ошибку «Поле «Имя» обязательно» (свой текст — проп `requiredMessage`) в двух случаях: когда в поле что-то было, а потом не стало (стёрли текст, сняли галочку) и когда форму не пустила проверка браузера — `Field` ловит `invalid` в фазе захвата. Звёздочки у лейбла нет, обязательность видно по сообщению. У радиогруппы момента «стёрли» не бывает, поэтому её держит нативный `required` на пунктах: форма не отправится, ошибка появится после неудачной отправки и уйдёт, как только выберут вариант. Отсюда и граница: `required` поля работает с нативными контролами — `Input`, `TextArea`, `CheckboxInput`, `RadioGroup`. Произвольный ребёнок не отдаёт ни значения, ни `invalid`, и поле о его пустоте не узнает. `RadioGroup` внутри `Field` легенду не рисует: именем группы становится лейбл поля.
+Контрол внутри должен быть один: id он берёт у поля, поэтому свой `id` на ребёнке перебивается, а два контрола получат одинаковый. `required` ставит `aria-required` на контрол и показывает ошибку «Поле «Имя» обязательно» (свой текст — проп `requiredMessage`) в двух случаях: когда в поле что-то было, а потом не стало (стёрли текст, сняли галочку) и когда форму не пустила проверка браузера — `Field` ловит `invalid` в фазе захвата. Звёздочки у лейбла нет, обязательность видно по сообщению. У радиогруппы момента «стёрли» не бывает, поэтому её держит нативный `required` на пунктах: форма не отправится, ошибка появится после неудачной отправки и уйдёт, как только выберут вариант. Отсюда и граница: `required` поля работает с контролами библиотеки, которые сообщают ему своё значение, — `Input`, `TextArea`, `CheckboxInput`, `RadioGroup`, `PhoneInput`, `Select`, `SelectSearch`, `DatePicker` и `Dropzone` (последний — по факту выбранного файла, см. ниже). Произвольный ребёнок не отдаёт ни значения, ни `invalid`, и поле о его пустоте не узнает: для своего контрола возьмите `useFieldControl` и зовите его `reportValue`. `RadioGroup` внутри `Field` легенду не рисует: именем группы становится лейбл поля.
 
 ## Слои: PopupSheet, Popover, DatePicker
 
@@ -307,6 +338,8 @@ import { Button } from '@de-kit/st-ui/components/button';
 ```
 
 `label` пункта остаётся строкой: по нему идут поиск и подпись в закрытом поле. Нужна своя разметка строки списка — `renderOption`. Значение в форму отдаёт скрытое, но валидируемое поле, поэтому `required` из `Field` проверяет именно выбор, а не набранный запрос.
+
+`aria-label`, `aria-labelledby` и `aria-describedby` садятся на сам combobox, а не на корневой `div` (у `div` нет роли, и имя на нём не читается), и важнее умолчаний: заданное снаружи имя побеждает плейсхолдер, а `aria-describedby` складывается с описанием из `Field`. Внутри `Field` имя даёт его `<label>`, своё указывать не нужно. Остальные атрибуты по-прежнему уходят на корень.
 
 ## Разработка
 

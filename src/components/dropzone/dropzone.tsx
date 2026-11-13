@@ -1,6 +1,7 @@
 import {
   forwardRef,
   useCallback,
+  useEffect,
   useId,
   useMemo,
   useRef,
@@ -28,6 +29,9 @@ import {
 import './dropzone.scss';
 
 export type DropzoneVariant = 'square' | 'wide';
+
+/** Ошибка выбора вместе с правилами, при которых она возникла. */
+type LocalError = { key: string; message: ReactNode } | null;
 
 const PLACEHOLDER = 'Перетащите сюда или\u00A0нажмите для выбора';
 
@@ -96,7 +100,7 @@ export const Dropzone = forwardRef<HTMLDivElement, DropzoneProps>(
     const checkRef = useRef(0);
     const ownId = useId();
     const [isDragOver, setIsDragOver] = useState(false);
-    const [localError, setLocalError] = useState<ReactNode>(null);
+    const [localError, setLocalError] = useState<LocalError>(null);
     const resolved = useMemo(() => resolveDropzoneAccept(accept), [accept]);
     const fileLabel = fileLabelProp ?? resolved.label;
     const rules = useMemo<DropzoneRules>(
@@ -109,9 +113,18 @@ export const Dropzone = forwardRef<HTMLDivElement, DropzoneProps>(
       [fileLabel, maxSize, resolved],
     );
     const acceptAttr = toAcceptAttr(resolved);
+    // Строка, а не объект `rules`: его пересобирает любой инлайновый проп на
+    // каждом рендере, а эти правила меняются только вместе со своим значением.
+    const rulesKey = `${acceptAttr ?? ''}|${maxSize ?? ''}`;
+    // Жалоба принадлежит тем правилам, при которых возникла: сменились `accept`
+    // или `maxSize` — «Выберите файл фото» больше не про эту зону и исчезает
+    // сама. Вычисляем при рендере, а не гасим эффектом: иначе лишний рендер,
+    // а один кадр ошибка ещё висела бы.
+    const localMessage =
+      localError?.key === rulesKey ? localError.message : null;
     const filled = preview != null && preview !== false;
     const showClear = filled && Boolean(onClear);
-    const visibleError = error || localError;
+    const visibleError = error || localMessage;
     const errorId = visibleError ? `${ownId}-error` : undefined;
     const { field, controlProps } = useFieldControlProps({
       error: Boolean(visibleError),
@@ -119,6 +132,20 @@ export const Dropzone = forwardRef<HTMLDivElement, DropzoneProps>(
       errorId,
       nativeRequired: false,
     });
+    const reportValue = field?.reportValue;
+
+    /**
+     * Единственный канал, по которому `Field` узнаёт про выбранный файл.
+     * Нативной обязательности у зоны нет (`nativeRequired: false`), а сам
+     * `input[type=file]` остаётся пустым: после выбора значение сбрасывается,
+     * файлы уходят в `onFiles`. Без этого `<Field required>` вокруг `Dropzone`
+     * не показал бы ошибку и не помешал отправке — ни одна из трёх проверок
+     * поля не срабатывала.
+     */
+    useEffect(() => {
+      reportValue?.(filled ? 'on' : '');
+    }, [filled, reportValue]);
+
     // Свой id важнее id поля и не остаётся на корне: иначе лейбл бьёт мимо инпута.
     const inputId = id ?? field?.id ?? ownId;
     const labelId = label ? `${inputId}-label` : undefined;
@@ -134,11 +161,15 @@ export const Dropzone = forwardRef<HTMLDivElement, DropzoneProps>(
         const files = multiple ? picked : picked.slice(0, 1);
         if (files.length === 0) return;
 
+        const fail = (message: ReactNode) => {
+          setLocalError({ key: rulesKey, message });
+        };
+
         const checkId = ++checkRef.current;
         for (const file of files) {
           const invalid = validateDropzoneFile(file, rules);
           if (invalid) {
-            setLocalError(invalid);
+            fail(invalid);
             return;
           }
         }
@@ -150,13 +181,13 @@ export const Dropzone = forwardRef<HTMLDivElement, DropzoneProps>(
               custom = await validate(file);
             } catch {
               if (checkId !== checkRef.current) return;
-              setLocalError('Не удалось проверить файл');
+              fail('Не удалось проверить файл');
               return;
             }
 
             if (checkId !== checkRef.current) return;
             if (custom) {
-              setLocalError(custom);
+              fail(custom);
               return;
             }
           }
@@ -165,7 +196,7 @@ export const Dropzone = forwardRef<HTMLDivElement, DropzoneProps>(
         setLocalError(null);
         onFiles(files);
       },
-      [disabled, multiple, onFiles, rules, validate],
+      [disabled, multiple, onFiles, rules, rulesKey, validate],
     );
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {

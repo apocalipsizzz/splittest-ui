@@ -1,0 +1,37 @@
+# Та же калитка, что локально: `pnpm verify` целиком, без выборочных шагов.
+# Падает здесь — значит ветку нельзя вливать.
+name: verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Новый пуш в ту же ветку отменяет предыдущий прогон: очередь не копится.
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v5
+
+      # Версия pnpm берётся из `packageManager` в package.json — здесь её не дублируем.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # build:icons + typecheck + lint + format + sync-tokens + coverage + build + check:exports
+      - run: pnpm verify

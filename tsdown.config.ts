@@ -11,7 +11,14 @@ export default defineConfig({
   clean: true,
   platform: 'browser',
   target: 'es2022',
-  sourcemap: true,
+  // Карт не эмитим. С `unbundle` и target es2022 выхлоп — почти построчная
+  // копия исходника: имена, комментарии и JSDoc на месте, меняются только JSX
+  // (в вызовы `jsx`) и снятые типы, так что отлаживать можно прямо по dist.
+  // А карты со `sourcesContent` занимали 785 КБ из 1477 КБ пакета — 53%, то
+  // есть наши же исходники. Карты без `sourcesContent` тут не выход: `files`
+  // не везёт `src`, и они ссылались бы в пустоту; нужны настоящие — публикуйте
+  // вместе с `src`.
+  sourcemap: false,
   unbundle: true,
   alias: {
     '@/': fileURLToPath(new URL('./src/', import.meta.url)),

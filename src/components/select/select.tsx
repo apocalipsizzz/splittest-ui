@@ -18,14 +18,15 @@ import {
 import type { InputSize } from '@/components/input';
 import { IconDrop } from '@/icons/icon-drop';
 import { cn, when } from '@/lib/cn';
-import { FloatingLayerTree } from '@/lib/floating-layer';
+import { withFloatingLayer } from '@/lib/floating-layer';
 import { useControllableState } from '@/lib/hooks/use-controllable-state';
 import {
   SelectDropdown,
+  selectControlClassName,
+  useSelectControl,
   useSelectDropdown,
-  useSelectField,
-  useSelectValue,
 } from './select-dropdown';
+import { SelectValueInput } from './select-value-input';
 import {
   createTypeaheadBuffer,
   handleListKeyDown,
@@ -94,6 +95,11 @@ const SelectFrame = forwardRef<HTMLDivElement, SelectProps>(
       onOpenChange,
       renderOption,
       renderValue,
+      // aria-* уезжают на combobox, а не на корневой div: у div нет роли,
+      // и имя на нём вспомогательные технологии не читают.
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledBy,
+      'aria-describedby': ariaDescribedBy,
       ...rest
     } = props;
 
@@ -106,16 +112,24 @@ const SelectFrame = forwardRef<HTMLDivElement, SelectProps>(
       onOpenChange,
     );
     const [activeIndex, setActiveIndex] = useState(0);
-    const { selectedValue, setSelectedValue } = useSelectValue(
+    const {
+      selectedValue,
+      setSelectedValue,
+      field,
+      isInvalid,
+      controlProps,
+      naming,
+      selected,
+    } = useSelectControl({
+      items: options,
       value,
       defaultValue,
-    );
-    const { field, isInvalid, controlProps } = useSelectField(
-      selectedValue,
       error,
-    );
-    const selected =
-      options.find(option => option.value === selectedValue) ?? null;
+      describedBy: ariaDescribedBy,
+      label: ariaLabel,
+      labelledBy: ariaLabelledBy,
+      placeholder,
+    });
     const highlighted = highlightedIndex(options, activeIndex);
     const nodeId = useFloatingNodeId();
     const dropdown = useSelectDropdown(open, setOpen, nodeId);
@@ -229,7 +243,7 @@ const SelectFrame = forwardRef<HTMLDivElement, SelectProps>(
                 ? `${listId}-option-${highlighted}`
                 : undefined
             }
-            aria-label={field ? undefined : placeholder}
+            {...naming.control}
             disabled={disabled}
             onMouseDown={handleMouseDown}
             onBlur={handleBlur}
@@ -239,13 +253,12 @@ const SelectFrame = forwardRef<HTMLDivElement, SelectProps>(
             data-state={open ? 'open' : 'closed'}
             data-invalid={isInvalid || undefined}
             data-disabled={disabled || undefined}
-            className={cn(
-              'input',
-              'select__trigger',
-              when(!selected, 'select__trigger--empty'),
-              when(size !== 'md', `input--${size}`),
-              when(isInvalid, 'input--error'),
-            )}
+            className={selectControlClassName({
+              kind: 'select__trigger',
+              size,
+              invalid: isInvalid,
+              empty: !selected,
+            })}
           >
             <span className="select__value">
               {selected
@@ -254,16 +267,12 @@ const SelectFrame = forwardRef<HTMLDivElement, SelectProps>(
             </span>
             <IconDrop className="select__arrow" />
           </button>
-          <input
-            className="select__value-input"
+          <SelectValueInput
             name={name}
             disabled={disabled}
-            tabIndex={-1}
-            aria-hidden
-            value={selectedValue ?? ''}
-            onChange={() => {}}
+            value={selectedValue}
+            required={field?.required}
             onFocus={handleValueFocus}
-            {...(field?.required ? { required: true } : {})}
           />
           <SelectDropdown
             open={open}
@@ -272,8 +281,8 @@ const SelectFrame = forwardRef<HTMLDivElement, SelectProps>(
             selectedValue={selectedValue}
             highlighted={highlighted}
             emptyText={emptyText}
-            accessibleName={placeholder}
-            labelId={field?.labelId}
+            accessibleName={naming.listLabel}
+            labelId={naming.listLabelId}
             floatingStyles={dropdown.floatingStyles}
             setFloating={dropdown.setDropdownRef}
             getFloatingProps={dropdown.getFloatingProps}
@@ -288,12 +297,4 @@ const SelectFrame = forwardRef<HTMLDivElement, SelectProps>(
   },
 );
 
-export const Select = forwardRef<HTMLDivElement, SelectProps>(
-  function Select(props, ref) {
-    return (
-      <FloatingLayerTree>
-        <SelectFrame {...props} ref={ref} />
-      </FloatingLayerTree>
-    );
-  },
-);
+export const Select = withFloatingLayer(SelectFrame, 'Select');

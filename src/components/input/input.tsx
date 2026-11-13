@@ -6,14 +6,12 @@ import {
   useState,
   type ChangeEvent,
   type InputHTMLAttributes,
-  type MouseEvent,
 } from 'react';
 
 import { useFieldControlProps } from '@/components/field/use-field-control-props';
-import { IconCross } from '@/icons/icon-cross';
 import { cn, when } from '@/lib/cn';
 import { composeRefs } from '@/lib/compose-refs';
-import { emitInputValue } from '@/lib/emit-input-value';
+import { InputClearButton } from './input-clear-button';
 import './input.scss';
 
 export type InputSize = 'sm' | 'md' | 'lg';
@@ -99,19 +97,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     onChange?.(event);
   };
 
-  const handleClearMouseDown = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-  };
-
-  const handleClear = () => {
-    const input = inputRef.current;
-    if (!input) return;
-
-    emitInputValue(input, '');
-    onClear?.();
-    input.focus();
-  };
-
   const canClear =
     clearable && !noWrap && !disabled && !readOnly && current !== '';
   // Свой id важнее id поля: несколько инпутов в одном Field иначе получают один и тот же.
@@ -150,15 +135,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     <div className="input__wrap">
       {input}
       {canClear ? (
-        <button
-          type="button"
-          className="input__clear"
-          aria-label={clearLabel}
-          onMouseDown={handleClearMouseDown}
-          onClick={handleClear}
-        >
-          <IconCross width={16} height={16} />
-        </button>
+        <InputClearButton
+          inputRef={inputRef}
+          label={clearLabel}
+          onClear={onClear}
+        />
       ) : null}
     </div>
   );

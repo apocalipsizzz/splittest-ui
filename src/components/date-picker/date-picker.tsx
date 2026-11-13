@@ -5,11 +5,10 @@ import {
   useFloating,
   useFloatingNodeId,
   useInteractions,
+  useMergeRefs,
 } from '@floating-ui/react';
 import {
   forwardRef,
-  useCallback,
-  useEffect,
   useId,
   useMemo,
   useRef,
@@ -23,9 +22,9 @@ import { Input } from '@/components/input';
 import { IconCalendar } from '@/icons/icon-calendar';
 import { IconCorrect } from '@/icons/icon-correct';
 import { cn } from '@/lib/cn';
-import { FloatingLayerTree } from '@/lib/floating-layer';
+import { withFloatingLayer } from '@/lib/floating-layer';
 import { useControllableState } from '@/lib/hooks/use-controllable-state';
-import { Portal, portalProps } from '@/lib/portal';
+import { PORTAL_SELECTOR, Portal, portalProps } from '@/lib/portal';
 import '../input/input.scss';
 import { useScrollLock } from '@/lib/hooks/use-scroll-lock';
 import { WheelColumn } from './wheel-column';
@@ -178,7 +177,6 @@ const DatePickerFrame = forwardRef<HTMLDivElement, DatePickerProps>(
     const [draft, setDraft] = useState<DateParts>(() =>
       clampParts(partsOf(value ?? maxBirth), maxBirth),
     );
-    const focusOnMount = useRef(false);
     const sheetRef = useRef<HTMLDialogElement | null>(null);
     const titleId = useId();
     const nodeId = useFloatingNodeId();
@@ -189,44 +187,20 @@ const DatePickerFrame = forwardRef<HTMLDivElement, DatePickerProps>(
         if (!next) setOpen(false);
       },
     });
-    // Ловушка фокуса — у менеджера. Он же через rAF возвращает фокус внешнему
-    // листу, и дерево это не отменяет. Пока слой открыт, чужой focusin
-    // возвращаем на лист — без второго кадра.
     const dismiss = useDismiss(context, {
       outsidePressEvent: 'mousedown',
     });
     const { getFloatingProps } = useInteractions([dismiss]);
     const { setFloating, setReference } = refs;
-    const setSheetRef = useCallback(
-      (node: HTMLDialogElement | null) => {
-        setFloating(node);
-        sheetRef.current = node;
-        if (!node || !focusOnMount.current) return;
-        focusOnMount.current = false;
-        node.focus();
-      },
-      [setFloating],
+    // Новый массив на каждый рендер пересоздал бы ref и сбросил floating-узел.
+    const setSheetRef = useMergeRefs(
+      useMemo(() => [sheetRef, setFloating], [setFloating]),
     );
 
     const years = range(Math.min(minYear, draft.year), lastYear);
     const days = range(1, daysInMonth(draft.year, draft.month));
 
     useScrollLock(open);
-
-    useEffect(() => {
-      if (!open) return;
-
-      const handleFocusIn = (event: FocusEvent) => {
-        const sheet = sheetRef.current;
-        const target = event.target;
-        if (!sheet || !(target instanceof Node) || sheet.contains(target))
-          return;
-        sheet.focus();
-      };
-
-      document.addEventListener('focusin', handleFocusIn);
-      return () => document.removeEventListener('focusin', handleFocusIn);
-    }, [open]);
 
     const openSheet = () => {
       if (disabled) return;
@@ -235,7 +209,6 @@ const DatePickerFrame = forwardRef<HTMLDivElement, DatePickerProps>(
       const limit = maxAllowedDate(minAge, now);
       setToday(now);
       setDraft(clampParts(partsOf(value ?? limit), limit));
-      focusOnMount.current = true;
       setOpen(true);
     };
 
@@ -317,7 +290,22 @@ const DatePickerFrame = forwardRef<HTMLDivElement, DatePickerProps>(
                   aria-hidden="true"
                   onClick={close}
                 />
-                <FloatingFocusManager context={context} modal initialFocus={-1}>
+                {/*
+                  Фокус целиком на менеджере, второго механизма нет: прежний
+                  слушатель `focusin` на document возвращал на лист любой фокус
+                  извне, и первый же вложенный слой в своём портале оказался бы
+                  в ловушке без видимой причины. Как в PopupSheet: начальный
+                  фокус на сам лист (скринридер успевает объявить роль и
+                  заголовок), а чужие порталы объявлены «своими».
+                */}
+                <FloatingFocusManager
+                  context={context}
+                  modal
+                  initialFocus={sheetRef}
+                  getInsideElements={() =>
+                    Array.from(document.querySelectorAll(PORTAL_SELECTOR))
+                  }
+                >
                   <dialog
                     open
                     {...getFloatingProps()}
@@ -393,12 +381,4 @@ const DatePickerFrame = forwardRef<HTMLDivElement, DatePickerProps>(
   },
 );
 
-export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
-  function DatePicker(props, ref) {
-    return (
-      <FloatingLayerTree>
-        <DatePickerFrame {...props} ref={ref} />
-      </FloatingLayerTree>
-    );
-  },
-);
+export const DatePicker = withFloatingLayer(DatePickerFrame, 'DatePicker');

@@ -13,12 +13,28 @@ import {
 } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import * as sass from 'sass';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const src = join(root, 'src');
 const dist = join(root, 'dist');
 
 const scssImport = /^import ['"]\.\.?\/[^'"]+\.scss['"];\r?\n/gm;
+
+// Стили уезжают в пакет как scss, консьюмер компилирует их сам.
+// Прогон в память роняет verify на битом файле, а не его сборку.
+const assertScssCompiles = dir => {
+  for (const entry of readdirSync(dir)) {
+    const file = join(dir, entry);
+    if (statSync(file).isDirectory()) {
+      assertScssCompiles(file);
+      continue;
+    }
+    if (!entry.endsWith('.scss')) continue;
+
+    sass.compile(file);
+  }
+};
 
 const walk = dir => {
   for (const entry of readdirSync(dir)) {
@@ -36,6 +52,7 @@ const walk = dir => {
   }
 };
 
+assertScssCompiles(src);
 walk(src);
 
 // attw резолвит import "./button.scss" в .d.ts как TS-модуль и не находит его.

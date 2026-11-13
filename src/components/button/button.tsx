@@ -62,22 +62,13 @@ interface ChildElementProps {
   onClick?: MouseEventHandler<HTMLElement>;
 }
 
-const styleKeys = [
-  'variant',
-  'size',
-  'fullWidth',
-  'loading',
-  'asChild',
-  'className',
-] as const;
-
-const getClassName = ({
-  variant = 'default',
-  size = 'md',
-  fullWidth = false,
-  loading = false,
-  className,
-}: ButtonStyleProps) =>
+const getClassName = (
+  variant: ButtonVariant,
+  size: ButtonSize,
+  fullWidth: boolean,
+  loading: boolean,
+  className?: string,
+) =>
   cn(
     'button',
     className,
@@ -86,19 +77,6 @@ const getClassName = ({
     when(fullWidth, 'button--full-width'),
     when(loading, 'button--loading'),
   );
-
-const omitStyleProps = <T extends ButtonStyleProps>(
-  props: T,
-): Omit<T, (typeof styleKeys)[number]> => {
-  const next: Record<string, unknown> = {};
-  const skipped = new Set<string>(styleKeys);
-
-  for (const [key, value] of Object.entries(props)) {
-    if (!skipped.has(key)) next[key] = value;
-  }
-
-  return next as Omit<T, (typeof styleKeys)[number]>;
-};
 
 const renderContent = (children: ReactNode, loading?: boolean) => {
   if (!loading) return children;
@@ -118,12 +96,27 @@ export const Button = forwardRef(function Button(
   props: ButtonComponentProps,
   ref: ForwardedRef<HTMLElement>,
 ) {
-  const { loading } = props;
-  const className = getClassName(props);
-  const { children, ref: propsRef, ...domProps } = omitStyleProps(props);
+  const {
+    variant = 'default',
+    size = 'md',
+    fullWidth = false,
+    loading = false,
+    asChild,
+    className: classNameProp,
+    children,
+    ref: propsRef,
+    ...domProps
+  } = props;
+  const className = getClassName(
+    variant,
+    size,
+    fullWidth,
+    loading,
+    classNameProp,
+  );
   const nodeRef = ref ?? propsRef;
 
-  if (props.asChild) {
+  if (asChild) {
     if (!isValidElement(children) || children.type === Fragment) {
       throw new Error('Button с asChild ждёт ровно один React-элемент.');
     }
@@ -133,6 +126,9 @@ export const Button = forwardRef(function Button(
       domProps as ButtonHTMLAttributes<HTMLButtonElement>;
     const hostButton = children.type === 'button';
     const isBlocked = Boolean(disabled || loading);
+    // Нативный disabled — только по явному пропу. На loading браузер унёс бы
+    // фокус в body, и объявлять aria-busy стало бы некому.
+    const nativelyDisabled = hostButton && Boolean(disabled);
     const handleClick: MouseEventHandler<HTMLElement> = event => {
       if (isBlocked) {
         event.preventDefault();
@@ -162,9 +158,9 @@ export const Button = forwardRef(function Button(
         {...(type !== undefined || hostButton
           ? { type: type ?? 'button' }
           : {})}
-        {...(hostButton && isBlocked ? { disabled: true } : {})}
+        {...(nativelyDisabled ? { disabled: true } : {})}
         {...(loading ? { 'aria-busy': true } : {})}
-        {...(!hostButton && isBlocked ? { 'aria-disabled': true } : {})}
+        {...(isBlocked && !nativelyDisabled ? { 'aria-disabled': true } : {})}
       >
         {element}
       </Slot>
@@ -180,15 +176,36 @@ export const Button = forwardRef(function Button(
     ...buttonProps
   } = domProps as ButtonHTMLAttributes<HTMLButtonElement>;
 
+  /**
+   * `loading` не ставит нативный `disabled`: браузер снимает фокус с
+   * выключенного контрола и уносит его в body — клавиатурный пользователь
+   * после отправки формы оказывается в начале документа, а `aria-busy`
+   * объявлять уже некому. Поэтому гасим клик сами, как в ветке `asChild`
+   * и в `Pagination`, а состояние отдаём через `aria-disabled` + `aria-busy`.
+   *
+   * Оба атрибута уходят условным спредом, а не `aria-busy={loading ||
+   * undefined}`: атрибут после спреда затирал бы значение потребителя —
+   * `Pagination` гасит `aria-disabled` шаги на краях списка.
+   */
+  const handleClick: MouseEventHandler<HTMLButtonElement> = event => {
+    if (loading) {
+      event.preventDefault();
+      return;
+    }
+
+    onClick?.(event);
+  };
+
   return (
     <button
       {...buttonProps}
       ref={nodeRef as Ref<HTMLButtonElement>}
       className={className}
       type={type}
-      disabled={disabled || loading}
-      onClick={onClick}
-      aria-busy={loading || undefined}
+      disabled={disabled}
+      onClick={handleClick}
+      {...(loading ? { 'aria-busy': true } : {})}
+      {...(loading && !disabled ? { 'aria-disabled': true } : {})}
     >
       {content}
     </button>

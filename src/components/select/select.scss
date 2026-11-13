@@ -49,7 +49,7 @@
 }
 
 .select__dropdown {
-  z-index: 30;
+  z-index: var(--z-dropdown);
   box-sizing: border-box;
   overflow: auto;
   max-height: 280px;
