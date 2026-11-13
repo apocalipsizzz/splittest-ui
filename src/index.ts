@@ -74,6 +74,18 @@ export {
 } from './components/popup-sheet';
 export { Progress, type ProgressProps } from './components/progress';
 export {
+  getPaginationState,
+  Pagination,
+  paginationRangeCompact,
+  paginationRangeRegular,
+  type PaginationItem,
+  type PaginationLayout,
+  type PaginationProps,
+  type PaginationRange,
+  type PaginationRangePreset,
+  type PaginationState,
+} from './components/pagination';
+export {
   Spinner,
   type SpinnerPosition,
   type SpinnerProps,

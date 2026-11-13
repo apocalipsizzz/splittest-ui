@@ -11,6 +11,7 @@ import { Field } from '@/components/field';
 import { Form, FormActions, FormSubmit } from '@/components/form';
 import { HR } from '@/components/hr';
 import { Input } from '@/components/input';
+import { Pagination } from '@/components/pagination';
 import { PhoneInput } from '@/components/phone-input';
 import { Popover } from '@/components/popover';
 import { PopupSheet } from '@/components/popup-sheet';
@@ -124,6 +125,19 @@ describe('доступность компонентов (axe)', () => {
           onFiles={() => {}}
         />
       </>,
+    );
+    expect(await axeViolations()).toEqual([]);
+  });
+
+  it('Pagination: текущая страница, края и многоточие', async () => {
+    render(
+      <Pagination
+        page={1}
+        pageCount={99}
+        layout="inline"
+        range="regular"
+        onPageChange={() => {}}
+      />,
     );
     expect(await axeViolations()).toEqual([]);
   });

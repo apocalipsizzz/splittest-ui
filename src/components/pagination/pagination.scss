@@ -1,0 +1,138 @@
+@use '../../styles/mixins' as mixins;
+
+.pagination {
+  // Размер кнопки номера, он же у «…»: ряд не прыгает по высоте.
+  --pagination-size: 30px;
+
+  box-sizing: border-box;
+  width: 100%;
+  container: pagination / inline-size;
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  @include mixins.min-width(md) {
+    .pagination__row {
+      flex-wrap: nowrap;
+    }
+  }
+
+  &--inline &__row {
+    flex-wrap: nowrap;
+  }
+
+  &--stacked &__row {
+    flex-wrap: wrap;
+  }
+
+  &__list {
+    @include mixins.reset-list;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+  }
+
+  &--responsive &__list {
+    @include mixins.min-width(md) {
+      flex: 1 1 auto;
+    }
+  }
+
+  &--stacked &__list {
+    order: -1;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+
+  &--inline &__list {
+    flex: 1 1 auto;
+  }
+
+  &__page {
+    box-sizing: border-box;
+    display: flex;
+    flex-shrink: 0;
+    min-width: var(--pagination-size);
+    height: var(--pagination-size);
+    margin: 0;
+    // Трёх- и четырёхзначные номера не влезают в круг: кнопка растёт в пилюлю.
+    // --radius-rounded (100%) дал бы на ней эллипс.
+    padding: 0 var(--space-1);
+    border: 2px solid transparent;
+    border-radius: calc(var(--pagination-size) / 2);
+    background: none;
+    color: var(--color-foreground);
+    font: inherit;
+    font-weight: var(--font-weight-bold);
+    line-height: 1;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+
+    &:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: var(--focus-ring-width) solid var(--focus-ring-color);
+      outline-offset: var(--focus-ring-offset);
+    }
+
+    @include mixins.hover {
+      &:not(:disabled, .pagination__page--current) {
+        background-color: var(--color-primary);
+        color: var(--color-primary-foreground);
+      }
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+
+    &--current {
+      border-color: var(--color-foreground);
+      cursor: default;
+    }
+  }
+
+  &__ellipsis {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--pagination-size);
+    height: var(--pagination-size);
+    font-weight: var(--font-weight-bold);
+    user-select: none;
+  }
+
+  // У link disabled остаётся цвет текста. На первой странице «Назад» серый.
+  &__step.button--link:disabled,
+  &__step.button--link[aria-disabled='true'] {
+    color: var(--color-inactive);
+    fill: currentColor;
+  }
+}
+
+// Пять и больше страниц: в узкой колонке номера не делят строку с кнопками.
+// Считаем ширину самого компонента, а не окна: колонка уже вьюпорта.
+@container pagination (max-width: #{mixins.breakpoint(md) - 0.02px}) {
+  .pagination--labeled .pagination__row {
+    flex-wrap: wrap;
+  }
+
+  .pagination--labeled .pagination__list {
+    order: -1;
+    flex: none;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+}
