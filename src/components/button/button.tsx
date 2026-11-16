@@ -78,6 +78,18 @@ const getClassName = (
     when(loading, 'button--loading'),
   );
 
+// React 18 вешает на props.ref геттер, который ругается при чтении.
+// В 19 ref — обычный проп. Читаем только если это не заглушка.
+const readPropsRef = (props: object): Ref<HTMLElement> | undefined => {
+  const getter = Object.getOwnPropertyDescriptor(props, 'ref')?.get as
+    | { isReactWarning?: boolean }
+    | undefined;
+  if (getter?.isReactWarning) return undefined;
+  if (!('ref' in props)) return undefined;
+
+  return (props as { ref?: Ref<HTMLElement> | null }).ref ?? undefined;
+};
+
 const renderContent = (children: ReactNode, loading?: boolean) => {
   if (!loading) return children;
 
@@ -96,6 +108,7 @@ export const Button = forwardRef(function Button(
   props: ButtonComponentProps,
   ref: ForwardedRef<HTMLElement>,
 ) {
+  const propsRef = readPropsRef(props);
   const {
     variant = 'default',
     size = 'md',
@@ -104,9 +117,10 @@ export const Button = forwardRef(function Button(
     asChild,
     className: classNameProp,
     children,
-    ref: propsRef,
     ...domProps
   } = props;
+  // В React 19 ref попадает в rest обычным полем. На узел его ставит nodeRef.
+  delete (domProps as { ref?: unknown }).ref;
   const className = getClassName(
     variant,
     size,

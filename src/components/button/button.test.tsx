@@ -131,6 +131,52 @@ describe('Button', () => {
     );
   });
 
+  it('не читает ref-заглушку React 18 и берёт аргумент forwardRef', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const buttonRef = createRef<HTMLButtonElement>();
+    const props: ButtonProps = { children: 'Ок' };
+    let reads = 0;
+    const warn = Object.assign(
+      () => {
+        reads += 1;
+        console.error('ref is not a prop');
+        return undefined;
+      },
+      { isReactWarning: true },
+    );
+
+    Object.defineProperty(props, 'ref', {
+      configurable: true,
+      get: warn,
+    });
+
+    const renderButton = (
+      Button as unknown as {
+        render: (props: ButtonProps, ref: typeof buttonRef) => ReactNode;
+      }
+    ).render;
+
+    render(<>{renderButton(props, buttonRef)}</>);
+
+    expect(reads).toBe(0);
+    expect(error).not.toHaveBeenCalled();
+    expect(buttonRef.current).toBeInstanceOf(HTMLButtonElement);
+    error.mockRestore();
+  });
+
+  it('берёт ref из props, если forwardRef его не передал', () => {
+    const buttonRef = createRef<HTMLButtonElement>();
+    const props: ButtonProps = { children: 'Ок', ref: buttonRef };
+    const renderButton = (
+      Button as unknown as {
+        render: (props: ButtonProps, ref: null) => ReactNode;
+      }
+    ).render;
+
+    render(<>{renderButton(props, null)}</>);
+    expect(buttonRef.current).toBeInstanceOf(HTMLButtonElement);
+  });
+
   it('ButtonProps принимает ref на HTMLElement', () => {
     let node: HTMLElement | null = null;
     const props: ButtonProps = {
