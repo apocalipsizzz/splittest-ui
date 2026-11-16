@@ -1,11 +1,11 @@
-import type { HTMLAttributes, ReactNode } from 'react';
+import { useEffect, useRef, type HTMLAttributes, type ReactNode } from 'react';
 
 import { Button } from '@/components/button';
 import { IconArrowLeft } from '@/icons/icon-arrow-left';
 import { IconArrowRight } from '@/icons/icon-arrow-right';
 import { cn, when } from '@/lib/cn';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
-import { getPaginationState } from './pagination-items';
+import { getPaginationState, outOfRangePage } from './pagination-items';
 import './pagination.scss';
 
 /** Совпадает с `min-width(md)` в mixins: в `@media` токен не подставить. */
@@ -27,6 +27,11 @@ export interface PaginationProps extends Omit<
   /** Сколько всего страниц. Меньше 2 — компонент не рисуется. */
   pageCount: number;
   onPageChange: (page: number) => void;
+  /**
+   * `page` вне 1…pageCount. Аргумент — номер, к которому ряд уже прижат.
+   * Пока `pageCount` < 1, не вызывается: страниц ещё нет, адрес трогать рано.
+   */
+  onPageOutOfRange?: (page: number) => void;
   prevLabel?: ReactNode;
   nextLabel?: ReactNode;
   disabled?: boolean;
@@ -43,6 +48,7 @@ export function Pagination(props: PaginationProps) {
     page,
     pageCount,
     onPageChange,
+    onPageOutOfRange,
     prevLabel = 'Назад',
     nextLabel = 'Вперёд',
     className,
@@ -50,6 +56,20 @@ export function Pagination(props: PaginationProps) {
     'aria-label': ariaLabel = 'Страницы',
     ...rest
   } = props;
+
+  const onPageOutOfRangeRef = useRef(onPageOutOfRange);
+  useEffect(() => {
+    onPageOutOfRangeRef.current = onPageOutOfRange;
+  });
+
+  // Ряд и так рисует прижатую страницу. Колбэк нужен родителю, чтобы
+  // поправить адрес: иначе `?page=40` при трёх страницах так и останется.
+  // Смена самой функции повторно не зовёт: иначе инлайн-колбэк зациклится.
+  useEffect(() => {
+    const next = outOfRangePage(page, pageCount);
+    if (next === null) return;
+    onPageOutOfRangeRef.current?.(next);
+  }, [page, pageCount]);
 
   const isWide = useMediaQuery(WIDE_QUERY);
   const state = getPaginationState(

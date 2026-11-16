@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { getPaginationState, type PaginationItem } from './pagination-items';
+import {
+  getPaginationState,
+  outOfRangePage,
+  type PaginationItem,
+} from './pagination-items';
 
 const picture = (items: PaginationItem[]) =>
   items.map(item => (item.type === 'page' ? String(item.page) : '…')).join(' ');
@@ -83,5 +87,25 @@ describe('getPaginationState', () => {
 
   it('на огромном списке ряд остаётся прежней длины', () => {
     expect(getPaginationState(1, 200000, WIDE).items).toHaveLength(10);
+  });
+});
+
+describe('outOfRangePage', () => {
+  it('прижимает страницу за краями диапазона', () => {
+    expect(outOfRangePage(40, 10)).toBe(10);
+    expect(outOfRangePage(0, 10)).toBe(1);
+    expect(outOfRangePage(-3, 10)).toBe(1);
+    expect(outOfRangePage(11.2, 10.9)).toBe(10);
+    expect(outOfRangePage(5, 1)).toBe(1);
+  });
+
+  it('молчит внутри диапазона и пока страниц нет', () => {
+    expect(outOfRangePage(5, 10)).toBeNull();
+    expect(outOfRangePage(1, 1)).toBeNull();
+    expect(outOfRangePage(10, 10)).toBeNull();
+    expect(outOfRangePage(10.9, 10)).toBeNull();
+    expect(outOfRangePage(5, 0)).toBeNull();
+    expect(outOfRangePage(5, Number.NaN)).toBeNull();
+    expect(outOfRangePage(Number.NaN, 10)).toBeNull();
   });
 });

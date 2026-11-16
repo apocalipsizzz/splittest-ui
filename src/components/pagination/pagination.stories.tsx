@@ -98,7 +98,7 @@ function ListPager(props: { total: number; limit: number }) {
   );
 }`;
 
-const propsExample = `// Больше пропсов у компонента нет: ряд и раскладку он выбирает сам.
+const propsExample = `// Ряд и раскладку компонент выбирает сам.
 <Pagination page={page} pageCount={99} onPageChange={setPage} />
 
 // Свои подписи шагов — они же имена кнопок для скринридера.
@@ -111,7 +111,19 @@ const propsExample = `// Больше пропсов у компонента н�
 />
 
 // Ряд целиком недоступен, пока грузится страница.
-<Pagination page={page} pageCount={99} disabled onPageChange={setPage} />`;
+<Pagination page={page} pageCount={99} disabled onPageChange={setPage} />
+
+// ?page=40 при трёх страницах: ряд уже показывает последнюю,
+// колбэк даёт поправить адрес. Пока pageCount < 1, молчит.
+<Pagination
+  page={page}
+  pageCount={pageCount}
+  onPageChange={setPage}
+  onPageOutOfRange={setPage}
+/>
+
+// Отступ сверху — --pagination-offset, по умолчанию --space-6.
+// .pagination { --pagination-offset: 0; }`;
 
 export const Usage: Story = {
   render: () => (

@@ -178,6 +178,72 @@ describe('Pagination', () => {
     expect(screen.getByRole('navigation')).not.toHaveClass('pagination--few');
   });
 
+  it('сообщает страницу за пределом и не трогает onPageChange', () => {
+    mockMatchMedia(true);
+    const onPageChange = vi.fn<(page: number) => void>();
+    const onPageOutOfRange = vi.fn<(page: number) => void>();
+
+    const { rerender } = render(
+      <Pagination
+        page={40}
+        pageCount={10}
+        onPageChange={onPageChange}
+        onPageOutOfRange={onPageOutOfRange}
+      />,
+    );
+
+    expect(onPageOutOfRange).toHaveBeenCalledTimes(1);
+    expect(onPageOutOfRange).toHaveBeenCalledWith(10);
+    expect(onPageChange).not.toHaveBeenCalled();
+    expect(screen.getByText('10')).toHaveAttribute('aria-current', 'page');
+
+    rerender(
+      <Pagination
+        page={40}
+        pageCount={10}
+        onPageChange={onPageChange}
+        onPageOutOfRange={() => {}}
+      />,
+    );
+    expect(onPageOutOfRange).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <Pagination
+        page={4}
+        pageCount={10}
+        onPageChange={onPageChange}
+        onPageOutOfRange={onPageOutOfRange}
+      />,
+    );
+    expect(onPageOutOfRange).toHaveBeenCalledTimes(1);
+  });
+
+  it('сообщает выход за предел, даже когда ряд не рисуется', () => {
+    const onPageOutOfRange = vi.fn<(page: number) => void>();
+
+    const { rerender } = render(
+      <Pagination
+        page={5}
+        pageCount={1}
+        onPageChange={() => {}}
+        onPageOutOfRange={onPageOutOfRange}
+      />,
+    );
+
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(onPageOutOfRange).toHaveBeenCalledWith(1);
+
+    rerender(
+      <Pagination
+        page={5}
+        pageCount={Number.NaN}
+        onPageChange={() => {}}
+        onPageOutOfRange={onPageOutOfRange}
+      />,
+    );
+    expect(onPageOutOfRange).toHaveBeenCalledTimes(1);
+  });
+
   it('не рисуется на одной странице и при битом pageCount', () => {
     const { rerender } = render(
       <Pagination page={1} pageCount={1} onPageChange={() => {}} />,

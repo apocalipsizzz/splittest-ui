@@ -1,5 +1,11 @@
 # @de-kit/st-ui
 
+## 0.4.6
+
+### Patch Changes
+
+- `Pagination` получает отступ сверху `--pagination-offset` (по умолчанию `--space-6`) и необязательный `onPageOutOfRange`. Колбэк вызывается с уже прижатым номером, когда `page` вне 1…pageCount. Пока `pageCount` меньше 1, не вызывается.
+
 ## 0.4.5
 
 ### Patch Changes

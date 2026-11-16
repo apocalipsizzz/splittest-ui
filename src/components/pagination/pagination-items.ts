@@ -66,6 +66,24 @@ const whole = (value: number) =>
   Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
 
 /**
+ * Номер, к которому прижата страница, если она вне 1…pageCount.
+ * `null` — страница уже в диапазоне, `page` не число или страниц ещё нет
+ * (`pageCount` < 1: список не пришёл, дёргать адрес рано).
+ */
+export const outOfRangePage = (
+  page: number,
+  pageCount: number,
+): number | null => {
+  const count = whole(pageCount);
+  if (count < 1 || !Number.isFinite(page)) return null;
+
+  const current = Math.trunc(page);
+  if (current >= 1 && current <= count) return null;
+
+  return Math.min(count, Math.max(1, current));
+};
+
+/**
  * Номера для отрисовки. `size` — сколько номеров видно по краям ряда.
  * Меньше двух страниц — пустой список, компонент тогда ничего не рисует.
  */

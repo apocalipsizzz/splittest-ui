@@ -3,9 +3,12 @@
 .pagination {
   // Размер кнопки номера, он же у «…»: ряд не прыгает по высоте.
   --pagination-size: 30px;
+  // Отступ от списка над рядом. Проекты больше не задают свой margin-top.
+  --pagination-offset: var(--space-6);
 
   box-sizing: border-box;
   width: 100%;
+  margin-top: var(--pagination-offset);
 
   &__row {
     display: flex;
