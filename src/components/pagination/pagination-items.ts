@@ -1,3 +1,4 @@
+/** @internal */
 export type PaginationItem =
   | { type: 'page'; page: number }
   | { type: 'ellipsis'; key: 'start' | 'end' };

@@ -67,7 +67,7 @@ const trimSize = (value: number) => {
   return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
 };
 
-export const formatMaxSize = (bytes: number) => {
+const formatMaxSize = (bytes: number) => {
   if (bytes >= MB) return `${trimSize(bytes / MB)} МБ`;
   if (bytes >= KB) return `${trimSize(bytes / KB)} КБ`;
   return `${bytes} Б`;

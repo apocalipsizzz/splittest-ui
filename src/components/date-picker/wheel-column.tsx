@@ -8,11 +8,13 @@ import {
 import { cn, when } from '@/lib/cn';
 import './wheel-column.scss';
 
+/** @internal Высота пункта. Тесты крутят scrollTop кратно ей. */
 export const WHEEL_ITEM_HEIGHT = 40;
 const VISIBLE_ROWS = 5;
 /** Пауза после последнего scroll-события, по которой считаем колесо остановленным. */
 const SETTLE_DELAY = 120;
 
+/** @internal */
 export interface WheelItem {
   value: number;
   label: string;

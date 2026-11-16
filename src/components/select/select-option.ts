@@ -6,7 +6,7 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
-export const firstEnabledIndex = (options: readonly SelectOption[]) =>
+const firstEnabledIndex = (options: readonly SelectOption[]) =>
   options.findIndex(option => !option.disabled);
 
 export const highlightedIndex = (
@@ -54,7 +54,10 @@ export const isPrintableKey = (event: KeyboardEvent) =>
   !event.metaKey &&
   !event.altKey;
 
-/** Пауза typeahead: «мо» ищет префикс, а не две отдельные буквы. Как у Radix и APG. */
+/**
+ * Пауза typeahead: «мо» ищет префикс, а не две отдельные буквы. Как у Radix и APG.
+ * @internal
+ */
 export const TYPEAHEAD_TIMEOUT = 500;
 
 const PAGE_STEP = 10;

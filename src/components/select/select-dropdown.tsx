@@ -26,7 +26,7 @@ import { cn, when } from '@/lib/cn';
 import { Portal, portalProps } from '@/lib/portal';
 import { type SelectOption } from './select-option';
 
-export const useSelectValue = (
+const useSelectValue = (
   value: string | null | undefined,
   defaultValue: string | null,
 ) => {
@@ -41,7 +41,7 @@ export const useSelectValue = (
   return { selectedValue, setSelectedValue };
 };
 
-export const useSelectField = (
+const useSelectField = (
   selectedValue: string | null,
   error?: boolean,
   describedBy?: string,
@@ -79,7 +79,7 @@ interface SelectNamingOptions {
  * садятся на combobox, а не на корневой `div`, — у `div` нет роли, и
  * `aria-label` на нём вспомогательные технологии игнорируют.
  */
-export const selectNaming = (options: SelectNamingOptions) => {
+const selectNaming = (options: SelectNamingOptions) => {
   const { label, labelledBy, placeholder, fieldLabelId, insideField } = options;
   const resolvedLabel =
     label ?? (labelledBy || insideField ? undefined : placeholder);

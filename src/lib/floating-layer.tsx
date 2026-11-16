@@ -12,7 +12,7 @@ import {
  * `FloatingNode` родителя и регистрируется в том же дереве.
  * Общее дерево нужно, чтобы фокус и Escape не спорили между листами.
  */
-export const FloatingLayerTree = (props: { children: ReactNode }) => {
+const FloatingLayerTree = (props: { children: ReactNode }) => {
   const parentId = useFloatingParentNodeId();
   if (parentId != null) return props.children;
 

@@ -28,6 +28,7 @@ const swapLayout = (value: string) =>
     .map(char => toEn.get(char) ?? toRu.get(char) ?? char)
     .join('');
 
+/** @internal */
 export const matchesQuery = (text: string, query: string) => {
   const primary = normalize(query);
   if (!primary) return true;
@@ -39,6 +40,7 @@ export const matchesQuery = (text: string, query: string) => {
   return alternate !== primary && haystack.includes(alternate);
 };
 
+/** @internal */
 export const defaultFilterOption = (
   option: SelectSearchable,
   query: string,

@@ -32,7 +32,7 @@ const PHONE_DEFINITIONS = {
  * литералы остаются. Это атрибут placeholder, а не значение, поэтому
  * required и FormData не меняются.
  */
-export const maskPlaceholder = (mask: string) => mask.replace(/[09#]/g, '_');
+const maskPlaceholder = (mask: string) => mask.replace(/[09#]/g, '_');
 
 export interface PhoneInputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,

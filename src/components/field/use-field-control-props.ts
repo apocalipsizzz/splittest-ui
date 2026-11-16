@@ -6,7 +6,7 @@ export const joinDescribedBy = (...ids: Array<string | undefined>) => {
   return value || undefined;
 };
 
-export interface FieldControlProps {
+interface FieldControlProps {
   'required'?: boolean;
   'aria-required'?: true;
   'aria-invalid'?: true;
