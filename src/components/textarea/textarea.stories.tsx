@@ -57,6 +57,9 @@ export const States: Story = {
         <Labeled label="disabled" wide maxWidth={360}>
           <TextArea disabled defaultValue="нельзя" />
         </Labeled>
+        <Labeled label="label" wide maxWidth={360}>
+          <TextArea label="Комментарий" placeholder="Комментарий" />
+        </Labeled>
       </LabeledBlock>
       <LabeledBlock title="counter">
         <Labeled label="maxLength" wide maxWidth={360}>

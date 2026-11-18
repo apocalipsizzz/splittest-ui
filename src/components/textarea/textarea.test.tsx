@@ -90,6 +90,33 @@ describe('TextArea', () => {
     expect(screen.getByPlaceholderText('Текст')).toHaveClass('textarea--lg');
   });
 
+  it('без label подписи нет', () => {
+    render(<TextArea placeholder="Текст" />);
+    expect(document.querySelector('.textarea__label')).not.toBeInTheDocument();
+  });
+
+  it('label связан с полем', async () => {
+    render(<TextArea label="Комментарий" />);
+    const area = screen.getByRole('textbox', { name: 'Комментарий' });
+
+    expect(area).toHaveClass('textarea');
+    await userEvent.click(screen.getByText('Комментарий'));
+    expect(area).toHaveFocus();
+  });
+
+  it('свой label не забирает id поля', () => {
+    render(
+      <Field label="Пример и комментарий">
+        <TextArea label="Комментарий" />
+      </Field>,
+    );
+
+    const area = screen.getByRole('textbox', { name: 'Комментарий' });
+    const fieldLabel = screen.getByText('Пример и комментарий');
+    expect(fieldLabel).toHaveAttribute('for');
+    expect(fieldLabel.getAttribute('for')).not.toBe(area.id);
+  });
+
   it('свой id важнее id поля', () => {
     render(
       <Field label="Комментарий">

@@ -199,7 +199,7 @@ import '@de-kit/st-ui/vars.scss';
 
 **Браузеры.** Планку задаёт CSS, а не JS: **Chrome/Edge 111+, Safari 16.2+, Firefox 113+** (весна 2023). Ограничивает `color-mix()` — на нём держатся `--color-border`, `--color-inactive`, `--color-recommended`, рамка ошибки и ползунок скролла; автопрефиксер его не раскрывает, полифила нет, в старом браузере эти цвета просто не применятся. Остальное мягче: `aspect-ratio` и `:is()` — с 2021 года, `scroll-snap-type` и `overscroll-behavior` в колесе `DatePicker` — давно, `scrollbar-gutter` в `reset.scss` до Safari 18.2 просто игнорируется и ничего не ломает. JS собран в es2022 (`?.`, `.at(-1)`) — это Chrome 92+ и Safari 15.4+, то есть заведомо ниже планки CSS. Поля `browserslist` в пакете нет намеренно: готовый CSS библиотека не эмитит, а JS-таргет задан в `tsdown.config.ts` — лишнее поле только вводило бы в заблуждение, будто сборка под него подстраивается.
 
-Класс в DOM буквальный: `button`, `input`, `checkbox`, `radio`, `textarea`, `spinner`. Корень и модификаторы одинарные (`.button`, `.button--outline`). Внутренние элементы — BEM: `checkbox__input`, `textarea__counter`.
+Класс в DOM буквальный: `button`, `input`, `checkbox`, `radio`, `textarea`, `spinner`. Корень и модификаторы одинарные (`.button`, `.button--outline`). Внутренние элементы — BEM: `checkbox__input`, `textarea__label`, `textarea__counter`.
 
 Кроме классов компоненты пишут состояние в `data-*` — это публичный контракт для CSS и тестов, в отличие от внутренних BEM-модификаторов:
 
@@ -263,6 +263,7 @@ import '@de-kit/st-ui/vars.scss';
 <TextArea recommended />
 <TextArea maxLength={200} />
 <TextArea maxLength={200} counter={false} />
+<TextArea label="Комментарий" />
 <CheckboxInput label="18-24" />
 <CheckboxInput label="Согласен" error />
 <RadioGroup label="Возраст" name="age" required>
@@ -274,9 +275,21 @@ import '@de-kit/st-ui/vars.scss';
 
 `Dropzone` стоит особняком: файл он отдаёт колбэком `onFiles`, а не через форму. Сам `input[type=file]` после выбора обнуляется, поэтому в `new FormData(form)` файла не будет и пропа `name` у зоны нет — храните файл в своём состоянии и отправляйте сами. В `Field` зона при этом полноценный контрол: про выбранный файл и про его пропажу она сообщает полю, так что `<Field required>` вокруг `Dropzone` покажет ошибку, когда файл сняли.
 
-Тексты, которые видит пользователь, — пропсы: `clearLabel` у `Input` и `PhoneInput`, `counterLabel` у `TextArea` (функция от остатка и максимума), `label` у `Spinner`, `errorFallback` у `Form` — он подставляется, когда `onSubmit` упал без внятного сообщения.
+Тексты, которые видит пользователь, — пропсы: `clearLabel` у `Input` и `PhoneInput`, `counterLabel` у `TextArea` (функция от остатка и максимума), `label` у `TextArea` и `Spinner`, `errorFallback` у `Form` — он подставляется, когда `onSubmit` упал без внятного сообщения.
 
-`size` у `Input` и `TextArea` — те же `sm`, `md`, `lg`, что у кнопки. У `Input` высота совпадает с кнопкой ровно: 30, 40 и 52px, включая `type="date"`. У `TextArea` размер меняет паддинги и `min-height`: 120 / 160 / 200px, с 680px — 60 / 80 / 100px. Текст во всех размерах остаётся `--text-sm`. У `Input` проп перекрывает нативный `size` (ширину в символах). `recommended` красит фон в `--color-recommended` у `Input`, `TextArea` и `PhoneInput`. `noWrap` у `Input` и `PhoneInput` убирает `div.input__wrap`: крестик `clearable` от неё позиционируется, поэтому с `noWrap` не рисуется. `counter={false}` заменяет опечатку `noMaxMoty`. Счётчик `TextArea` показывает остаток символов и связан с полем через `aria-describedby`, сам `maxLength` по-прежнему режет ввод. `CheckboxInput` сам ставит `id`, если его не передали. Общий `name` у радио задаёт `RadioGroup`, она же рисует `fieldset` с `role="radiogroup"`. Её `required` делает обязательной всю группу и вне `Field`: `aria-required` уезжает на группу, нативный `required` — на пункты. Красная рамка у `CheckboxInput` и `RadioInput` — это проп `error`; один `required` больше не красит, он только обязывает. `Spinner` тянется по родителю, `position` раскладывает его по высоте, а `label` (по умолчанию «Загрузка») — подпись для скринридера.
+`size` у `Input` и `TextArea` — те же `sm`, `md`, `lg`, что у кнопки. У `Input` высота совпадает с кнопкой ровно: 30, 40 и 52px, включая `type="date"`. У `TextArea` размер меняет паддинги и `min-height`: 120 / 160 / 200px, с 680px — 60 / 80 / 100px. Текст во всех размерах остаётся `--text-sm`. У `Input` проп перекрывает нативный `size` (ширину в символах). `recommended` красит фон в `--color-recommended` у `Input`, `TextArea` и `PhoneInput`. `noWrap` у `Input` и `PhoneInput` убирает `div.input__wrap`: крестик `clearable` от неё позиционируется, поэтому с `noWrap` не рисуется. `counter={false}` заменяет опечатку `noMaxMoty`. Счётчик `TextArea` показывает остаток символов и связан с полем через `aria-describedby`, сам `maxLength` по-прежнему режет ввод. `label` у `TextArea` необязателен: подпись над полем, тот же кегль, что у `Dropzone` (`--text-sm`, semibold), клик ведёт в поле. Со своим `label` текстарея берёт отдельный id и не занимает id `Field`, поэтому в одном поле с `Dropzone` контролы не схлопываются. Без `label` имя по-прежнему даёт лейбл `Field`. `CheckboxInput` сам ставит `id`, если его не передали. Общий `name` у радио задаёт `RadioGroup`, она же рисует `fieldset` с `role="radiogroup"`. Её `required` делает обязательной всю группу и вне `Field`: `aria-required` уезжает на группу, нативный `required` — на пункты. Красная рамка у `CheckboxInput` и `RadioInput` — это проп `error`; один `required` больше не красит, он только обязывает. `Spinner` тянется по родителю, `position` раскладывает его по высоте, а `label` (по умолчанию «Загрузка») — подпись для скринридера.
+
+`HR` — линия на всю ширину, цвет `--color-border`. Отступы не зашиты в `margin`, а сидят во внутренней переменной `--hr-margin`: по умолчанию `--space-8 0 --space-6`, с 680px компонент сам подменяет её на `--space-12 0 --space-9`. Свой отступ — переопределение `--hr-margin` на элементе (класс или `style`). Правило без медиазапроса с 680px проиграет внутреннему, поэтому нулевые отступы на всех ширинах задаются и там:
+
+```scss
+.page__hr {
+  --hr-margin: 0;
+
+  @media (min-width: 680px) {
+    --hr-margin: 0;
+  }
+}
+```
 
 ## Поле
 

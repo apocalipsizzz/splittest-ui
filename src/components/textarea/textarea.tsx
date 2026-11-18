@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type ChangeEvent,
+  type ReactNode,
   type TextareaHTMLAttributes,
 } from 'react';
 
@@ -23,6 +24,8 @@ export interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
   size?: TextAreaSize;
   recommended?: boolean;
   error?: boolean;
+  /** Подпись над полем, как у Dropzone. Без неё имя даёт лейбл `Field`. */
+  label?: ReactNode;
   /** Счётчик остатка при `maxLength`. `false` — то, что в приложении было `noMaxMoty`. */
   counter?: boolean;
   /** Текст счётчика. `left` — сколько символов ещё можно ввести. */
@@ -44,6 +47,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       size = 'md',
       recommended,
       error,
+      label,
       counter = true,
       counterLabel = defaultCounterLabel,
       className,
@@ -58,7 +62,10 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     const autoId = useId();
     const { field, isInvalid, controlProps } = useFieldControlProps({ error });
     const reportValue = field?.reportValue;
-    const textareaId = id ?? field?.id ?? autoId;
+    const hasLabel = Boolean(label);
+    // Свой лейбл — свой id. Иначе в одном Field с Dropzone оба берут id поля,
+    // и клик по подписи текстареи открывает выбор файла.
+    const textareaId = id ?? (hasLabel ? autoId : (field?.id ?? autoId));
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [length, setLength] = useState(0);
     const withCounter = maxLength !== undefined && counter;
@@ -113,6 +120,11 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 
     return (
       <div className="textarea__wrap">
+        {hasLabel ? (
+          <label className="textarea__label" htmlFor={textareaId}>
+            {label}
+          </label>
+        ) : null}
         <textarea
           {...props}
           ref={setRef}

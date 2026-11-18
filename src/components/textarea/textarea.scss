@@ -4,6 +4,15 @@
   position: relative;
 }
 
+.textarea__label {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--color-foreground);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--text-sm--line-height);
+}
+
 .textarea {
   // Паддинги как у Input соответствующего размера, высота — 0.75 / 1 / 1.25 от md.
   --textarea-padding-y: var(--space-2);
