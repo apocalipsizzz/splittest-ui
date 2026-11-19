@@ -103,7 +103,7 @@ const renderContent = (children: ReactNode, loading?: boolean) => {
   );
 };
 
-// forwardRef остаётся: в React 18 ref ещё не обычный проп, peer — ^18.3 || ^19.
+// forwardRef остаётся: в React 18 ref ещё не обычный проп, peer — ^18.2 || ^19.
 export const Button = forwardRef(function Button(
   props: ButtonComponentProps,
   ref: ForwardedRef<HTMLElement>,
