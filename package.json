@@ -5,7 +5,7 @@
   "license": "UNLICENSED",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/apocalipsizzz/splittest-ui.git"
+    "url": "git+ssh://git@bitbucket.org/marketplacehub/splittest-ui.git"
   },
   "files": [
     "dist",

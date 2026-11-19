@@ -1,6 +1,6 @@
 # @de-kit/st-ui
 
-React-компоненты splittest. Стили едут вместе с компонентом (глобальный SCSS, не CSS-модули). Токены скопированы из `splittest-frontend/src/app/styles`. Tailwind нет.
+React-компоненты splittest. Стили едут вместе с компонентом (глобальный SCSS, не CSS-модули).
 
 ## Подключение
 
@@ -17,6 +17,8 @@ import {
   Spinner,
 } from '@de-kit/st-ui';
 ```
+
+Из корня, кроме примера выше: `PhoneInput`, `Dropzone`, `Field`, `FieldList`, `Form`, `FormActions`, `FormConsent`, `FormSubmit`, `Select`, `SelectSearch`, `DatePicker`, `Popover`, `PopupSheet`, `Pagination`, `Progress`, `HR`. Стили отдельными входами: `vars.scss`, `mixins.scss`, `reset.scss`, `typography.scss`, `global.scss`.
 
 Иконки — отдельный вход, в бандл попадают только импортированные:
 
@@ -49,7 +51,11 @@ import '@de-kit/st-ui/vars.scss';
 
 `reset.scss` — сброс, типографика и нейтральные стили тегов. `global.scss` — каркас страницы splittest поверх него (`#root`, флексовый `body`, `.wrapper`, вуаль `.body--modal`); в чужой странице подключать только `reset.scss`. Шрифт Inter библиотека не везёт, его по-прежнему грузит фронтенд.
 
-Служебное наружу: `cn` для склейки классов, `Slot` для своего `asChild`, `useFieldControl` для своего контрола внутри `Field`, `filterSelectOptions` для своего фильтра пунктов.
+`typography.scss` уже внутри `reset.scss`: теги `h1`–`h4` и классы `.text-xs`, `.text-sm`, `.text-base`, `.text-lg`, `.heading-1`–`.heading-4` (класс задаёт вид, тег — семантику). Отдельный вход `@de-kit/st-ui/typography.scss` — если классы нужны без сброса.
+
+Служебное наружу: `cn` для склейки классов, `Slot` для своего `asChild`, `useFieldControl` для своего контрола внутри `Field`, `filterSelectOptions` для своего фильтра пунктов, `useMediaQuery` для `matchMedia` без рассинхрона гидрации, `PHONE_MASK` и `dropzonePreset`.
+
+`useMediaQuery` отдаёт `false` на сервере и на первом проходе гидрации; в клиентском приложении без SSR первое значение сразу настоящее. `query` обязан быть статическим: кеш `MediaQueryList` не вытесняется, шаблон от значения из state оставит живой список на каждую строку. `PHONE_MASK` — `+7 (#00) 000-00-00`: 7 и 8 первой цифрой номера не принимаются, иначе набор «8999…» съезжает и последняя цифра отрезается. `dropzonePreset` — mime и расширения пресетов `image`, `video`, `audio`.
 
 Токены подключаются один раз вместе с пакетом — `import './styles/vars.scss'` сидит в `src/index.ts`, то есть в корневом входе. В своих scss это дальше обычные `var()`, `@use` не нужен. Подключать `vars.scss` руками нужно в двух случаях: стили собираются без JS и при импорте по подпути (см. выше).
 
@@ -212,7 +218,7 @@ import '@de-kit/st-ui/vars.scss';
 
 У `PopupSheet` `data-state` остаётся `closed` весь кадр перед открытием и всю анимацию закрытия — по нему можно вешать и вход, и выход.
 
-`reset.scss` — сброс, типографика и нейтральные стили тегов, его можно подключать в любом проекте. `global.scss` — каркас страницы splittest (`#root`, флексовый `body`, `.wrapper`, вуаль `.body--modal`); он включает в себя `reset.scss`, но в чужую страницу его тянуть не надо.
+`reset.scss` — сброс, типографика и нейтральные стили тегов, его можно подключать в любом проекте; типографику он берёт из `typography.scss`. `global.scss` — каркас страницы splittest (`#root`, флексовый `body`, `.wrapper`, вуаль `.body--modal`); он включает в себя `reset.scss`, но в чужую страницу его тянуть не надо.
 
 ## Кнопка
 
@@ -275,6 +281,8 @@ import '@de-kit/st-ui/vars.scss';
 
 `Dropzone` стоит особняком: файл он отдаёт колбэком `onFiles`, а не через форму. Сам `input[type=file]` после выбора обнуляется, поэтому в `new FormData(form)` файла не будет и пропа `name` у зоны нет — храните файл в своём состоянии и отправляйте сами. В `Field` зона при этом полноценный контрол: про выбранный файл и про его пропажу она сообщает полю, так что `<Field required>` вокруг `Dropzone` покажет ошибку, когда файл сняли.
 
+`accept` — пресет `image`, `video`, `audio` (списки в `dropzonePreset`) или свой `{ mimeTypes, extensions }`. Без `accept` берётся любой файл. `variant`: `square` — медиа, по умолчанию; `wide` — вложение в колонке формы. `maxSize` в байтах, без пропа размер не проверяется. `validate` идёт после типа и размера: вернутая строка — ошибка, `onFiles` не зовётся. Локальная ошибка формата исчезает сама, когда меняются `accept` или `maxSize`. Превью рисует потребитель через `preview`; пока оно задано, пунктир скрыт и клик не открывает диалог, снятие — `onClear` (`clearLabel` по умолчанию «Удалить файл»). `progress` от 0 до 100 показывает бар только в пустой зоне; проп не передан — бара нет, даже на нуле. `label` над зоной пресет сам не подставляет. `children` — кнопки пустой зоны («Отменить», «Повторить»), клик по ним файл не открывает.
+
 Тексты, которые видит пользователь, — пропсы: `clearLabel` у `Input` и `PhoneInput`, `counterLabel` у `TextArea` (функция от остатка и максимума), `label` у `TextArea` и `Spinner`, `errorFallback` у `Form` — он подставляется, когда `onSubmit` упал без внятного сообщения.
 
 `size` у `Input` и `TextArea` — те же `sm`, `md`, `lg`, что у кнопки. У `Input` высота совпадает с кнопкой ровно: 30, 40 и 52px, включая `type="date"`. У `TextArea` размер меняет паддинги и `min-height`: 120 / 160 / 200px, с 680px — 60 / 80 / 100px. Текст во всех размерах остаётся `--text-sm`. У `Input` проп перекрывает нативный `size` (ширину в символах). `recommended` красит фон в `--color-recommended` у `Input`, `TextArea` и `PhoneInput`. `noWrap` у `Input` и `PhoneInput` убирает `div.input__wrap`: крестик `clearable` от неё позиционируется, поэтому с `noWrap` не рисуется. `counter={false}` заменяет опечатку `noMaxMoty`. Счётчик `TextArea` показывает остаток символов и связан с полем через `aria-describedby`, сам `maxLength` по-прежнему режет ввод. `label` у `TextArea` необязателен: подпись над полем, тот же кегль, что у `Dropzone` (`--text-sm`, semibold), клик ведёт в поле. Со своим `label` текстарея берёт отдельный id и не занимает id `Field`, поэтому в одном поле с `Dropzone` контролы не схлопываются. Без `label` имя по-прежнему даёт лейбл `Field`. `CheckboxInput` сам ставит `id`, если его не передали. Общий `name` у радио задаёт `RadioGroup`, она же рисует `fieldset` с `role="radiogroup"`. Её `required` делает обязательной всю группу и вне `Field`: `aria-required` уезжает на группу, нативный `required` — на пункты. Красная рамка у `CheckboxInput` и `RadioInput` — это проп `error`; один `required` больше не красит, он только обязывает. `Spinner` тянется по родителю, `position` раскладывает его по высоте, а `label` (по умолчанию «Загрузка») — подпись для скринридера.
@@ -293,7 +301,7 @@ import '@de-kit/st-ui/vars.scss';
 
 ## Поле
 
-`Field` оборачивает один контрол: ставит подсказку и ошибку и связывает их через `aria-describedby`, `aria-errormessage` и `role="alert"`. `label` необязателен: без него `<label>` не рисуется, а текст `required` — «Обязательное поле».
+`Field` оборачивает один контрол: ставит подсказку и ошибку и связывает их через `aria-describedby`, `aria-errormessage` и `role="alert"`. `label` необязателен: без него `<label>` не рисуется, а текст `required` — «Обязательное поле». `hint` по умолчанию под полем (`hintPlacement="bottom"`), `"label"` — сразу под лейблом. `FieldList` — стопка полей с одинаковым отступом. Это не группа: связанные поля с общим вопросом — `fieldset`.
 
 ```tsx
 <Field label="Имя" hint="Нельзя изменить после проверки">
@@ -307,11 +315,72 @@ import '@de-kit/st-ui/vars.scss';
     <RadioInput label="18-24" value="18" />
   </RadioGroup>
 </Field>
+<Field label="Комментарий" hint="Виден только модератору" hintPlacement="label">
+  <TextArea name="comment" />
+</Field>
+<FieldList>
+  <Field label="Имя"><Input name="name" /></Field>
+  <Field label="Город"><Input name="city" /></Field>
+</FieldList>
 ```
 
 Валидацией можно распоряжаться снаружи: проп `invalid` ставит `aria-invalid` на контрол, а собственная проверка обязательности при этом молчит — так поле подключается к react-hook-form или к ответу сервера без борьбы с внутренней эвристикой. Свой контрол внутри `Field` пишется через `useFieldControl` из корня пакета.
 
-Контрол внутри должен быть один: id он берёт у поля, поэтому свой `id` на ребёнке перебивается, а два контрола получат одинаковый. `required` ставит `aria-required` на контрол и показывает ошибку «Поле «Имя» обязательно» (свой текст — проп `requiredMessage`) в двух случаях: когда в поле что-то было, а потом не стало (стёрли текст, сняли галочку) и когда форму не пустила проверка браузера — `Field` ловит `invalid` в фазе захвата. Звёздочки у лейбла нет, обязательность видно по сообщению. У радиогруппы момента «стёрли» не бывает, поэтому её держит нативный `required` на пунктах: форма не отправится, ошибка появится после неудачной отправки и уйдёт, как только выберут вариант. Отсюда и граница: `required` поля работает с контролами библиотеки, которые сообщают ему своё значение, — `Input`, `TextArea`, `CheckboxInput`, `RadioGroup`, `PhoneInput`, `Select`, `SelectSearch`, `DatePicker` и `Dropzone` (последний — по факту выбранного файла, см. ниже). Произвольный ребёнок не отдаёт ни значения, ни `invalid`, и поле о его пустоте не узнает: для своего контрола возьмите `useFieldControl` и зовите его `reportValue`. `RadioGroup` внутри `Field` легенду не рисует: именем группы становится лейбл поля.
+Контрол без своего `id` берёт id поля, поэтому два таких ребёнка получат одинаковый и лейбл попадёт в первый. Свой `id` контрол сохраняет: так в одном `Field` живут несколько полей, у кода из СМС снова работают переход к следующей цифре и Backspace. У `Dropzone` указанный `id` стоит на инпуте файла, а не на корневой обёртке. `required` ставит `aria-required` на контрол и показывает ошибку «Поле «Имя» обязательно» (свой текст — проп `requiredMessage`) в двух случаях: когда в поле что-то было, а потом не стало (стёрли текст, сняли галочку) и когда форму не пустила проверка браузера — `Field` ловит `invalid` в фазе захвата. Звёздочки у лейбла нет, обязательность видно по сообщению. У радиогруппы момента «стёрли» не бывает, поэтому её держит нативный `required` на пунктах: форма не отправится, ошибка появится после неудачной отправки и уйдёт, как только выберут вариант. Отсюда и граница: `required` поля работает с контролами библиотеки, которые сообщают ему своё значение, — `Input`, `TextArea`, `CheckboxInput`, `RadioGroup`, `PhoneInput`, `Select`, `SelectSearch`, `DatePicker` и `Dropzone` (последний — по факту выбранного файла, см. выше). Произвольный ребёнок не отдаёт ни значения, ни `invalid`, и поле о его пустоте не узнает: для своего контрола возьмите `useFieldControl` и зовите его `reportValue`. `RadioGroup` внутри `Field` легенду не рисует: именем группы становится лейбл поля.
+
+## Форма
+
+`Form` вызывает `onSubmit` уже после нативной проверки и отдаёт `FormData` по `name` контролов. Промис держит `FormSubmit` в `loading`, пока не осядет. Синхронный throw и reject рисуют ошибку под полями: строка, `Error.message` или `errorFallback` (по умолчанию «Не получилось отправить. Попробуйте ещё раз»). Свой `error` перекрывает текст из упавшего `onSubmit`. `pending` — когда запрос ведёт стор снаружи и `onSubmit` ничего не вернул; складывается с ожиданием промиса. Повторный сабмит, пока форма занята, отсекается — в том числе `requestSubmit` и Enter.
+
+Без своего `onSubmit` и без `action` нативный сабмит не уходит: иначе браузер сделает GET на текущий URL и поля попадут в query. С явным `action` и без обработчика форма отправляется как обычно. Бабл браузера на контроле внутри `.field` отменяется: ошибку уже рисует `Field`, фокус уходит на первый невалидный.
+
+`FormSubmit` — `Button` с `type="submit"`, `asChild` у него нет. `FormActions` — ряд кнопок, `FormConsent` — текст рядом (оферта, ссылки внутри).
+
+```tsx
+<Form onSubmit={send} errorFallback="Не отправилось">
+  <Field label="Email" required>
+    <Input name="email" type="email" />
+  </Field>
+  <FormActions>
+    <FormSubmit>Отправить</FormSubmit>
+    <FormConsent>
+      Нажимая, принимаю <a href="/offer">условия оферты</a>
+    </FormConsent>
+  </FormActions>
+</Form>
+```
+
+## Пагинация
+
+`Pagination` рисуется только при `pageCount` от 2. Раскладку выбирает сам по ширине экрана, пропов `layout` и `range` нет. От 680px — одна строка и восемь номеров у края (`1…8 … N`). Уже — пять номеров строкой сверху, «Назад» и «Вперёд» по краям второй. Меньше пяти страниц на узком экране всё остаётся одной строкой, у шагов видны только стрелки, подписи остаются именем кнопки. Текущая страница — `aria-current="page"`. На краях шаг гасится через `aria-disabled`, не нативный `disabled`: иначе клик уносит фокус в `body`.
+
+`page` с 1. `onPageOutOfRange` зовётся с уже прижатым номером, когда `page` вне 1…`pageCount` — чтобы поправить адрес вроде `?page=40` при трёх страницах. Пока `pageCount` меньше 1, не вызывается. Смена самой функции повторно не зовёт. `disabled` глушит весь ряд. `prevLabel` и `nextLabel` по умолчанию «Назад» и «Вперёд», `aria-label` корня — «Страницы».
+
+Отступ сверху — `--pagination-offset` (по умолчанию `--space-6`), размер клетки — `--pagination-size` (30px).
+
+```tsx
+<Pagination page={page} pageCount={99} onPageChange={setPage} />
+<Pagination
+  page={page}
+  pageCount={pageCount}
+  onPageChange={setPage}
+  onPageOutOfRange={setPage}
+/>
+```
+
+## Прогресс
+
+`Progress` — нативный `<progress>` без подписи и без раскладки. Имя задаёт `aria-label` или внешний `<label>`. `value` — доля от `max` (по умолчанию 100). Трек и заливка: `--progress-track` (`--color-background`) и `--progress-value` (`--color-primary`). Тот же бар `Dropzone` рисует у себя, когда передан `progress`.
+
+```tsx
+<Progress value={40} aria-label="Загрузка: 40%" />
+<Progress
+  value={position}
+  max={duration}
+  aria-label="Воспроизведение"
+  style={{ '--progress-track': 'var(--color-sidebar)' }}
+/>
+```
 
 ## Слои: PopupSheet, Popover, DatePicker
 
@@ -332,6 +401,8 @@ import '@de-kit/st-ui/vars.scss';
 
 `onClose` остаётся как короткая форма «только закрытие».
 
+Селектор портала один на библиотеку: `POPOVER_PORTAL_SELECTOR` и `POPUP_SHEET_PORTAL_SELECTOR` совпадают, клик по дропдауну внутри листа лист не закрывает. Ширина `Popover` по умолчанию — `POPOVER_MIN_WIDTH` 280 и `POPOVER_MAX_WIDTH` 360.
+
 Якорь `Popover` принадлежит вам, поэтому сам по себе клик по нему панель не открывает — это делает ваш `onClick`. Нужен `Popover`, который живёт без внешнего состояния, — включите `openOnTriggerClick`: тогда якорь переключает панель, а ваш `onClick` на нём продолжает вызываться.
 
 ```tsx
@@ -350,15 +421,27 @@ import '@de-kit/st-ui/vars.scss';
 <SelectSearch options={options} name="bank" searchPlaceholder="Поиск банка" />
 ```
 
-`label` пункта остаётся строкой: по нему идут поиск и подпись в закрытом поле. Нужна своя разметка строки списка — `renderOption`. Значение в форму отдаёт скрытое, но валидируемое поле, поэтому `required` из `Field` проверяет именно выбор, а не набранный запрос.
+`label` пункта остаётся строкой: по нему идут поиск и подпись в закрытом поле. Нужна своя разметка строки списка — `renderOption`. У `Select` есть ещё `renderValue`: своя разметка выбранного значения на кнопке, без него кнопка показывает `label`. У `SelectSearch` закрытое поле — подпись, открытое — запрос, `renderValue` нет. Дополнительные слова поиска, которых нет в списке, — `keywords` у пункта. Свой матч — `filterOption`; пустой запрос туда не приходит, список показывается целиком. `size` у обоих — те же `sm`, `md`, `lg`, что у `Input`. Значение в форму отдаёт скрытое, но валидируемое поле, поэтому `required` из `Field` проверяет именно выбор, а не набранный запрос.
 
 `aria-label`, `aria-labelledby` и `aria-describedby` садятся на сам combobox, а не на корневой `div` (у `div` нет роли, и имя на нём не читается), и важнее умолчаний: заданное снаружи имя побеждает плейсхолдер, а `aria-describedby` складывается с описанием из `Field`. Внутри `Field` имя даёт его `<label>`, своё указывать не нужно. Остальные атрибуты по-прежнему уходят на корень.
 
 ## Разработка
 
+Peer: `react` и `react-dom` `^18.2.0 || ^19.0.0`. Отдельных API 18.3 библиотека не использует, `ref` идёт через `forwardRef`. `sass` — необязательный peer. Сборка пакета — Node `>=20`.
+
 ```bash
 pnpm install
-pnpm dev       # Storybook, :6007
-pnpm test
-pnpm build     # dist: js + d.ts + scss рядом с компонентами
+pnpm dev              # build:icons + Storybook, :6007
+pnpm test             # vitest run
+pnpm test:watch
+pnpm test:coverage
+pnpm typecheck
+pnpm lint             # oxlint
+pnpm format           # oxfmt --check
+pnpm knip
+pnpm docs:tokens      # таблица токенов в этом README из vars.scss
+pnpm build            # dist: js + d.ts + scss рядом с компонентами
+pnpm verify           # иконки, типы, lint, format, knip, токены, покрытие, сборка, publint и attw
+pnpm changeset
+pnpm release          # verify, затем changeset publish
 ```
